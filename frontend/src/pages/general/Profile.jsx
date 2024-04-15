@@ -13,7 +13,7 @@ const Profile = () => {
             <div className="container mx-auto h-screen flex flex-col justify-center items-center text-black relative z-10">
                 <div className="bg-opacity-80 bg-white p-8 rounded-lg w-1/3"> 
                     <div className="flex justify-center items-center mb-8">
-                        <img src="/Profile_image.jpg" alt="Profile" className="h-24 w-24 rounded-full border-2 border-white" />
+                        <img src="/Profile_image.jpg" alt="Profile" className="h-32 w-32 rounded-full border-2 border-white" />
                     </div>
                     <div className="text-left">
                         <div className="mb-6">
