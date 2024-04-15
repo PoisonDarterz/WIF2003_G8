@@ -29,7 +29,7 @@ function App() {
         <Routes>
           {/* General module routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/general/Profile" element={<Profile />} />
+          <Route path="/general/profile" element={<Profile />} />
           
           {/* Attendance module routes */}
 
