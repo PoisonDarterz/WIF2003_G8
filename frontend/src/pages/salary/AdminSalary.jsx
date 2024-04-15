@@ -10,7 +10,7 @@ const slipData = [
   { id: '#S0032304', month: 'Apr 2023', date: '6/5/2023' }
 ];
 
-function ViewSalary() {
+function AdminSalary() {
   return (
     <div className="p-8">
       <div className="mt-[-32px] ml-[-32px] mr-[-32px]">
@@ -18,7 +18,19 @@ function ViewSalary() {
       </div>
       <div className="mt-8 mb-4 text-left">
         <h1 className="text-2xl font-bold">Past salary slips</h1>
-        <p className="text-lg">View all your past salary slips here.</p>
+        <p className="text-lg">View all employee’s past salary slips here. Want to generate slips? <a href="/" className="text-blue-500 underline">Click here.</a></p>
+      </div>
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <label className="mr-2">Filters: Employee ID:</label>
+          <input type="text" className="border p-1 rounded" />
+          <label className="ml-4 mr-2">Date issued: From:</label>
+          <input type="date" className="border p-1 rounded" />
+          <label className="ml-4 mr-2">To:</label>
+          <input type="date" className="border p-1 rounded" />
+          <label className="ml-4 mr-2">Job title:</label>
+          <input type="text" className="border p-1 rounded" />
+        </div>
       </div>
       <div className="overflow-x-auto mt-10 p-4">
         <table className="w-full table-auto">
@@ -59,4 +71,4 @@ function ViewSalary() {
   );
 }
 
-export default ViewSalary;
+export default AdminSalary;
