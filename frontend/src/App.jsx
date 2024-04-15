@@ -18,7 +18,8 @@ import Profile from './pages/general/Profile';
 // Info module routes
 
 // Salary module routes
-import ViewSalary from './pages/salary/viewSalary';
+import ViewSalary from './pages/salary/ViewSalary';
+import AdminSalary from './pages/salary/AdminSalary';
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
         <Routes>
           {/* General module routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/general/Profile" element={<Profile />} />
+          <Route path="/general/profile" element={<Profile />} />
           
           {/* Attendance module routes */}
 
@@ -40,6 +41,7 @@ function App() {
 
           {/* Salary module routes */}
           <Route path="/salary/view" element={<ViewSalary />} />
+          <Route path="/salary/adminview" element={<AdminSalary />} />
         </Routes>
       </div>
     </Router>
