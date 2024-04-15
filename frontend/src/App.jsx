@@ -8,6 +8,7 @@ import './tailwind.css';
 // General module routes
 import Home from './pages/general/Home';
 import Profile from './pages/general/Profile';
+import LogIn from './pages/general/LogIn';
 
 // Attendance module routes
 
@@ -29,7 +30,6 @@ function App() {
         <Routes>
           {/* General module routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/general/profile" element={<Profile />} />
           
           {/* Attendance module routes */}
 
