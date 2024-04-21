@@ -25,6 +25,9 @@ import Attendance from "./pages/attendance/Attendance";
 // Salary module routes
 import ViewSalary from './pages/salary/ViewSalary';
 import AdminSalary from './pages/salary/AdminSalary';
+import Benefits from './pages/salary/Benefits';
+import ProcessSalary from './pages/salary/ProcessSalary';
+import AssignBenefits from './pages/salary/AssignBenefits';
 
 function App() {
   return (
@@ -52,6 +55,9 @@ function App() {
           {/* Salary module routes */}
           <Route path="/salary/view" element={<ViewSalary />} />
           <Route path="/salary/adminview" element={<AdminSalary />} />
+          <Route path="/salary/benefits" element={<Benefits />} />
+          <Route path="/salary/process" element={<ProcessSalary />} />
+          <Route path="/salary/assign" element={<AssignBenefits />} />
         </Routes>
       </div>
     </Router>
