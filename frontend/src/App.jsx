@@ -22,7 +22,7 @@ import ResetPassword from './pages/general/ResetPassword';
 // Info module routes
 
 // Salary module routes
-import ViewSalary from './pages/salary/viewSalary';
+import ViewSalary from './pages/salary/ViewSalary';
 import AdminSalary from './pages/salary/AdminSalary';
 
 function App() {
