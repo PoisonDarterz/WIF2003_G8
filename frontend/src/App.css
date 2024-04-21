@@ -1,7 +1,19 @@
+<<<<<<< HEAD:src/App.css
 @tailwindcss @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
 body {
   font-family: "Poppins", sans-serif;
+=======
+@tailwindcss
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+.App {
+  text-align: center;
+>>>>>>> cd873d2d5caf4efa4f6f49249bb6081b2fe10863:frontend/src/App.css
 }
 
 /* .App {
