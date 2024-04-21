@@ -3,22 +3,22 @@ import { Link, useLocation } from "react-router-dom";
 import { navItems } from "./navItems";
 
 function TopNavBlack() {
-  const [activeLink, setActiveLink] = useState('');
+  const [activeLink, setActiveLink] = useState("");
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === '/attendance') {
-      setActiveLink('ATTENDANCE');
-    } else if (location.pathname.startsWith('/salary')) {
-      setActiveLink('SALARY');
-    } else if (location.pathname === '/info') {
-      setActiveLink('INFORMATION');
-    } else if (location.pathname === '/community') {
-      setActiveLink('COMMUNITY');
-    } else if (location.pathname === '/helpdesk') {
-      setActiveLink('HELPDESK');
-    } else if (location.pathname === '/') {
-      setActiveLink('HOME');
+    if (location.pathname === "/") {
+      setActiveLink("HOME");
+    } else if (location.pathname.startsWith("/attendance")) {
+      setActiveLink("ATTENDANCE");
+    } else if (location.pathname.startsWith("/salary")) {
+      setActiveLink("SALARY");
+    } else if (location.pathname === "/info") {
+      setActiveLink("INFORMATION");
+    } else if (location.pathname === "/community") {
+      setActiveLink("COMMUNITY");
+    } else if (location.pathname === "/helpdesk") {
+      setActiveLink("HELPDESK");
     }
   }, [location]);
 
@@ -43,7 +43,11 @@ function TopNavBlack() {
       </div>
       <div>
         <Link to="/general/Profile">
-          <img src="/Profile.png" alt="Profile" className="h-8 cursor-pointer" />
+          <img
+            src="/Profile.png"
+            alt="Profile"
+            className="h-8 cursor-pointer"
+          />
         </Link>
       </div>
     </nav>
