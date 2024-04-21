@@ -14,7 +14,7 @@ import SignUp from './pages/general/SignUp';
 import ResetPassword from './pages/general/ResetPassword';
 
 // Attendance module routes
-// import Attendance from "./pages/attendance/Attendance";
+import Attendance from "./pages/attendance/Attendance";
 
 // Community module routes
 
