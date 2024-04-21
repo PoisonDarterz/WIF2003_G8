@@ -9,6 +9,7 @@ import Home from "./pages/general/Home";
 import Profile from "./pages/general/Profile";
 
 // Attendance module routes
+import Attendance from "./pages/attendance/Attendance";
 
 // Community module routes
 
@@ -18,7 +19,6 @@ import Profile from "./pages/general/Profile";
 
 // Salary module routes
 import ViewSalary from "./pages/salary/viewSalary";
-import Attendance from "./pages/attendance/Attendance";
 
 function App() {
   return (
