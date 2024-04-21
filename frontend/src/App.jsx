@@ -8,6 +8,10 @@ import './tailwind.css';
 // General module routes
 import Home from './pages/general/Home';
 import Profile from './pages/general/Profile';
+import LogIn from './pages/general/LogIn';
+import ForgotPassword from './pages/general/ForgotPassword';
+import SignUp from './pages/general/SignUp';
+import ResetPassword from './pages/general/ResetPassword';
 
 // Attendance module routes
 
@@ -18,7 +22,8 @@ import Profile from './pages/general/Profile';
 // Info module routes
 
 // Salary module routes
-import ViewSalary from './pages/salary/viewSalary';
+import ViewSalary from './pages/salary/ViewSalary';
+import AdminSalary from './pages/salary/AdminSalary';
 
 function App() {
   return (
@@ -29,6 +34,11 @@ function App() {
           {/* General module routes */}
           <Route path="/" element={<Home />} />
           <Route path="/general/Profile" element={<Profile />} />
+          <Route path="/general/LogIn" element={<LogIn />} />
+          <Route path="/general/ForgotPassword" element={<ForgotPassword />} />
+          <Route path="/general/SignUp" element={<SignUp />} />
+          <Route path="/general/ResetPassword" element={<ResetPassword />} />
+
           
           {/* Attendance module routes */}
 
@@ -40,6 +50,7 @@ function App() {
 
           {/* Salary module routes */}
           <Route path="/salary/view" element={<ViewSalary />} />
+          <Route path="/salary/adminview" element={<AdminSalary />} />
         </Routes>
       </div>
     </Router>
