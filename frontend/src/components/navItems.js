@@ -20,6 +20,10 @@ export const navItems = [
             {
                 title: 'Admin View',
                 link: '/salary/adminview'
+            },
+            {
+                title: 'Benefits',
+                link: '/salary/benefits'
             }
         ]
     },

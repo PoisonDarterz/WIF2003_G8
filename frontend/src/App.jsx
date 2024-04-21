@@ -25,6 +25,7 @@ import ResetPassword from './pages/general/ResetPassword';
 // Salary module routes
 import ViewSalary from './pages/salary/ViewSalary';
 import AdminSalary from './pages/salary/AdminSalary';
+import Benefits from './pages/salary/Benefits';
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           {/* Salary module routes */}
           <Route path="/salary/view" element={<ViewSalary />} />
           <Route path="/salary/adminview" element={<AdminSalary />} />
+          <Route path="/salary/benefits" element={<Benefits />} />
         </Routes>
       </div>
     </Router>
