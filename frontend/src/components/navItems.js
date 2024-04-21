@@ -25,7 +25,7 @@ export const navItems = [
     },
     {
         title: 'INFORMATION',
-        link: '/info',
+        link: '/info/employeeList',
         submenu:[]
     },
     {

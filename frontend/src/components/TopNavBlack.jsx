@@ -11,7 +11,7 @@ function TopNavBlack() {
       setActiveLink('ATTENDANCE');
     } else if (location.pathname.startsWith('/salary')) {
       setActiveLink('SALARY');
-    } else if (location.pathname === '/info') {
+    } else if (location.pathname.startsWith('/info')) {
       setActiveLink('INFORMATION');
     } else if (location.pathname === '/community') {
       setActiveLink('COMMUNITY');
