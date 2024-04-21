@@ -7,15 +7,15 @@ function TopNavBlack() {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === '/attendance') {
+    if (location.pathname.startsWith('/attendance')) {
       setActiveLink('ATTENDANCE');
     } else if (location.pathname.startsWith('/salary')) {
       setActiveLink('SALARY');
-    } else if (location.pathname === '/info') {
+    } else if (location.pathname.startsWith('/info')) {
       setActiveLink('INFORMATION');
-    } else if (location.pathname === '/community') {
+    } else if (location.pathname.startsWith('/community')) {
       setActiveLink('COMMUNITY');
-    } else if (location.pathname === '/helpdesk') {
+    } else if (location.pathname.startsWith('/helpdesk')) {
       setActiveLink('HELPDESK');
     } else if (location.pathname === '/') {
       setActiveLink('HOME');
