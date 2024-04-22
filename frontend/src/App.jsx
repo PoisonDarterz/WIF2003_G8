@@ -14,6 +14,7 @@ import SignUp from './pages/general/SignUp';
 import ResetPassword from './pages/general/ResetPassword';
 
 // Attendance module routes
+import Attendance from "./pages/attendance/Attendance";
 
 // Community module routes
 
@@ -26,8 +27,11 @@ import EditMyProfile from "./pages/info/editMyProfile";
 import EditEmployeeProfile from "./pages/info/editEmployeeProfile";
 
 // Salary module routes
-import ViewSalary from './pages/salary/viewSalary';
+import ViewSalary from './pages/salary/ViewSalary';
 import AdminSalary from './pages/salary/AdminSalary';
+import Benefits from './pages/salary/Benefits';
+import ProcessSalary from './pages/salary/ProcessSalary';
+import AssignBenefits from './pages/salary/AssignBenefits';
 
 function App() {
   return (
@@ -43,8 +47,8 @@ function App() {
           <Route path="/general/SignUp" element={<SignUp />} />
           <Route path="/general/ResetPassword" element={<ResetPassword />} />
 
-          
           {/* Attendance module routes */}
+          <Route path="/attendance" element={<Attendance />} />
 
           {/* Community module routes */}
 
@@ -59,6 +63,9 @@ function App() {
           {/* Salary module routes */}
           <Route path="/salary/view" element={<ViewSalary />} />
           <Route path="/salary/adminview" element={<AdminSalary />} />
+          <Route path="/salary/benefits" element={<Benefits />} />
+          <Route path="/salary/process" element={<ProcessSalary />} />
+          <Route path="/salary/assign" element={<AssignBenefits />} />
         </Routes>
       </div>
     </Router>
