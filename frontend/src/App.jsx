@@ -14,7 +14,7 @@ import SignUp from './pages/general/SignUp';
 import ResetPassword from './pages/general/ResetPassword';
 
 // Attendance module routes
-// import Attendance from "./pages/attendance/Attendance";
+import Attendance from "./pages/attendance/Attendance";
 
 // Community module routes
 
@@ -43,8 +43,8 @@ function App() {
           <Route path="/general/SignUp" element={<SignUp />} />
           <Route path="/general/ResetPassword" element={<ResetPassword />} />
 
-          
           {/* Attendance module routes */}
+          <Route path="/attendance" element={<Attendance />} />
 
           {/* Community module routes */}
 
