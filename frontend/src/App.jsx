@@ -19,6 +19,8 @@ import Attendance from "./pages/attendance/Attendance";
 // Community module routes
 
 // Helpdesk module routes
+import Tickets from "./pages/helpdesk/MyTickets";
+import Feedback from "./pages/helpdesk/Feedback";
 
 // Info module routes
 import ViewEmployeeList from './pages/info/employeeList';
@@ -32,6 +34,11 @@ import AdminSalary from './pages/salary/AdminSalary';
 import Benefits from './pages/salary/Benefits';
 import ProcessSalary from './pages/salary/ProcessSalary';
 import AssignBenefits from './pages/salary/AssignBenefits';
+import AddNewTicket from "./pages/helpdesk/AddNewTicket";
+import ReviewTicket from "./pages/helpdesk/ReviewTicket";
+import AllEmployeeTickets from "./pages/helpdesk/AllEmployeeTickets";
+import ResolveTicket from "./pages/helpdesk/ResolveTicket";
+import SubmitFeedback from "./pages/helpdesk/SubmitFeedback";
 
 function App() {
   return (
@@ -53,6 +60,13 @@ function App() {
           {/* Community module routes */}
 
           {/* Helpdesk module routes */}
+          <Route path="/helpdesk/" element={<Tickets />} />
+          <Route path="/helpdesk/addNewTicket" element={<AddNewTicket />} />
+          <Route path="/helpdesk/reviewTicket" element={<ReviewTicket />} />
+          <Route path="/helpdesk/allEmployeeTickets" element={<AllEmployeeTickets />} />
+          <Route path="/helpdesk/resolveTicket" element={<ResolveTicket />} />
+          <Route path="/helpdesk/feedback" element={<Feedback />} />
+          <Route path="/helpdesk/submitFeedback" element={<SubmitFeedback />} />
 
           {/* Info module routes */}
           <Route path="/info/employeeList" element={<ViewEmployeeList />} />
