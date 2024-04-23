@@ -8,7 +8,7 @@ const roleBenefits = [
 
 const personalBenefits = ["Benefit 1", "Benefit 2", "Benefit 3"];
 
-function BenefitsBox() {
+function BenefitsBox({ openModal }) {
   return (
     <div className="h-[70vh] w-3/4 bg-[#EAF3FF] rounded-lg p-8 overflow-y-auto">
       <h2 className="text-lg font-bold mb-4 text-left">Role benefits</h2>
@@ -16,7 +16,7 @@ function BenefitsBox() {
         <div key={index}>
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-md font-semibold">{section.type} benefits</h3>
-            <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4">+ Add a record </button>
+            <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4" onClick={openModal}>+ Add a record </button>
           </div>
           {section.benefits.map((benefit, index) => (
             <div key={index} className="flex justify-between items-center mb-2">
@@ -32,7 +32,7 @@ function BenefitsBox() {
       <div className="mt-4">
       <div className="flex justify-between items-center mb-2">
           <h3 className="text-md font-semibold">Individual benefits</h3>
-          <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4">+ Add a record</button>
+          <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4" onClick={openModal}>+ Add a record</button>
         </div>
         {personalBenefits.map((benefit, index) => (
           <div key={index} className="flex justify-between items-center mb-2">

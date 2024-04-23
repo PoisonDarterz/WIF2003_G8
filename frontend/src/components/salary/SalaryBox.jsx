@@ -7,7 +7,7 @@ const salaryDetails = {
   "EPF \/ Socso": [{ name: 'EPF', amount: 150 }, { name: 'SOCSO', amount: 50 }],
 };
 
-function SalaryBox() {
+function SalaryBox({ openModal }) {
   return (
     <div className="h-[70vh] w-2/5 bg-[#EAF3FF] rounded-lg p-8 overflow-y-auto">
       <div className="flex justify-between items-center mb-4">
@@ -18,7 +18,7 @@ function SalaryBox() {
         <div key={key}>
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-md font-semibold capitalize">{key}</h3>
-            <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4">+ Add a record</button>
+            <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4" onClick={openModal}>+ Add a record</button>
           </div>
           {value.map((item, index) => (
             <div key={index} className="flex justify-between items-center mb-3">

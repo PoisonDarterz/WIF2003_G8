@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
 import EmpNameBox from "../../components/salary/EmpNameBox";
 import BenefitsBox from "../../components/salary/BenefitsBox";
+import BenefitsDialog from "../../components/salary/BenefitsDialog";
 
 function AssignBenefits() {
   const [employees, setEmployees] = useState([
@@ -9,6 +10,16 @@ function AssignBenefits() {
     { id: 2, name: 'Jane Doe', checked: false },
     // add more employees as needed
   ]);
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
 
   return (
     <div className="p-8">
@@ -29,8 +40,9 @@ function AssignBenefits() {
       </div>
       <div className="flex space-x-8">
         <EmpNameBox employees={employees} setEmployees={setEmployees} singleSelect={true} width='w-1/4' />
-        <BenefitsBox />
+        <BenefitsBox openModal={openModal}/>
       </div>
+      <BenefitsDialog isOpen={modalIsOpen} onRequestClose={closeModal} />
     </div>
   )
 }

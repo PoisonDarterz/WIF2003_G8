@@ -3,6 +3,7 @@ import TopNavBlack from "../../components/TopNavBlack";
 import EmpNameBox from "../../components/salary/EmpNameBox";
 import SalaryBox from "../../components/salary/SalaryBox";
 import SummaryBox from "../../components/salary/SalSummary";
+import SalaryDialog from "../../components/salary/SalaryDialog";
 
 
 function ProcessSalary() {
@@ -11,6 +12,16 @@ function ProcessSalary() {
     { id: 2, name: 'Jane Doe', checked: false },
     // add more employees as needed
   ]);
+  
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
   
   return (
     <div className="p-8">
@@ -31,9 +42,10 @@ function ProcessSalary() {
       </div>
       <div className="flex space-x-6">
         <EmpNameBox employees={employees} setEmployees={setEmployees} singleSelect={false} width='w-1/5' />
-        <SalaryBox />
+        <SalaryBox openModal={openModal}/>
         <SummaryBox employees={employees} />
       </div>
+      <SalaryDialog isOpen={modalIsOpen} onRequestClose={closeModal} />
     </div>
   )
 }
