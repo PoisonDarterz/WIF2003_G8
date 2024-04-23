@@ -1,5 +1,7 @@
 import React from "react";
 import TopNavBlack from "../../components/TopNavBlack";
+import EmpNameBox from "../../components/salary/EmpNameBox";
+import BenefitsBox from "../../components/salary/BenefitsBox";
 
 function AssignBenefits() {
     return (
@@ -18,6 +20,10 @@ function AssignBenefits() {
                     <label className="ml-4 mr-2">Job title:</label>
                     <input type="text" className="border p-1 rounded" />
                 </div>
+            </div>
+            <div className="flex space-x-8">
+                <EmpNameBox singleSelect={true}/>
+                <BenefitsBox />
             </div>
         </div>
     )
