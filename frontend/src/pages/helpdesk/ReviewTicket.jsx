@@ -1,6 +1,6 @@
 import TopNavBlack from "../../components/TopNavBlack"
 
-function ReviewTicket(){
+function ReviewTicket({}){
     return(
         <div className="p-8">
         <div className="mt-[-32px] ml-[-32px] mr-[-32px]">
