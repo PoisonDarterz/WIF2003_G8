@@ -32,70 +32,37 @@ export default function EditEmployeeProfile() {
   };
 
   const handleAddEducation = () => {
-    setEducationList([...educationList, { title: "", evidence: "", confirmed: false }]);
+    setEducationList([...educationList, { title: "", description: "", evidence: "", confirmed: false }]);
   };
 
   const handleAddSkill = () => {
-    setSkillsList([...skillsList, { skill: "", evidence: "", confirmed: false }]);
+    setSkillsList([...skillsList, { skill: "", description: "", evidence: "", confirmed: false }]);
   };
 
   const handleAddAward = () => {
-    setAwardsList([...awardsList, { award: "", evidence: "", confirmed: false }]);
+    setAwardsList([...awardsList, { award: "", description: "", evidence: "", confirmed: false }]);
   };
 
-  const handleEducationChange = (e, index) => {
+  const handleConfirmItem = (index, listType) => {
+    const updatedList = [...listType];
+    updatedList[index].confirmed = true;
+    listType === educationList ? setEducationList(updatedList) :
+    listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
+  };
+
+  const handleDeleteItem = (index, listType) => {
+    const updatedList = [...listType];
+    updatedList.splice(index, 1);
+    listType === educationList ? setEducationList(updatedList) :
+    listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
+  };
+
+  const handleChange = (e, index, listType) => {
     const { name, value } = e.target;
-    const updatedEducationList = [...educationList];
-    updatedEducationList[index][name] = value;
-    setEducationList(updatedEducationList);
-  };
-
-  const handleSkillChange = (e, index) => {
-    const updatedSkillsList = [...skillsList];
-    updatedSkillsList[index][e.target.name] = e.target.value;
-    setSkillsList(updatedSkillsList);
-  };
-
-  const handleAwardChange = (e, index) => {
-    const updatedAwardsList = [...awardsList];
-    updatedAwardsList[index][e.target.name] = e.target.value;
-    setAwardsList(updatedAwardsList);
-  };
-
-  const handleConfirmEducation = (index) => {
-    const updatedEducationList = [...educationList];
-    updatedEducationList[index].confirmed = true;
-    setEducationList(updatedEducationList);
-  };
-
-  const handleConfirmSkill = (index) => {
-    const updatedSkillsList = [...skillsList];
-    updatedSkillsList[index].confirmed = true;
-    setSkillsList(updatedSkillsList);
-  };
-
-  const handleConfirmAward = (index) => {
-    const updatedAwardsList = [...awardsList];
-    updatedAwardsList[index].confirmed = true;
-    setAwardsList(updatedAwardsList);
-  };
-
-  const handleDeleteEducation = (index) => {
-    const updatedEducationList = [...educationList];
-    updatedEducationList.splice(index, 1);
-    setEducationList(updatedEducationList);
-  };
-
-  const handleDeleteSkill = (index) => {
-    const updatedSkillsList = [...skillsList];
-    updatedSkillsList.splice(index, 1);
-    setSkillsList(updatedSkillsList);
-  };
-
-  const handleDeleteAward = (index) => {
-    const updatedAwardsList = [...awardsList];
-    updatedAwardsList.splice(index, 1);
-    setAwardsList(updatedAwardsList);
+    const updatedList = [...listType];
+    updatedList[index][name] = value;
+    listType === educationList ? setEducationList(updatedList) :
+    listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
   };
 
   return (
@@ -232,25 +199,36 @@ export default function EditEmployeeProfile() {
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 defaultValue={''}
             />
+            <div className="border-b border-gray-900/10 pb-12"></div>
 
             {/* Education Section */}
             <div>
-              <label className="mt-5 block text-md font-medium leading-6 text-gray-900">Education</label>
+              <label className="mt-5 block text-md font-medium leading-6 text-gray-900">Education and Experiences</label>
               {educationList.map((education, index) => (
-                <div key={index} className="mt-2 flex items-center gap-4">
+                <div key={index} className="mt-2">
                   {education.confirmed ? (
-                    <React.Fragment>
-                      <span>{education.title}</span>
-                      <button type="button" onClick={() => handleDeleteEducation(index)} className="text-indigo-600">✖</button>
-                    </React.Fragment>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="text-lg font-semibold">{education.title}</h4>
+                        <p>{education.description}</p>
+                      </div>
+                      <button type="button" onClick={() => handleDeleteItem(index, educationList)} className="text-indigo-600">Delete</button>
+                    </div>
                   ) : (
-                    <React.Fragment>
+                    <div className="flex flex-col gap-4">
                       <input
                         type="text"
                         name="title"
-                        placeholder="Education Title"
+                        placeholder="Education and Experiences"
                         value={education.title}
-                        onChange={(e) => handleEducationChange(e, index)}
+                        onChange={(e) => handleChange(e, index, educationList)}
+                        className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <textarea
+                        name="description"
+                        placeholder="Description"
+                        value={education.description}
+                        onChange={(e) => handleChange(e, index, educationList)}
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <input
@@ -258,38 +236,49 @@ export default function EditEmployeeProfile() {
                         id={`evidence${index}`}
                         name={`evidence${index}`}
                       />
-                      <button type="button" onClick={() => handleConfirmEducation(index)} className="text-indigo-600">Confirm</button>
-                    </React.Fragment>
+                      <button type="button" onClick={() => handleConfirmItem(index, educationList)} className="text-indigo-600">Add</button>
+                    </div>
                   )}
                 </div>
               ))}
               <button
                 type="button"
                 onClick={handleAddEducation}
-                className="text-indigo-600"
-              >
-                + Add Education
+                className="mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                + Add Education and Experiences
               </button>
             </div>
+            <div className="border-b border-gray-900/10 pb-12"></div>
 
             {/* Skills Section */}
             <div>
               <label className="mt-5 block text-md font-medium leading-6 text-gray-900">Skills</label>
               {skillsList.map((skill, index) => (
-                <div key={index} className="mt-2 flex items-center gap-4">
+                <div key={index} className="mt-2">
                   {skill.confirmed ? (
-                    <React.Fragment>
-                      <span>{skill.skill}</span>
-                      <button type="button" onClick={() => handleDeleteSkill(index)} className="text-indigo-600">✖</button>
-                    </React.Fragment>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="text-lg font-semibold">{skill.skill}</h4>
+                        <p>{skill.description}</p>
+                      </div>
+                      <button type="button" onClick={() => handleDeleteItem(index, skillsList)} className="text-indigo-600">Delete</button>
+                    </div>
                   ) : (
-                    <React.Fragment>
+                    <div className="flex flex-col gap-4">
                       <input
                         type="text"
                         name="skill"
                         placeholder="Skill"
                         value={skill.skill}
-                        onChange={(e) => handleSkillChange(e, index)}
+                        onChange={(e) => handleChange(e, index, skillsList)}
+                        className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <textarea
+                        name="description"
+                        placeholder="Description"
+                        value={skill.description}
+                        onChange={(e) => handleChange(e, index, skillsList)}
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <input
@@ -297,38 +286,49 @@ export default function EditEmployeeProfile() {
                         id={`skillEvidence${index}`}
                         name={`skillEvidence${index}`}
                       />
-                      <button type="button" onClick={() => handleConfirmSkill(index)} className="text-indigo-600">Confirm</button>
-                    </React.Fragment>
+                      <button type="button" onClick={() => handleConfirmItem(index, skillsList)} className="text-indigo-600">Add</button>
+                    </div>
                   )}
                 </div>
               ))}
               <button
                 type="button"
                 onClick={handleAddSkill}
-                className="text-indigo-600"
-              >
+                className="mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
                 + Add Skill
               </button>
             </div>
+            <div className="border-b border-gray-900/10 pb-12"></div>
 
             {/* Awards Section */}
             <div>
               <label className="mt-5 block text-md font-medium leading-6 text-gray-900">Professional Affiliations or Awards</label>
               {awardsList.map((award, index) => (
-                <div key={index} className="mt-2 flex items-center gap-4">
+                <div key={index} className="mt-2">
                   {award.confirmed ? (
-                    <React.Fragment>
-                      <span>{award.award}</span>
-                      <button type="button" onClick={() => handleDeleteAward(index)} className="text-indigo-600">✖</button>
-                    </React.Fragment>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="text-lg font-semibold">{award.award}</h4>
+                        <p>{award.description}</p>
+                      </div>
+                      <button type="button" onClick={() => handleDeleteItem(index, awardsList)} className="text-indigo-600">Delete</button>
+                    </div>
                   ) : (
-                    <React.Fragment>
+                    <div className="flex flex-col gap-4">
                       <input
                         type="text"
                         name="award"
                         placeholder="Professional Affiliation or Award"
                         value={award.award}
-                        onChange={(e) => handleAwardChange(e, index)}
+                        onChange={(e) => handleChange(e, index, awardsList)}
+                        className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <textarea
+                        name="description"
+                        placeholder="Description"
+                        value={award.description}
+                        onChange={(e) => handleChange(e, index, awardsList)}
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <input
@@ -336,22 +336,23 @@ export default function EditEmployeeProfile() {
                         id={`awardEvidence${index}`}
                         name={`awardEvidence${index}`}
                       />
-                      <button type="button" onClick={() => handleConfirmAward(index)} className="text-indigo-600">Confirm</button>
-                    </React.Fragment>
+                      <button type="button" onClick={() => handleConfirmItem(index, awardsList)} className="text-indigo-600">Add</button>
+                    </div>
                   )}
                 </div>
               ))}
               <button
                 type="button"
                 onClick={handleAddAward}
-                className="text-indigo-600"
+                className="mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 + Add Affiliation or Award
               </button>
             </div>
           </div>
         </div>
-        <div className="border-b border-gray-900/10 pb-6"></div>
+        <div className="border-b border-gray-900/10 pb-12"></div>
+
         {/* Button to save profile */}
         <div className="mt-6 flex items-center justify-center gap-x-6">
           <button
@@ -360,7 +361,14 @@ export default function EditEmployeeProfile() {
           >
             Save Profile
           </button>
+          <button
+            type="submit"
+            className="rounded-md bg-gray-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+          >
+            Cancel
+          </button>
         </div>
+
       </div>
     </form>
   );

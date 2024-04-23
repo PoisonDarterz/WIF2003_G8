@@ -1,8 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
 import { Link } from "react-router-dom";
 
 export default function ViewProfile() {
+  const [showImage, setShowImage] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+
+  const skillList = [
+    {skill: "Market Analysis", desc:"desc", image: "/blank.png"},
+    {skill: "Negotiation", desc:"desc", image: "/blank.png"}
+  ];
+
+  const awardList = [
+    {award: "award1", desc:"desc", image: "/blank.png"},
+    {award: "award2", desc:"desc", image: "/blank.png"}
+  ];
+
+  const handleViewImage = (url) => {
+    setImageUrl(url);
+    setShowImage(!showImage);
+  };
+
   return (
     <form>
       <div className="p-8">
@@ -59,79 +77,82 @@ export default function ViewProfile() {
               about delivering exceptional results.
             </p>
             <div className="border-b border-gray-900/10 pb-12"></div>
-            <h2 className="mt-5 font-bold">Education</h2>
+            <h2 className="mt-5 font-bold">Education and Experiences</h2>
             <p>Bachelor of Finance, University Malaya</p>
             <div className="border-b border-gray-900/10 pb-12"></div>
 
-            <h2 className="mt-5 font-bold">Skills</h2>
-            <div className="mt-5 grid grid-cols-2 gap-4">
-                {/* Left Column */}
-                <div>
-                    <ul>
-                    <li>
-                        <span className="font-bold">-</span> Strategic Planning
-                        
-                    </li>
-                    <li>
-                        <span className="font-bold">-</span> Leadership
-                        <img
-                        className="h-6 w-6 ml-2"
-                        src="/leadership_image.jpg"
-                        alt="Leadership"
-                        />
-                    </li>
-                    <li>
-                        <span className="font-bold">-</span> Market Analysis
-                        <img
-                        className="h-6 w-6 ml-2"
-                        src="/market_analysis_image.jpg"
-                        alt="Market Analysis"
-                        />
-                    </li>
-                    </ul>
-                </div>
-
-                {/* Right Column */}
-                <div>
-                    <ul>
-                    {/* Add more skills here */}
-                    <li>
-                        <span className="font-bold">-</span> Relationship Building
-                    </li>
-                    <li>
-                        <span className="font-bold">-</span> Negotiation
-                        <img
-                        className="h-6 w-6 ml-2"
-                        src="/negotiation_image.jpg"
-                        alt="Negotiation"
-                        />
-                    </li>
-                    </ul>
-                </div>
-                </div>
-
+            <table className="mt-5 w-full table-auto">
+              <thead>
+                <tr className="text-md font-medium text-black rounded-lg">
+                  <th className="w-[30%] px-4 py-2 bg-gray-200 font-bold">Skills</th>
+                  <th className="w-[50%] px-4 py-2 bg-gray-200 font-bold">Description</th>
+                  <th className="w-[20%] px-4 py-2 bg-gray-200 font-bold">Support Document</th>
+                </tr>
+              </thead>
+              <tbody className="text-md font-normal text-gray-700">
+                {skillList.map((skill, i) => (
+                  <tr
+                    className={`${
+                      i % 2 === 0 ? "bg-[#fefefe]" : "bg-gray-50"
+                    } px-4 py-2`}
+                    key={i}
+                  >
+                    <td className="w-[30%] px-4 py-4">{skill.skill}</td>
+                    <td className="w-[50%] px-4 py-4">{skill.desc}</td>
+                    <td className="w-[20%] px-4 py-4">
+                      <img
+                        className="h-20 w-20"
+                        src={skill.image}
+                        alt={skill.skill}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             <div className="border-b border-gray-900/10 pb-12"></div>
 
-            <h2 className="mt-5 font-bold">
-              Professional Affiliations or Awards
-            </h2>
-            <div className="flex items-center">
-              <img
-                className="h-12 w-12 rounded-full mr-4"
-                src="/awards_image.jpg"
-                alt="Awards"
-              />
-              <p>
-                Throughout my career, I have been honored to receive recognition
-                for my contributions to the sales industry. Some of my notable
-                affiliations and awards include:
-                <li>Sales Excellence Award</li>
-                <li>Member of Sales Management Association</li>
-                <li>Speaker at Industry Conferences</li>
-                <li>Certified Sales Professional</li>
-              </p>
-            </div>
+            <table className="mt-5 w-full table-auto">
+              <thead>
+                <tr className="text-md font-medium text-black rounded-lg">
+                  <th className="w-[30%] px-4 py-2 bg-gray-200 font-bold">Professional Affiliations or Awards</th>
+                  <th className="w-[50%] px-4 py-2 bg-gray-200 font-bold">Description</th>
+                  <th className="w-[20%] px-4 py-2 bg-gray-200 font-bold">Support Document</th>
+                </tr>
+              </thead>
+              <tbody className="text-md font-normal text-gray-700">
+                {awardList.map((award, i) => (
+                  <tr
+                    className={`${
+                      i % 2 === 0 ? "bg-[#fefefe]" : "bg-gray-50"
+                    } px-4 py-2`}
+                    key={i}
+                  >
+                    <td className="w-[30%] px-4 py-4">{award.award}</td>
+                    <td className="w-[50%] px-4 py-4">{award.desc}</td>
+                    <td className="w-[20%] px-4 py-4">
+                      <img
+                        className="h-20 w-20 cursor-pointer"
+                        src={award.image}
+                        alt={award.award}
+                        onClick={() => handleViewImage(award.image)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
+            {/* Display image when showImage is true */}
+            {showImage && (
+              <div className="mt-4">
+                <img
+                  src={imageUrl}
+                  alt="Support Document"
+                  className="max-w-[500px] mx-auto"
+                />
+              </div>
+            )}
             <div className="border-b border-gray-900/10 pb-12"></div>
 
             <div className="mt-6 flex items-center justify-end gap-x-6">
