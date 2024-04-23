@@ -41,7 +41,7 @@ const IndividualCategory=({categoryName,img,description})=>{
     e.preventDefault();
     // Logic for handling login
     // For now, just navigate to the home page
-    navigate('/helpdesk/submitFeedback',{ state: data });
+    navigate('/helpdesk/submitFeedback', {state:data} );
   };
 
   return (
