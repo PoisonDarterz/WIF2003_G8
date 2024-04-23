@@ -59,8 +59,8 @@ function SubmitFeedback(){
             />
         </div>
         <div className="flex my-10 justify-center items-center">
-          <button className="mx-5 bg-[#EAF3FF] p-2 rounded-lg" onClick={handleCancelFeedback}>Cancel</button>
-          <button className="mx-5 bg-[#EAF3FF] p-2 rounded-lg" onClick={handleSubmit}>Submit</button>
+          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF]" onClick={handleCancelFeedback}>Cancel</button>
+          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF]" onClick={handleSubmit}>Submit</button>
         </div>
       </div>
   )
