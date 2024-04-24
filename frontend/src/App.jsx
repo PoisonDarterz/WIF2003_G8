@@ -23,6 +23,10 @@ import Tickets from "./pages/helpdesk/MyTickets";
 import Feedback from "./pages/helpdesk/Feedback";
 
 // Info module routes
+import ViewEmployeeList from './pages/info/employeeList';
+import ViewProfile from './pages/info/viewProfile';
+import EditMyProfile from "./pages/info/editMyProfile";
+import EditEmployeeProfile from "./pages/info/editEmployeeProfile";
 
 // Salary module routes
 import ViewSalary from './pages/salary/ViewSalary';
@@ -65,6 +69,10 @@ function App() {
           <Route path="/helpdesk/submitFeedback" element={<SubmitFeedback />} />
 
           {/* Info module routes */}
+          <Route path="/info/employeeList" element={<ViewEmployeeList />} />
+          <Route path="/info/viewProfile" element={<ViewProfile />} />
+          <Route path="/info/editMyProfile" element={<EditMyProfile />} />
+          <Route path="/info/editEmployeeProfile" element={<EditEmployeeProfile />} />
 
           {/* Salary module routes */}
           <Route path="/salary/view" element={<ViewSalary />} />
