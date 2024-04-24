@@ -18,7 +18,7 @@ function AdminSalary() {
       </div>
       <div className="mt-8 mb-4 text-left">
         <h1 className="text-2xl font-bold">Past salary slips</h1>
-        <p className="text-lg">View all employee’s past salary slips here. Want to generate slips? <a href="/" className="text-blue-500 underline">Click here.</a></p>
+        <p className="text-lg">View all employee’s past salary slips here. Want to generate slips? <a href="/salary/process" className="text-blue-500 underline">Click here.</a></p>
       </div>
       <div className="flex justify-between items-center mb-4">
         <div>

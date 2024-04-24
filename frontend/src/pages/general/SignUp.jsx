@@ -11,7 +11,7 @@ const SignUp = () => {
         e.preventDefault();
         // Logic for handling sign up
         // For now, just navigate to the login page
-        navigate('/general/LogIn');
+        navigate('/');
     };
 
     return (
@@ -101,7 +101,7 @@ const SignUp = () => {
                     {/* Sign Up */}
                     <p className="text-gray-500 text-sm mt-4">
                         Already have an account?
-                        <Link to="/general/LogIn" className="text-black underline ml-1">Log In</Link>
+                        <Link to="/" className="text-black underline ml-1">Log In</Link>
                     </p>
                 </form>
             </div>

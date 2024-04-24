@@ -50,7 +50,7 @@ const ForgotPassword = () => {
                         {/* Back to Login */}
                         <p className="text-sm text-center">
                             Back to 
-                            <Link to="/general/login" className="text-black underline ml-1">Log in</Link>
+                            <Link to="/" className="text-black underline ml-1">Log in</Link>
                         </p>
                     </form>
                 </div>

@@ -46,7 +46,7 @@ function Benefits() {
       </div>
       <div className="mt-10 p-4 text-left">
         <h2 className="text-xl font-bold">Need more information?</h2>
-        <p className="mt-4">Contact your HR representative for more information <a href="/" className="text-blue-500 underline">here.</a></p>
+        <p className="mt-4">Contact your HR representative for more information <a href="/helpdesk/addNewTicket" className="text-blue-500 underline">here.</a></p>
       </div>
     </div>
   );

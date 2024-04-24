@@ -30,7 +30,7 @@ const Profile = () => {
                         </div>
                         <div className="border-b border-black pb-5"></div>
                         <div className="flex justify-center"> 
-                            <Link to="/general/LogIn" className="mt-5 text-red-500 font-semibold hover:underline">Log Out</Link>
+                            <Link to="/" className="mt-5 text-red-500 font-semibold hover:underline">Log Out</Link>
                         </div>
                     </div>
                 </div>
