@@ -5,6 +5,7 @@ import {
   FaClipboardList,
   FaCalendarPlus,
   FaClipboardCheck,
+  FaUserCog,
 } from "react-icons/fa";
 
 const SideNavBar = () => {
@@ -59,6 +60,18 @@ const SideNavBar = () => {
         >
           <FaClipboardCheck className="mr-2" />
           Leave History
+        </NavLink>
+        <NavLink
+          to="/attendance/admin"
+          className={({ isActive }) =>
+            `flex items-center text-white hover:text-[#2C74D8] ${
+              isActive ? "text-red-600 font-bold" : ""
+            }`
+          }
+          end
+        >
+          <FaUserCog className="mr-2" />
+          Admin Dashboard
         </NavLink>
       </div>
     </div>
