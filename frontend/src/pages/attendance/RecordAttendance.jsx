@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
-import SideNavBar from "../../components/SideNavBar";
+import SideNavBar from "../../components/attendance/SideNavBar";
 
 const RecordAttendance = () => {
   const [currentTime, setCurrentTime] = useState(new Date());

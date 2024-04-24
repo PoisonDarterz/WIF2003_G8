@@ -1,8 +1,8 @@
 import React from 'react';
 import TopNavBlack from '../../components/TopNavBlack';
-import CommunityCard from '../../components/CommunityCard';
-import CommunityPost from '../../components/CommunityPost';
-import CommunitySidebar from '../../components/CommunitySideBar';
+import CommunityCard from '../../components/community/CommunityCard';
+import CommunityPost from '../../components/community/CommunityPost';
+import CommunitySidebar from '../../components/community/CommunitySideBar';
 
 const CommunityHomePage = () => {
     return (
