@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaUpload, FaCalendarAlt } from "react-icons/fa";
@@ -12,6 +12,7 @@ const LeaveApplicationForm = () => {
   const [endDate, setEndDate] = useState(null);
   const [file, setFile] = useState(null);
   const [leaveRecords, setLeaveRecords] = useState([]);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const existingRecords =
@@ -56,6 +57,10 @@ const LeaveApplicationForm = () => {
     setStartDate(null);
     setEndDate(null);
     setFile(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleFileUpload = (e) => {
@@ -171,13 +176,14 @@ const LeaveApplicationForm = () => {
               <input
                 type="file"
                 id="file"
+                ref={fileInputRef}
                 onChange={handleFileUpload}
                 className="w-64 px-3 py-2 border border-gray-300 rounded"
               />
             </div>
             <button
               type="button"
-              className="bg-[#EBB99E] hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded mt-2 w-64"
+              className="bg-[#EBB99E] hover:bg-opacity-90 text-black font-bold py-2 px-4 rounded mt-2 w-64"
             >
               <FaUpload className="mr-2 inline-block" />
               Upload
