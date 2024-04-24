@@ -67,7 +67,7 @@ const LeaveApplicationForm = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full text-left">
       <h3 className="text-lg font-semibold mt-8 mb-4 ml-4">
         Leave Application Form
       </h3>
