@@ -37,7 +37,7 @@ const CommunitySidebar = () => {
 
     return (
         <div className="sticky top-4 w-1/5 pr-4">
-            <div className="mb-8">
+            <div className="sticky top-4 mb-8">
                 {/* Popular Posts */}
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
@@ -64,7 +64,7 @@ const CommunitySidebar = () => {
                 </div>
 
                 {/* Trending Topics */}
-                <div className='mt-12'>
+                <div sticky top-4 className='sticky top-4 mt-12'>
                     <h2 className="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
                         <FaTags className="mr-2 text-blue-600" /> Trending Topics
                     </h2>

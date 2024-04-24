@@ -18,6 +18,7 @@ import Attendance from "./pages/attendance/Attendance";
 
 // Community module routes
 import CommunityHomePage from './pages/community/CommunityHomePage';
+import OfficeInsightsArticle from "./pages/community/OfficeInsightsArticle";
 
 // Helpdesk module routes
 import Tickets from "./pages/helpdesk/MyTickets";
@@ -60,6 +61,7 @@ function App() {
 
           {/* Community module routes */}
           <Route path="/community" element={<CommunityHomePage />} />
+          <Route path="/community/OfficeInsightsArticle" element={<OfficeInsightsArticle/>} />
           
           {/* Helpdesk module routes */}
           <Route path="/helpdesk/" element={<Tickets />} />
