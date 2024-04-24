@@ -26,7 +26,7 @@ const CommentSection = ({ comments }) => {
                                 <h4 className="text-lg font-semibold text-gray-800">{comment.username}</h4>
                                 <p className="text-sm text-gray-500 ml-2">{comment.commentTime}</p>
                             </div>
-                            <p className="text-gray-700">{comment.commentText}</p>
+                            <p className="text-gray-700 text-left">{comment.commentText}</p>
 
                             {/* Actions */}
                             <div className="flex items-center mt-2">
