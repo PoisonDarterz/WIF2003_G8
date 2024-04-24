@@ -177,6 +177,14 @@ const ReviewLeaveTable = () => {
     setCurrentPage(pageNumber);
   };
 
+  const handlePrevious = () => {
+    setCurrentPage(currentPage - 1);
+  };
+
+  const handleNext = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
   const handleAccept = (id) => {
     console.log("Leave Application Accepted", id);
   };
@@ -256,7 +264,7 @@ const ReviewLeaveTable = () => {
                   onClick={() => handleReject(application.id)}
                 />
                 <FaPauseCircle
-                  style={{ color: "yellow", cursor: "pointer" }}
+                  style={{ color: "#ed8332", cursor: "pointer" }}
                   onClick={() => handlePending(application.id)}
                 />
               </td>
@@ -264,23 +272,38 @@ const ReviewLeaveTable = () => {
           ))}
         </tbody>
       </table>
-      <div className="mt-4 flex justify-between items-center">
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <div>
-          {[...Array(totalPages)].map((_, index) => (
-            <button
-              key={index}
-              className={`px-2 py-1 border border-gray-300 rounded ${
-                currentPage === index + 1 ? "bg-blue-500 text-white" : ""
-              }`}
-              onClick={() => handlePageChange(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
+      <div className="flex justify-center items-center mt-6">
+        <button
+          className={`px-4 py-2 text-sm text-white bg-gray-500 rounded ${
+            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index}
+            className={`px-4 py-2 ml-2 text-sm ${
+              currentPage === index + 1
+                ? "text-white bg-[#2C74D8]"
+                : "text-black bg-gray-300"
+            } rounded`}
+            onClick={() => handlePageChange(index + 1)}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button
+          className={`px-4 py-2 ml-2 text-sm text-white bg-gray-500 rounded ${
+            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
