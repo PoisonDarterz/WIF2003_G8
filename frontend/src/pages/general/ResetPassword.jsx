@@ -9,7 +9,7 @@ const ResetPassword = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Navigate to LogIn page
-        navigate('/general/LogIn');
+        navigate('/');
     };
 
     return (

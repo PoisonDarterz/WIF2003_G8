@@ -11,7 +11,7 @@ const LogIn = () => {
         e.preventDefault();
         // Logic for handling login
         // For now, just navigate to the home page
-        navigate('/');
+        navigate('/home');
     };
 
     return (

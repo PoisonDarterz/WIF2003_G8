@@ -54,9 +54,9 @@ function App() {
         
         <Routes>
           {/* General module routes */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<LogIn />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/general/Profile" element={<Profile />} />
-          <Route path="/general/LogIn" element={<LogIn />} />
           <Route path="/general/ForgotPassword" element={<ForgotPassword />} />
           <Route path="/general/SignUp" element={<SignUp />} />
           <Route path="/general/ResetPassword" element={<ResetPassword />} />

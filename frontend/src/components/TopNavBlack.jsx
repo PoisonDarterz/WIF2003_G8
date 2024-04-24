@@ -17,14 +17,14 @@ function TopNavBlack() {
       setActiveLink('COMMUNITY');
     } else if (location.pathname.startsWith('/helpdesk')) {
       setActiveLink('HELPDESK');
-    } else if (location.pathname === '/') {
+    } else if (location.pathname.startsWith('/home')) {
       setActiveLink('HOME');
     }
   }, [location]);
 
   return (
     <nav className="bg-black text-white flex justify-between items-center p-5 relative z-20">
-      <Link to="/">
+      <Link to="/home">
         <img src="/LogoText.png" alt="Company Logo" className="h-12" />
       </Link>
       <div className="flex space-x-16">
