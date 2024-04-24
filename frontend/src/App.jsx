@@ -71,7 +71,7 @@ function App() {
           {/* Community module routes */}
           <Route path="/community" element={<CommunityHomePage />} />
           
-          {/* Helpdesk module routes */}
+          {/* Helpdesk/Feedback module routes */}
           <Route path="/helpdesk/" element={<Tickets />} />
           <Route path="/helpdesk/addNewTicket" element={<AddNewTicket />} />
           <Route path="/helpdesk/reviewTicket" element={<ReviewTicket />} />
