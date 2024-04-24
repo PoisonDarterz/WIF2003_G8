@@ -134,15 +134,15 @@ export default function EditMyProfile() {
               {educationList.map((education, index) => (
                 <div key={index} className="mt-2">
                   {education.confirmed ? (
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="text-lg font-semibold">{education.title}</h4>
+                    <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
+                    <div>
+                        <h4 className="text-sm font-semibold">{education.title}</h4>
                         <p>{education.description}</p>
                       </div>
                       <button type="button" onClick={() => handleDeleteItem(index, educationList)} className="text-indigo-600">Delete</button>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 bg-[#eaf3ff] p-4 rounded-lg">
                       <input
                         type="text"
                         name="title"
@@ -184,15 +184,15 @@ export default function EditMyProfile() {
               {skillsList.map((skill, index) => (
                 <div key={index} className="mt-2">
                   {skill.confirmed ? (
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="text-lg font-semibold">{skill.skill}</h4>
+                    <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
+                    <div>
+                        <h4 className="text-sm font-semibold">{skill.skill}</h4>
                         <p>{skill.description}</p>
                       </div>
                       <button type="button" onClick={() => handleDeleteItem(index, skillsList)} className="text-indigo-600">Delete</button>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 bg-[#eaf3ff] p-4 rounded-lg">
                       <input
                         type="text"
                         name="skill"
@@ -234,15 +234,15 @@ export default function EditMyProfile() {
               {awardsList.map((award, index) => (
                 <div key={index} className="mt-2">
                   {award.confirmed ? (
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="text-lg font-semibold">{award.award}</h4>
+                    <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
+                    <div>
+                        <h4 className="text-sm font-semibold">{award.award}</h4>
                         <p>{award.description}</p>
                       </div>
                       <button type="button" onClick={() => handleDeleteItem(index, awardsList)} className="text-indigo-600">Delete</button>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 bg-[#eaf3ff] p-4 rounded-lg">
                       <input
                         type="text"
                         name="award"
@@ -289,8 +289,9 @@ export default function EditMyProfile() {
             Save Profile
           </button>
           <button
-            type="submit"
+            type="button"
             className="rounded-md bg-gray-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+            onClick={() => window.history.back()}
           >
             Cancel
           </button>

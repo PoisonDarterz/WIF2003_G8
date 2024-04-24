@@ -24,7 +24,7 @@ function ViewEmployeeList() {
   const [searchQuery, setSearchQuery] = useState(""); 
   const [filters, setFilters] = useState({ id: "", department: "", jobTitle: "" });
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 10; // Number of records to show per page
+  const recordsPerPage = 10; 
 
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value); 

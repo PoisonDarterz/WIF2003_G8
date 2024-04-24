@@ -143,16 +143,6 @@ export default function ViewProfile() {
               </tbody>
             </table>
 
-            {/* Display image when showImage is true */}
-            {showImage && (
-              <div className="mt-4">
-                <img
-                  src={imageUrl}
-                  alt="Support Document"
-                  className="max-w-[500px] mx-auto"
-                />
-              </div>
-            )}
             <div className="border-b border-gray-900/10 pb-12"></div>
 
             <div className="mt-6 flex items-center justify-end gap-x-6">
