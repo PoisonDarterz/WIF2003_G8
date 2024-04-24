@@ -20,8 +20,14 @@ import Attendance from "./pages/attendance/Attendance";
 import CommunityHomePage from './pages/community/CommunityHomePage';
 
 // Helpdesk module routes
+import Tickets from "./pages/helpdesk/MyTickets";
+import Feedback from "./pages/helpdesk/Feedback";
 
 // Info module routes
+import ViewEmployeeList from './pages/info/employeeList';
+import ViewProfile from './pages/info/viewProfile';
+import EditMyProfile from "./pages/info/editMyProfile";
+import EditEmployeeProfile from "./pages/info/editEmployeeProfile";
 
 // Salary module routes
 import ViewSalary from './pages/salary/ViewSalary';
@@ -29,6 +35,11 @@ import AdminSalary from './pages/salary/AdminSalary';
 import Benefits from './pages/salary/Benefits';
 import ProcessSalary from './pages/salary/ProcessSalary';
 import AssignBenefits from './pages/salary/AssignBenefits';
+import AddNewTicket from "./pages/helpdesk/AddNewTicket";
+import ReviewTicket from "./pages/helpdesk/ReviewTicket";
+import AllEmployeeTickets from "./pages/helpdesk/AllEmployeeTickets";
+import ResolveTicket from "./pages/helpdesk/ResolveTicket";
+import SubmitFeedback from "./pages/helpdesk/SubmitFeedback";
 
 function App() {
   return (
@@ -51,8 +62,19 @@ function App() {
           <Route path="/community" element={<CommunityHomePage />} />
           
           {/* Helpdesk module routes */}
+          <Route path="/helpdesk/" element={<Tickets />} />
+          <Route path="/helpdesk/addNewTicket" element={<AddNewTicket />} />
+          <Route path="/helpdesk/reviewTicket" element={<ReviewTicket />} />
+          <Route path="/helpdesk/allEmployeeTickets" element={<AllEmployeeTickets />} />
+          <Route path="/helpdesk/resolveTicket" element={<ResolveTicket />} />
+          <Route path="/helpdesk/feedback" element={<Feedback />} />
+          <Route path="/helpdesk/submitFeedback" element={<SubmitFeedback />} />
 
           {/* Info module routes */}
+          <Route path="/info/employeeList" element={<ViewEmployeeList />} />
+          <Route path="/info/viewProfile" element={<ViewProfile />} />
+          <Route path="/info/editMyProfile" element={<EditMyProfile />} />
+          <Route path="/info/editEmployeeProfile" element={<EditEmployeeProfile />} />
 
           {/* Salary module routes */}
           <Route path="/salary/view" element={<ViewSalary />} />
