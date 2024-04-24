@@ -1,9 +1,9 @@
 import React from "react";
-import AttendanceHistory from "./AttendanceHistory";
+import AttendanceHistoryAdmin from "./AttendanceHistoryAdmin";
 
 const Attendance = () => {
   return (
-    <AttendanceHistory />
+    <AttendanceHistoryAdmin />
   );
 };
 

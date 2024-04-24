@@ -1,7 +1,7 @@
 import React from "react";
 import TopNavBlack from "../../components/TopNavBlack";
-import SideNavBar from "../../components/SideNavBar";
-import LeaveHistoryTable from "../../components/LeaveHistoryTable";
+import SideNavBar from "../../components/attendance/SideNavBar";
+import LeaveHistoryTable from "../../components/attendance/LeaveHistoryTable";
 
 const LeaveHistory = () => {
   return (

@@ -15,6 +15,11 @@ import ResetPassword from './pages/general/ResetPassword';
 
 // Attendance module routes
 import Attendance from "./pages/attendance/Attendance";
+import RecordAttendance from "./pages/attendance/RecordAttendance";
+import ApplyForLeave from "./pages/attendance/ApplyForLeave";
+import LeaveHistory from "./pages/attendance/LeaveHistory";
+import ReviewLeave from "./pages/attendance/admin/ReviewLeave";
+import AttendanceHistoryAdmin from "./pages/attendance/admin/AttendanceHistoryAdmin";
 
 // Community module routes
 import CommunityHomePage from './pages/community/CommunityHomePage';
@@ -58,12 +63,17 @@ function App() {
 
           {/* Attendance module routes */}
           <Route path="/attendance" element={<Attendance />} />
+          <Route path="/attendance/record-attendance" element={<RecordAttendance />} />
+          <Route path="/attendance/apply-leave" element={<ApplyForLeave />} />
+          <Route path="/attendance/leave-history" element={<LeaveHistory />} />
+          <Route path="/attendance/admin" element={<ReviewLeave />} />
+          <Route path="/attendance/admin/attendance-history-admin" element={<AttendanceHistoryAdmin />} />
 
           {/* Community module routes */}
           <Route path="/community" element={<CommunityHomePage />} />
           <Route path="/community/OfficeInsightsArticle" element={<OfficeInsightsArticle/>} />
           
-          {/* Helpdesk module routes */}
+          {/* Helpdesk/Feedback module routes */}
           <Route path="/helpdesk/" element={<Tickets />} />
           <Route path="/helpdesk/addNewTicket" element={<AddNewTicket />} />
           <Route path="/helpdesk/reviewTicket" element={<ReviewTicket />} />
