@@ -17,6 +17,7 @@ import ResetPassword from './pages/general/ResetPassword';
 import Attendance from "./pages/attendance/Attendance";
 
 // Community module routes
+import CommunityHomePage from './pages/community/CommunityHomePage';
 
 // Helpdesk module routes
 import Tickets from "./pages/helpdesk/MyTickets";
@@ -58,7 +59,8 @@ function App() {
           <Route path="/attendance" element={<Attendance />} />
 
           {/* Community module routes */}
-
+          <Route path="/community" element={<CommunityHomePage />} />
+          
           {/* Helpdesk module routes */}
           <Route path="/helpdesk/" element={<Tickets />} />
           <Route path="/helpdesk/addNewTicket" element={<AddNewTicket />} />
