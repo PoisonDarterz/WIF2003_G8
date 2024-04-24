@@ -24,7 +24,7 @@ function ViewEmployeeList() {
   const [searchQuery, setSearchQuery] = useState(""); 
   const [filters, setFilters] = useState({ id: "", department: "", jobTitle: "" });
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 10; 
+  const recordsPerPage = 6; 
 
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value); 
@@ -62,24 +62,19 @@ function ViewEmployeeList() {
       <div className="mt-8 mb-4 text-left">
         <h1 className="text-2xl font-bold">Employee Information</h1>
       </div>
-      <div className="mb-4" style={{ textAlign: 'left' }}>
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={searchQuery}
-          onChange={handleSearchInputChange} 
-          className="border p-1 rounded mr-2"
-        />
-      </div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="font-bold">Filters:</h2>
-        <div>          
-          <label className="mr-2">Employee ID:</label>
-          <input type="text" name="id" value={filters.id} onChange={handleFilterChange} className="border p-1 rounded" />
-          <label className="ml-20 mr-2">Department:</label>
-          <input type="text" name="department" value={filters.department} onChange={handleFilterChange} className="border p-1 rounded" />
-          <label className="ml-20 mr-2">Job title:</label>
-          <input type="text" name="jobTitle" value={filters.jobTitle} onChange={handleFilterChange} className="border p-1 rounded" /> 
+
+      <div className="flex justify-between items-center mb-2">
+      <h2 className="font-bold mr-1">Filters:</h2>
+        <div>  
+                      
+          <label className="mr-2">ID:</label>
+          <input type="text" name="id" value={filters.id} onChange={handleFilterChange} className="border p-1 rounded mr-2" />
+          <label className="mr-2">Name:</label>   
+          <input type="text" name="name" value={searchQuery} onChange={handleSearchInputChange} className="border p-1 rounded mr-2"/>  
+          <label className="mr-2">Department:</label>
+          <input type="text" name="department" value={filters.department} onChange={handleFilterChange} className="border p-1 rounded mr-2" />
+          <label className="mr-2">Job title:</label>
+          <input type="text" name="jobTitle" value={filters.jobTitle} onChange={handleFilterChange} className="border p-1 rounded mr-2" /> 
         </div>
       </div>
       <div className="overflow-x-auto mt-10 p-4">
