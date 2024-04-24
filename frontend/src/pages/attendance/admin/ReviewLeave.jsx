@@ -1,7 +1,7 @@
 import React from "react";
 import TopNavBlack from "../../../components/TopNavBlack";
-import SideNavBarAdmin from "../../../components/SideNavBarAdmin";
-import ReviewLeaveTable from "../../../components/ReviewLeaveTable";
+import SideNavBarAdmin from "../../../components/attendance/SideNavBarAdmin";
+import ReviewLeaveTable from "../../../components/attendance/ReviewLeaveTable";
 
 const ReviewLeave = () => {
   return (

@@ -1,7 +1,7 @@
 import React from "react";
 import TopNavBlack from "../../components/TopNavBlack";
-import SideNavBar from "../../components/SideNavBar";
-import LeaveApplicationForm from "../../components/LeaveApplicationForm";
+import SideNavBar from "../../components/attendance/SideNavBar";
+import LeaveApplicationForm from "../../components/attendance/LeaveApplicationForm";
 
 const ApplyForLeave = () => {
   return (

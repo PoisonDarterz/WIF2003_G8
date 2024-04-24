@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { navAdmAtt } from "./navAdmAtt";
+import { navAttendance } from "../navAttendance";
 
 const SideNavBar = () => {
   const location = useLocation();
@@ -9,7 +9,7 @@ const SideNavBar = () => {
     <div className="bg-[#B9DDDA] p-4 h-screen">
       <div className="font-bold mb-8 text-left text-black">Menu</div>
       <div className="space-y-6">
-        {navAdmAtt.map((item, index) => (
+        {navAttendance.map((item, index) => (
           <Link
             key={index}
             to={item.to}

@@ -1,7 +1,7 @@
 import React from "react";
 import TopNavBlack from "../../../components/TopNavBlack";
-import SideNavBarAdmin from "../../../components/SideNavBarAdmin";
-import AttendanceTableAdmin from "../../../components/AttendanceTableAdmin";
+import SideNavBarAdmin from "../../../components/attendance/SideNavBarAdmin";
+import AttendanceTableAdmin from "../../../components/attendance/AttendanceTableAdmin";
 
 const AttendanceHistoryAdmin = () => {
   return (
