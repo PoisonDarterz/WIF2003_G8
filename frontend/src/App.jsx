@@ -23,6 +23,7 @@ import AttendanceHistoryAdmin from "./pages/attendance/admin/AttendanceHistoryAd
 
 // Community module routes
 import CommunityHomePage from './pages/community/CommunityHomePage';
+import OfficeInsightsArticle from "./pages/community/OfficeInsightsArticle";
 
 // Helpdesk module routes
 import Tickets from "./pages/helpdesk/MyTickets";
@@ -70,6 +71,7 @@ function App() {
 
           {/* Community module routes */}
           <Route path="/community" element={<CommunityHomePage />} />
+          <Route path="/community/OfficeInsightsArticle" element={<OfficeInsightsArticle/>} />
           
           {/* Helpdesk/Feedback module routes */}
           <Route path="/helpdesk/" element={<Tickets />} />

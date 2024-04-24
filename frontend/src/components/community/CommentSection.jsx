@@ -3,16 +3,41 @@ import { FaReply, FaArrowUp, FaArrowDown } from 'react-icons/fa'; // Importing F
 
 const CommentSection = ({ comments }) => {
     const [newComment, setNewComment] = useState('');
-    const [isReplying, setIsReplying] = useState(false);
+    const [replyingTo, setReplyingTo] = useState(Array(comments.length).fill(-1));
+    const [upvotedComments, setUpvotedComments] = useState([]);
+    const [downvotedComments, setDownvotedComments] = useState([]);
 
     const handleCommentChange = (e) => {
         setNewComment(e.target.value);
     };
 
     const handleSubmitComment = () => {
-        // Handle submitting the new comment, for now just log it
         console.log('New comment:', newComment);
-        setNewComment(''); // Clear the input field after submitting
+        setNewComment('');
+    };
+
+    const toggleReply = (index) => {
+        const newRepliesState = [...replyingTo];
+        newRepliesState[index] = (newRepliesState[index] === -1) ? index : -1;
+        setReplyingTo(newRepliesState);
+    };
+
+    const toggleUpvote = (index) => {
+        if (upvotedComments.includes(index)) {
+            setUpvotedComments(upvotedComments.filter(item => item !== index));
+        } else {
+            setUpvotedComments([...upvotedComments, index]);
+            setDownvotedComments(downvotedComments.filter(item => item !== index));
+        }
+    };
+
+    const toggleDownvote = (index) => {
+        if (downvotedComments.includes(index)) {
+            setDownvotedComments(downvotedComments.filter(item => item !== index));
+        } else {
+            setDownvotedComments([...downvotedComments, index]);
+            setUpvotedComments(upvotedComments.filter(item => item !== index));
+        }
     };
 
     return (
@@ -28,24 +53,28 @@ const CommentSection = ({ comments }) => {
                             </div>
                             <p className="text-gray-700 text-left">{comment.commentText}</p>
 
-                            {/* Actions */}
                             <div className="flex items-center mt-2">
-                                <button className="flex items-center text-gray-500 hover:text-blue-500">
+                                <button 
+                                    className={`flex items-center text-gray-500 hover:text-blue-500 ${upvotedComments.includes(index) ? 'text-blue-500' : 'text-gray-500'}`}
+                                    onClick={() => toggleUpvote(index)}
+                                >
                                     <FaArrowUp className="mr-1" /> Upvote
                                 </button>
-                                <button className="flex items-center text-gray-500 hover:text-red-500 ml-4">
+                                <button 
+                                    className={`flex items-center text-gray-500 hover:text-red-500 ml-4 ${downvotedComments.includes(index) ? 'text-red-500' : 'text-gray-500'}`}
+                                    onClick={() => toggleDownvote(index)}
+                                >
                                     <FaArrowDown className="mr-1" /> Downvote
                                 </button>
                                 <button 
                                     className="flex items-center text-blue-500 hover:underline ml-4"
-                                    onClick={() => setIsReplying(!isReplying)}
+                                    onClick={() => toggleReply(index)}
                                 >
-                                    <FaReply className="mr-1" /> Reply
+                                    <FaReply className="mr-2" /> Reply
                                 </button>
                             </div>
 
-                            {/* Reply */}
-                            {isReplying && (
+                            {replyingTo[index] === index && (
                                 <div className="mt-2">
                                     <textarea
                                         className="w-full p-2 rounded-md border"
@@ -64,7 +93,6 @@ const CommentSection = ({ comments }) => {
                         </div>
                     </div>
                     
-                    {/* Replies */}
                     {comment.replies && (
                         <div className="ml-16 mt-4">
                             {comment.replies.map((reply, idx) => (
@@ -84,7 +112,6 @@ const CommentSection = ({ comments }) => {
                 </div>
             ))}
 
-            {/* Add new comment section */}
             <div className="mt-4">
                 <textarea
                     className="w-full p-2 rounded-md border"

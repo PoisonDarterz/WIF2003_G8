@@ -11,10 +11,21 @@ const CommunityPost = ({
     likes, 
     comments 
 }) => {
-    const [showComments, setShowComments] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(likes);
+    const [isCommentsShown, setIsCommentsShown] = useState(false);
+
+    const toggleLike = () => {
+        if (isLiked) {
+            setLikeCount(likeCount - 1);
+        } else {
+            setLikeCount(likeCount + 1);
+        }
+        setIsLiked(!isLiked);
+    };
 
     const toggleComments = () => {
-        setShowComments(!showComments);
+        setIsCommentsShown(!isCommentsShown);
     };
 
     // Example comments array based on the number of comments passed
@@ -42,18 +53,19 @@ const CommunityPost = ({
             </div>
             <div className="flex justify-between items-center">
                 <button 
-                    className="flex items-center text-blue-500 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className={`flex items-center ${isLiked ? 'text-blue-600' : 'text-gray-500'} hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
+                    onClick={toggleLike}
                 >
-                    <FaThumbsUp className="mr-2" /> {likes} Likes
+                    <FaThumbsUp className="mr-2" /> {likeCount} Likes
                 </button>
                 <button 
-                    className="flex items-center text-blue-500 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className={`flex items-center ${isCommentsShown ? 'text-blue-600' : 'text-gray-500'} hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
                     onClick={toggleComments}
                 >
                     <FaComment className="mr-2" /> {comments} Comments
                 </button>
             </div>
-            {showComments && <CommentSection comments={commentsArray} />}
+            {isCommentsShown && <CommentSection comments={commentsArray} />}
         </div>
     );
 };
