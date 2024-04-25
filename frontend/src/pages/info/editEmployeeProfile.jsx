@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import TopNavBlack from "../../components/TopNavBlack";
 
 export default function EditEmployeeProfile() {
@@ -55,6 +56,10 @@ export default function EditEmployeeProfile() {
     updatedList.splice(index, 1);
     listType === educationList ? setEducationList(updatedList) :
     listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
+  };
+
+  const handleCancelEditSection = (index, listType) =>{
+
   };
 
   const handleChange = (e, index, listType) => {
@@ -212,7 +217,11 @@ export default function EditEmployeeProfile() {
                         <h4 className="text-sm font-semibold">{education.title}</h4>
                         <p>{education.description}</p>
                       </div>
-                      <button type="button" onClick={() => handleDeleteItem(index, educationList)} className="text-indigo-600">Delete</button>
+                      <div className="flex gap-2">
+                        {/* <button type="button" onClick={() => handleModifyItem(index, educationList)} className="text-indigo-600"><AiOutlineEdit /></button> */}
+                        <button type="button" className="text-indigo-600"><AiOutlineEdit /></button>
+                        <button type="button" onClick={() => handleDeleteItem(index, educationList)} className="text-red-500"><AiOutlineDelete /></button>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-4 bg-[#eaf3ff] p-4 rounded-lg">
@@ -236,7 +245,10 @@ export default function EditEmployeeProfile() {
                         id={`evidence${index}`}
                         name={`evidence${index}`}
                       />
-                      <button type="button" onClick={() => handleConfirmItem(index, educationList)} className="text-indigo-600">Add</button>
+                      <div className="flex justify-center gap-10 items-center">
+                        <button type="button" onClick={() => handleConfirmItem(index, educationList)} className="text-indigo-600">Add</button>
+                        <button type="button" onClick={() => handleCancelEditSection(index, educationList)} className="text-red-500">Cancel</button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -258,11 +270,15 @@ export default function EditEmployeeProfile() {
                 <div key={index} className="mt-2">
                   {skill.confirmed ? (
                     <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
-                      <div>
+                    <div>
                         <h4 className="text-sm font-semibold">{skill.skill}</h4>
                         <p>{skill.description}</p>
                       </div>
-                      <button type="button" onClick={() => handleDeleteItem(index, skillsList)} className="text-indigo-600">Delete</button>
+                      <div className="flex gap-2">
+                        {/* <button type="button" onClick={() => handleModifyItem(index, skillsList)} className="text-indigo-600"><AiOutlineEdit /></button> */}
+                        <button type="button" className="text-indigo-600"><AiOutlineEdit /></button>
+                        <button type="button" onClick={() => handleDeleteItem(index, skillsList)} className="text-red-500"><AiOutlineDelete /></button>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-4 bg-[#eaf3ff] p-4 rounded-lg">
@@ -286,7 +302,10 @@ export default function EditEmployeeProfile() {
                         id={`skillEvidence${index}`}
                         name={`skillEvidence${index}`}
                       />
-                      <button type="button" onClick={() => handleConfirmItem(index, skillsList)} className="text-indigo-600">Add</button>
+                      <div className="flex justify-center gap-10 items-center">
+                        <button type="button" onClick={() => handleConfirmItem(index, skillsList)} className="text-indigo-600">Add</button>
+                        <button type="button" onClick={() => handleCancelEditSection(index, skillsList)} className="text-red-500">Cancel</button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -312,7 +331,11 @@ export default function EditEmployeeProfile() {
                         <h4 className="text-sm font-semibold">{award.award}</h4>
                         <p>{award.description}</p>
                       </div>
-                      <button type="button" onClick={() => handleDeleteItem(index, awardsList)} className="text-indigo-600">Delete</button>
+                      <div className="flex gap-2">
+                        {/* <button type="button" onClick={() => handleModifyItem(index, awardsList)} className="text-indigo-600"><AiOutlineEdit /></button> */}
+                        <button type="button" className="text-indigo-600"><AiOutlineEdit /></button>
+                        <button type="button" onClick={() => handleDeleteItem(index, awardsList)} className="text-red-500"><AiOutlineDelete /></button>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-4 bg-[#eaf3ff] p-4 rounded-lg">
@@ -336,7 +359,10 @@ export default function EditEmployeeProfile() {
                         id={`awardEvidence${index}`}
                         name={`awardEvidence${index}`}
                       />
-                      <button type="button" onClick={() => handleConfirmItem(index, awardsList)} className="text-indigo-600">Add</button>
+                      <div className="flex justify-center gap-10 items-center">
+                        <button type="button" onClick={() => handleConfirmItem(index, awardsList)} className="text-indigo-600">Add</button>
+                        <button type="button" onClick={() => handleCancelEditSection(index, awardsList)} className="text-red-500">Cancel</button>
+                      </div>
                     </div>
                   )}
                 </div>
