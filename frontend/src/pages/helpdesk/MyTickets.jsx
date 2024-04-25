@@ -24,7 +24,7 @@ function MyTickets(){
       reportTime:"4:45pm",
       category:"Workplace harassment",
       subject:"Inappropriate Behavior by Colleague",
-      assignedInvestigator:"Kong",
+      assignedInvestigator:"James",
       status:"resolved",
 
     },
@@ -34,7 +34,7 @@ function MyTickets(){
       reportTime:"10:49am",
       category:"Financial Misconduct",
       subject:"Misuse of Company Funds",
-      assignedInvestigator:"Sharran",
+      assignedInvestigator:"Hui Min",
       status:"resolved"
     },
   ]
@@ -56,10 +56,10 @@ function MyTickets(){
         </div>
         <div className="mt-8 mb-4 text-left">
           <h1 className="text-2xl font-bold">My tickets</h1>
-          <p className="text-lg">Report any non-compliance here</p>
+          <p className="text-lg ">Report any non-compliance here</p>
         </div>
         <div className="flex justify-end">
-          <button onClick={handleAddTicket} className="flex w-52 h-7 p-2 bg-[#2C74D8] text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 m-1 justify-center items-center">
+          <button onClick={handleAddTicket} className="flex w-52 h-7 p-2 bg-[#2C74D8] text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:scale-105 transition-transform m-1 justify-center items-center">
             <div>
               <img className="w-5 h-5 mr-1" src={"/PlusIcon.png"} alt="report non-compliance"/>
             </div>
@@ -81,7 +81,7 @@ function MyTickets(){
           </thead>
           <tbody className="text-sm font-normal text-gray-700">
             {tickets.map((data, i) => (
-              <tr onClick={()=>{handleViewTicket(i)}} className={`${i % 2 === 0 ? 'bg-[#fefefe]' : 'bg-[#eaf3ff]'} px-4 py-2`}>
+              <tr onClick={()=>{handleViewTicket(i)}} className={`hover:bg-slate-300 ${i % 2 === 0 ? 'bg-[#fefefe] '  : 'bg-[#eaf3ff] '} px-4 py-2`}>
                 <td className="w-[5%] px-4 py-4">{data.ticketID}</td>
                 <td className="w-[10%] px-4 py-4">{data.reportDate}</td>
                 <td className="w-[10%] px-4 py-4">{data.reportTime}</td>

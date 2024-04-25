@@ -112,8 +112,8 @@ function ResolveTicket(){
           </div>
         </div>
         <div className="flex my-10 justify-center items-center">
-          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF]" onClick={handleCancelSave}>Cancel</button>
-          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF]" onClick={handleSave}>Save</button>
+          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF] hover:scale-110 transition-transform" onClick={handleCancelSave}>Cancel</button>
+          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF] hover:scale-110 transition-transform" onClick={handleSave}>Save</button>
         </div>
         </div>
     )

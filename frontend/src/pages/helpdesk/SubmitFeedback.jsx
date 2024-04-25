@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Rating from 'react-rating';
 import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaStar, FaRegStar } from 'react-icons/fa';
 
 function SubmitFeedback(){
   const [rating,setRating]=useState(0);
@@ -44,8 +45,8 @@ function SubmitFeedback(){
           <Rating
             className=""
             initialRating={rating}
-            emptySymbol={<img className="h-10 w-12 mx-2" src="/EmptyStar.png" alt="empty star"/>}
-            fullSymbol={<img className="h-10 w-12 mx-2" src="/FilledStar.png" alt="filled star"/>}
+            emptySymbol={<FaRegStar className="h-10 w-12 mx-2 text-yellow-500 " />}
+            fullSymbol={<FaStar className="h-10 w-12 mx-2 text-yellow-500 "/>}
             onChange={handleRatingChange}
           />
         </div>
@@ -54,13 +55,13 @@ function SubmitFeedback(){
           <textarea
               value={feedback}
               onChange={handleFeedbackChange}
-              className="border rounded-lg h-40 w-[70%] p-2 resize-none overflow-auto"
+              className="border rounded-lg h-40 w-[70%] p-2 resize-none overflow-auto bg-[#eaf3ff] border-gray-300"
               placeholder="Your thoughts are valuable to us"
             />
         </div>
         <div className="flex my-10 justify-center items-center">
-          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF]" onClick={handleCancelFeedback}>Cancel</button>
-          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF]" onClick={handleSubmit}>Submit</button>
+          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF] hover:scale-110 transition-transform" onClick={handleCancelFeedback}>Cancel</button>
+          <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF] hover:scale-110 transition-transform" onClick={handleSubmit}>Submit</button>
         </div>
       </div>
   )

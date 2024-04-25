@@ -34,7 +34,7 @@ function TopNavBlack() {
             {item.submenu && (
               <div className="absolute left-0 top-full w-48 rounded-md shadow-lg bg-black text-white z-10 hidden group-hover:block border-t-2 border-transparent">
                 {item.submenu.map((subItem) => (
-                  <Link to={subItem.link} className="block px-4 py-2 text-sm" onClick={() => setActiveLink(item.title.toUpperCase())} key={subItem.title}>{subItem.title}</Link>
+                  <Link to={subItem.link} className="block px-4 py-2 text-sm hover:text-[#EB4335]" onClick={() => setActiveLink(item.title.toUpperCase())} key={subItem.title}>{subItem.title}</Link>
                 ))}
               </div>
             )}

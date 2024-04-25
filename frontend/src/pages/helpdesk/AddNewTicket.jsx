@@ -60,7 +60,7 @@ function AddNewTicket(){
             <div className="flex my-3">
               <label className="font-bold w-[12%] text-start">Ticket ID</label>
               <input
-                className="border rounded-lg w-60 h-fit"
+                className="border rounded-lg w-60 h-fit pl-2"
                 type="text"
                 id="ticketID"
                 value="T007"
@@ -70,7 +70,7 @@ function AddNewTicket(){
             </div>  
             <div className="flex my-3">
               <label className="font-bold w-[12%] text-start">Category</label>
-              <select id="category" className="border rounded-lg w-60" >
+              <select id="category" className="border rounded-lg w-60 pl-2" >
                 <option value="General">Select</option>
                 <option value="Financial misconduct">Financial misconduct</option>
                 <option value="Data security breaches">Data security breaches</option>
@@ -133,8 +133,8 @@ function AddNewTicket(){
             <div className="flex bg-green-300 justify-center items-center">Ticket submitted successfully!</div>
       )}
             <div className="flex my-10 justify-center items-center">
-              <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF]" onClick={handleCancelAddTicket}>Cancel</button>
-              <button type="submit" className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF]" >Submit</button>
+              <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF] hover:scale-110 transition-transform" onClick={handleCancelAddTicket}>Cancel</button>
+              <button type="submit" className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF] hover:scale-110 transition-transform" >Submit</button>
             </div>              
           </form>
 
