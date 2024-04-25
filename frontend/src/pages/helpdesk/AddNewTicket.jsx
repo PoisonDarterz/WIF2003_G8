@@ -6,6 +6,7 @@ import { MdCancel } from "react-icons/md";
 
 function AddNewTicket(){
   const [files,setFiles]=useState([]);
+  const [isSubmitted,setIsSubmitted]=useState(false);
   const navigate=useNavigate();
 
   const handleFileChange=(event)=>{
@@ -41,10 +42,11 @@ function AddNewTicket(){
   const handleSubmit=(event)=>{
     event.preventDefault()
     setNotification("Ticket submitted successfully!");
-    setTimeout(() => {
-      setNotification(null);
-      navigate("/helpdesk/");
-    }, 3000);
+    setIsSubmitted(true);
+    // setTimeout(() => {
+    //   setNotification(null);
+    //   navigate("/helpdesk/");
+    // }, 3000);
   }
 
     return(
@@ -64,13 +66,13 @@ function AddNewTicket(){
                 type="text"
                 id="ticketID"
                 value="T007"
-                readonly
+                readOnly
               >
               </input>
             </div>  
             <div className="flex my-3">
               <label className="font-bold w-[12%] text-start">Category</label>
-              <select id="category" className="border rounded-lg w-60 pl-2" >
+              <select id="category" className="border rounded-lg w-60 pl-2">
                 <option value="General">Select</option>
                 <option value="Financial misconduct">Financial misconduct</option>
                 <option value="Data security breaches">Data security breaches</option>
@@ -86,6 +88,7 @@ function AddNewTicket(){
                 type="text"
                 id="subject"
                 placeholder="Subject"
+                readOnly={isSubmitted}
               >
               </input>
             </div>
@@ -96,6 +99,8 @@ function AddNewTicket(){
                 id="detail"
                 placeholder="Provide as much detail as possible"
                 rows="4"
+                required
+                readOnly={isSubmitted}
               >
               </textarea>
             </div> 
@@ -130,12 +135,18 @@ function AddNewTicket(){
             </div>
                 
             {notification && (
-            <div className="flex bg-green-300 justify-center items-center">Ticket submitted successfully!</div>
-      )}
+            <div className="flex bg-green-300 justify-center items-center rounded-lg">Ticket submitted successfully!</div>
+            )}
+            {isSubmitted?
+            <div className="flex my-10 justify-center items-center">
+              <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF] hover:scale-110 transition-transform" onClick={handleCancelAddTicket}>Back</button>
+            </div>  
+            :
             <div className="flex my-10 justify-center items-center">
               <button className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF] hover:scale-110 transition-transform" onClick={handleCancelAddTicket}>Cancel</button>
               <button type="submit" className="mx-5 bg-[#2C74D8] p-2 rounded-lg text-[#FFFFFF] hover:scale-110 transition-transform" >Submit</button>
-            </div>              
+            </div>  
+            }
           </form>
 
         </div>
