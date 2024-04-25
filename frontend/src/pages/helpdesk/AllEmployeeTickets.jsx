@@ -24,11 +24,11 @@ function AllEmployeeTickets(){
       attachment:null,
       investigationUpdate:null,    
     },    
-    {ticketID:"T005",employeeID:"E1002",reportDate:"28 Feb 2024",reportTime:"5:56pm",category:"Others",subject:"Safety Violations",assignedInvestigator:"Ahmad","status":"in progress"},
-    {ticketID:"T004",employeeID:"E1003",reportDate:"1 Jan 2024",reportTime:"11:23am",category:"Data Security Breaches",subject:"Unauthorized Access to Confidential Data",assignedInvestigator:"Firdaus",status:"in progress"},
-    {ticketID:"T003",employeeID:"E1004",reportDate:"27 Dec 2023",reportTime:"2:28pm",category:"Discrimination",subject:"Unfair Treatment due to National Origin",assignedInvestigator:"Desmond",status:"resolved"},
-    {ticketID:"T002",employeeID:"E1001",reportDate:"4 August 2023",reportTime:"4:45pm",category:"Workplace harassment",subject:"Inappropriate Behavior by Colleague",assignedInvestigator:"Kong",status:"resolved"},
-    {ticketID:"T001",employeeID:"E1001",reportDate:"26 Mac 2023",reportTime:"10:49am",category:"Financial Misconduct",subject:"Misuse of Company Funds",assignedInvestigator:"Sharran","status":"resolved"},
+    {ticketID:"T005",employeeID:"E1002",reportDate:"28 Feb 2024",reportTime:"5:56pm",category:"Others",subject:"Safety Violations",assignedInvestigator:"Jonas","status":"in progress"},
+    {ticketID:"T004",employeeID:"E1003",reportDate:"1 Jan 2024",reportTime:"11:23am",category:"Data Security Breaches",subject:"Unauthorized Access to Confidential Data",assignedInvestigator:"Ching Ying",status:"in progress"},
+    {ticketID:"T003",employeeID:"E1004",reportDate:"27 Dec 2023",reportTime:"2:28pm",category:"Discrimination",subject:"Unfair Treatment due to National Origin",assignedInvestigator:"Ing Zhen",status:"resolved"},
+    {ticketID:"T002",employeeID:"E1001",reportDate:"4 August 2023",reportTime:"4:45pm",category:"Workplace harassment",subject:"Inappropriate Behavior by Colleague",assignedInvestigator:"James",status:"resolved"},
+    {ticketID:"T001",employeeID:"E1001",reportDate:"26 Mac 2023",reportTime:"10:49am",category:"Financial Misconduct",subject:"Misuse of Company Funds",assignedInvestigator:"Hui Min","status":"resolved"},
   ]
     return(
       <div className="p-8">
@@ -55,7 +55,7 @@ function AllEmployeeTickets(){
           </thead>
           <tbody className="text-sm font-normal text-gray-700">
             {allTickets.map((data, i) => (
-              <tr onClick={()=>handleResolveTicket(i)} className={`${i % 2 === 0 ? 'bg-[#fefefe]' : 'bg-[#eaf3ff]'} px-4 py-2`}>
+              <tr onClick={()=>handleResolveTicket(i)} className={`hover:bg-slate-300 ${i % 2 === 0 ? 'bg-[#fefefe]' : 'bg-[#eaf3ff]'} px-4 py-2`}>
                 <td className="w-[7%] px-4 py-4">{data.ticketID}</td>
                 <td className="w-[9%] px-4 py-4">{data.employeeID}</td>
                 <td className="w-[10%] px-4 py-4">{data.reportDate}</td>
