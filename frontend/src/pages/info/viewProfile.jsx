@@ -7,18 +7,22 @@ export default function ViewProfile() {
   const [imageUrl, setImageUrl] = useState("");
 
   const skillList = [
-    {skill: "Market Analysis", desc:"desc", image: "/blank.png"},
-    {skill: "Negotiation", desc:"desc", image: "/blank.png"}
+    { skill: "Market Analysis", desc: "desc", image: "/blank.png" },
+    { skill: "Negotiation", desc: "desc", image: "/blank.png" }
   ];
 
   const awardList = [
-    {award: "award1", desc:"desc", image: "/blank.png"},
-    {award: "award2", desc:"desc", image: "/blank.png"}
+    { award: "award1", desc: "desc", image: "/blank.png" },
+    { award: "award2", desc: "desc", image: "/blank.png" }
   ];
 
   const handleViewImage = (url) => {
     setImageUrl(url);
-    setShowImage(!showImage);
+    setShowImage(true);
+  };
+
+  const handleCloseImage = () => {
+    setShowImage(false);
   };
 
   return (
@@ -36,9 +40,10 @@ export default function ViewProfile() {
           <div className="bg-[#eaf3ff] p-5 sm:col-span-2 text-left rounded-lg">
             <div>
               <img
-                className="h-48 w-36 rounded-lg"
+                className="h-48 w-36 rounded-lg cursor-pointer"
                 src="/Profile_image.jpg"
                 alt="Profile Picture"
+                onClick={() => handleViewImage("/Profile_image.jpg")}
               />
               <h2 className="mt-5 font-bold">Employee ID</h2>
               <p>#E00318</p>
@@ -64,7 +69,7 @@ export default function ViewProfile() {
           </div>
 
           {/* Right Column */}
-          <div className="sm:col-span-8 text-left ml-5">
+          <div className="bg-[#eaf3ff] p-5 sm:col-span-8 text-left ml-5 rounded-lg">
             <h2 className="font-bold">Bio</h2>
             <p>
               I am an experienced Sales Manager with a strong track record in
@@ -81,7 +86,7 @@ export default function ViewProfile() {
             <p>Bachelor of Finance, University Malaya</p>
             <div className="border-b border-gray-900/10 pb-12"></div>
 
-            <table className="mt-5 w-full table-auto">
+            <table className="mt-5 w-full table-auto rounded-lg">
               <thead>
                 <tr className="text-md font-medium text-black rounded-lg">
                   <th className="w-[30%] px-4 py-2 bg-gray-200 font-bold">Skills</th>
@@ -101,9 +106,10 @@ export default function ViewProfile() {
                     <td className="w-[50%] px-4 py-4">{skill.desc}</td>
                     <td className="w-[20%] px-4 py-4">
                       <img
-                        className="h-20 w-20"
+                        className="h-20 w-20 cursor-pointer"
                         src={skill.image}
                         alt={skill.skill}
+                        onClick={() => handleViewImage(skill.image)}
                       />
                     </td>
                   </tr>
@@ -112,7 +118,7 @@ export default function ViewProfile() {
             </table>
             <div className="border-b border-gray-900/10 pb-12"></div>
 
-            <table className="mt-5 w-full table-auto">
+            <table className="mt-5 w-full table-auto rounded-lg">
               <thead>
                 <tr className="text-md font-medium text-black rounded-lg">
                   <th className="w-[30%] px-4 py-2 bg-gray-200 font-bold">Professional Affiliations or Awards</th>
@@ -158,6 +164,20 @@ export default function ViewProfile() {
           </div>
         </div>
       </div>
+      {/* Modal for showing the enlarged image */}
+      {showImage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+          <div className="max-w-xl p-4 bg-white rounded-lg">
+            <img src={imageUrl} alt="Enlarged Image" className="w-full" />
+            <button
+              onClick={handleCloseImage}
+              className="p-2 mr-1 absolute top-2 right-2 text-white hover:text-gray-400"
+            >
+              ╳  
+            </button>
+          </div>
+        </div>
+      )}
     </form>
   );
 }
