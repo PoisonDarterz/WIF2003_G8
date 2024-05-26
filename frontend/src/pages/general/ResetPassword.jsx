@@ -1,15 +1,42 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ResetPassword = () => {
     const outerBgColor = 'bg-teal-200'; // Background color for the outer div
     const innerBgColor = 'bg-gray-100'; // Background color for the inner rectangle
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const [formData, setFormData] = useState({
+        newPassword: '',
+        confirmPassword: ''
+    });
+
+    const [message, setMessage] = useState('');
+
+    const { newPassword, confirmPassword } = formData;
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Navigate to LogIn page
-        navigate('/');
+
+        if (newPassword !== confirmPassword) {
+            setMessage('Passwords do not match.');
+            return;
+        }
+
+        try {
+            const token = window.location.pathname.split('/').pop(); // Extract token from URL
+            const response = await axios.post(`http://localhost:5000/api/auth/reset-password/${token}`, {
+                newPassword
+            });
+            setMessage(response.data.message);
+        } catch (err) {
+            setMessage(err.response.data.message);
+        }
     };
 
     return (
@@ -35,6 +62,8 @@ const ResetPassword = () => {
                                 id="newPassword" 
                                 className="w-full p-2 border rounded-md" 
                                 placeholder="Enter new password" 
+                                value={newPassword}
+                                onChange={handleChange}
                                 required 
                             />
                         </div>
@@ -47,9 +76,14 @@ const ResetPassword = () => {
                                 id="confirmPassword" 
                                 className="w-full p-2 border rounded-md" 
                                 placeholder="Confirm new password" 
+                                value={confirmPassword}
+                                onChange={handleChange}
                                 required 
                             />
                         </div>
+
+                        {/* Message */}
+                        {message && <p className="text-red-500 mb-4">{message}</p>}
 
                         {/* Reset Button */}
                         <button 
