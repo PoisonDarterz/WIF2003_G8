@@ -16,8 +16,11 @@ function ProcessSalary() {
   
   const [previewGenerated, setPreviewGenerated] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
-  const [salaryDetails, setSalaryDetails] = useState(null);
-  const [category, setCategory] = useState('');
+  const [salaryDetails, setSalaryDetails] = useState({
+    basic: [],
+    allowances: [],
+    deductions: [],
+  });
 
   const handlePreview = async () => {
     const firstSelectedEmployee = employees.find(employee => employee.checked);

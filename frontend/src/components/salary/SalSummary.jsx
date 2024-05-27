@@ -2,10 +2,10 @@ import React from 'react';
 
 function SummaryBox({ employees, handlePreview, handleGenerate, salaryDetails }) {
   const summaryDetails = {
-    basic: salaryDetails.basic.reduce((sum, item) => sum + item.amount, 0),
-    allowance: salaryDetails.allowances.reduce((sum, item) => sum + item.amount, 0),
-    "Bonus - Deductions": salaryDetails.bonuses.reduce((sum, item) => sum + item.amount, 0) - salaryDetails.deductions.reduce((sum, item) => sum + item.amount, 0),
-    "EPF \/ Socso": salaryDetails["EPF \/ Socso"].reduce((sum, item) => sum + item.amount, 0),
+    basic: salaryDetails.basic ? salaryDetails.basic.reduce((sum, item) => sum + item.amount, 0) : 0,
+    allowance: salaryDetails.allowances ? salaryDetails.allowances.reduce((sum, item) => sum + item.amount, 0) : 0,
+    "Bonus - Deductions": (salaryDetails.bonuses ? salaryDetails.bonuses.reduce((sum, item) => sum + item.amount, 0) : 0) - (salaryDetails.deductions ? salaryDetails.deductions.reduce((sum, item) => sum + item.amount, 0) : 0),
+    "EPF \/ Socso": salaryDetails["EPF \/ Socso"] ? salaryDetails["EPF \/ Socso"].reduce((sum, item) => sum + item.amount, 0) : 0,
   };
 
   const checkedEmployees = employees.filter(employee => employee.checked);

@@ -12,6 +12,7 @@ function SalaryBox({ openModal, setSalaryDetails }) {
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [category, setCategory] = useState('');
+  const [editingRecord, setEditingRecord] = useState(null);
 
   const handleAddRecord = (title, amount, notes) => {
     const newRecord = { name: title, amount: Number(amount), notes };
@@ -20,23 +21,44 @@ function SalaryBox({ openModal, setSalaryDetails }) {
       [category]: [...prevState[category], newRecord],
     }));
   };
+
+  
+  const handleEditRecord = (category, index) => {
+    setEditingRecord({ category, index, record: localSalaryDetails[category][index] });
+    setModalIsOpen(true);
+  };
+
+  const handleSaveEdit = (title, amount, notes) => {
+    const updatedRecord = { name: title, amount: Number(amount), notes };
+    setLocalSalaryDetails(prevState => ({
+      ...prevState,
+      [editingRecord.category]: prevState[editingRecord.category].map((record, index) =>
+        index === editingRecord.index ? updatedRecord : record
+      ),
+    }));
+    setEditingRecord(null);
+    setModalIsOpen(false);
+  };
+
+  const handleRemoveRecord = (category, index) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+    if (confirmDelete) {
+      setLocalSalaryDetails(prevState => ({
+        ...prevState,
+        [category]: prevState[category].filter((_, i) => i !== index),
+      }));
+    }
+  };
   
   const openModalWithAddRecord = (category) => {
     setModalIsOpen(true);
     setCategory(category);
   };
-  
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
 
   // Update the parent component whenever localSalaryDetails changes
   useEffect(() => {
     setSalaryDetails(localSalaryDetails);
   }, [localSalaryDetails, setSalaryDetails]);
-
-
 
   return (
     <div className="h-[70vh] w-2/5 bg-[#EAF3FF] rounded-lg p-8 overflow-y-auto">
@@ -60,13 +82,15 @@ function SalaryBox({ openModal, setSalaryDetails }) {
                 <div className="ml-4">
                   <button
                     style={{ backgroundColor: '#EBB99E', color: '#000000' }}
-                    className="mr-2 rounded px-4">
+                    className="mr-2 rounded px-4"
+                    onClick={() => handleEditRecord(key, index)}>
                     Edit
                   </button>
                   {key !== 'basic' &&
                     <button
                       style={{ backgroundColor: '#EB4335', color: '#FFFFFF' }}
-                      className="rounded px-4">
+                      className="rounded px-4"
+                      onClick={() => handleRemoveRecord(key, index)}>
                       Remove
                     </button>}
                 </div>
@@ -75,7 +99,16 @@ function SalaryBox({ openModal, setSalaryDetails }) {
           ))}
         </div>
       ))}
-      <SalaryDialog isOpen={modalIsOpen} onRequestClose={closeModal} handleAddRecord={handleAddRecord} />
+        <SalaryDialog
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        handleAddRecord={handleAddRecord}
+        handleEditRecord={handleSaveEdit}
+        editMode={!!editingRecord}
+        existingTitle={editingRecord?.record.name}
+        existingAmount={editingRecord?.record.amount}
+        existingNotes={editingRecord?.record.notes}
+      />
     </div>
   );
 }
