@@ -19,9 +19,9 @@ router.post('/generate-salary', async (req, res) => {
 
         // Loop through all checked employees
         for (const employee of checkedEmployees) {
-            console.log(`Generating PDF for employee ${employee.id}`);
+            console.log(`Generating PDF for employee ${employee.employee.id}`);
             console.log(employee);
-            
+
             // Generate the PDF
             const pdfDocDefinition = generatePreview(employee.employee, employee.salaryDetails, true);
             const pdfDocGenerator = pdfMake.createPdf(pdfDocDefinition);
@@ -34,22 +34,41 @@ router.post('/generate-salary', async (req, res) => {
             console.log('PDF converted to buffer');
 
             // Upload the PDF to Azure Blob Storage
-            const blobName = `${employee.id}-${new Date().toISOString()}.pdf`;
+            const blobName = `${employee.employee.id}-${new Date().toISOString()}.pdf`;
             const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-            await blockBlobClient.upload(pdfBuffer, pdfBuffer.length); 
+            await blockBlobClient.upload(pdfBuffer, pdfBuffer.length);
 
             console.log('PDF uploaded to Azure Blob Storage');
 
             // Get the URL of the uploaded PDF
             const documentURL = blockBlobClient.url;
+            console.log('Salary document created');
+
+            const salaryDetails2 = Object.keys(employee.salaryDetails).map(category => {
+                if (category !== 'monthYear') {
+                    return {
+                        category,
+                        records: employee.salaryDetails[category]
+                    };
+                }
+            }).filter(Boolean);
+
+            console.log('Salary details:', salaryDetails2);
 
             // Create a new Salary document
             const salary = new Salary({
                 dateIssued: new Date(),
-                // rest of your code
+                month: employee.salaryDetails.monthYear,
+                documentURL,
+                employeeId: employee.employee._id,
+                salaryDetails: salaryDetails2
             });
 
-            console.log('Salary document created');
+            salary.save()
+                .then(() => console.log('Salary added successfully'))
+                .catch(err => console.error('Error: ', err));
+
+            console.log('Salary document saved to MongoDB');
         }
     } catch (error) {
         console.error('An error occurred:', error);
