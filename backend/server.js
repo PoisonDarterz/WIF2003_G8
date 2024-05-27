@@ -1,9 +1,11 @@
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: '../.env' }); // Add this line at the top
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 
+const employeeRouter = require('./routers/employee.router');
 const authRouter = require('./routers/auth.router')
 
 // Connect to MongoDB Atlas database
@@ -22,6 +24,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
+app.use('/api/employees', employeeRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
