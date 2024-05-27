@@ -1,30 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
 import { Link } from "react-router-dom";
-
-const employeeData = [
-  { id: '#E00318', name: 'John Smith', department: 'Sales', jobTitle: 'Sales Manager', email: 'john.smith@gmail.com'},
-  { id: '#E00278', name: 'Emily Johnson', department: 'Marketing', jobTitle: 'Marketing Specialist', email: 'emily.johnson@gmail.com'},
-  { id: '#E00106', name: 'David Lee', department: 'Engineering', jobTitle: 'Software Engineer', email: 'david.lee@gmail.com'},
-  { id: '#E00335', name: 'Sarah Brown', department: 'Human Resources', jobTitle: 'HR Coordinator', email: 'sarah.brown@gmail.com'},
-  { id: '#E00243', name: 'Michael Garcia', department: 'Finance', jobTitle: 'Financial Analyst', email: 'michael.garcia@gmail.com'},
-  { id: '#E00189', name: 'Jessica Martinez', department: 'Operations', jobTitle: 'Operations Manager', email: 'jessica.martinez@gmail.com'},
-  { id: '#E00456', name: 'Daniel Clark', department: 'Customer Service', jobTitle: 'Customer Service Representative', email: 'daniel.clark@gmail.com'},
-  { id: '#E00567', name: 'Sophia Anderson', department: 'Information Technology', jobTitle: 'IT Specialist', email: 'sophia.anderson@gmail.com'},
-  { id: '#E00678', name: 'Matthew Taylor', department: 'Research and Development', jobTitle: 'Research Scientist', email: 'matthew.taylor@gmail.com'},
-  { id: '#E00789', name: 'Olivia White', department: 'Quality Assurance', jobTitle: 'QA Engineer', email: 'olivia.white@gmail.com'},
-  { id: '#E00890', name: 'Emma Thompson', department: 'Public Relations', jobTitle: 'PR Manager', email: 'emma.thompson@gmail.com'},
-  { id: '#E00987', name: 'Andrew Wilson', department: 'Product Management', jobTitle: 'Product Manager', email: 'andrew.wilson@gmail.com'},
-  { id: '#E01054', name: 'Grace Davis', department: 'Customer Success', jobTitle: 'Customer Success Manager', email: 'grace.davis@gmail.com'},
-  { id: '#E01123', name: 'William Baker', department: 'Legal', jobTitle: 'Legal Counsel', email: 'william.baker@gmail.com'},
-  { id: '#E01234', name: 'Natalie Moore', department: 'Human Resources', jobTitle: 'Recruitment Specialist', email: 'natalie.moore@gmail.com'},
-];
+import axios from "axios";
 
 function ViewEmployeeList() {
   const [searchQuery, setSearchQuery] = useState(""); 
   const [filters, setFilters] = useState({ id: "", department: "", jobTitle: "" });
   const [currentPage, setCurrentPage] = useState(1);
+  const [employeeData, setEmployeeData] = useState([]);
   const recordsPerPage = 6; 
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/employees");
+        console.log("Fetched employees from frontend:", response.data); 
+        setEmployeeData(response.data);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+  
+    fetchEmployees();
+  }, []);
 
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value); 
@@ -98,7 +96,7 @@ function ViewEmployeeList() {
                 <td className="w-[20%] px-4 py-4">{data.jobTitle}</td>
                 <td className="w-[20%] px-4 py-4">{data.email}</td>
                 <td className="w-[10%] px-4 py-4">
-                  <Link to="/info/viewProfile">
+                <Link to={`/info/viewProfile/${data.id}`}>
                     <button className="px-2 py-1 text-sm text-[#2C74D8]">View</button>
                   </Link>
                 </td>

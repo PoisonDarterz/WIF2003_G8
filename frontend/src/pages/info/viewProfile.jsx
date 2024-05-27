@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import axios from "axios";
 
 export default function ViewProfile() {
+  const {id} = useParams();
   const [showImage, setShowImage] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [employeeData, setEmployeeData] = useState({});
 
   const skillList = [
     { skill: "Market Analysis", desc: "desc", image: "/blank.png" },
@@ -25,6 +28,21 @@ export default function ViewProfile() {
     setShowImage(false);
   };
 
+  useEffect(() => {
+    console.log(`Fetching data for employee ID: ${id}`);
+    const fetchEmployee = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/employees/${id}`);
+        console.log("Fetched employee data:", response.data);
+        setEmployeeData(response.data);
+      } catch (error) {
+        console.error("Error fetching employee data:", error);
+      }
+    };
+
+    fetchEmployee();
+  }, [id]); 
+
   return (
     <form>
       <div className="p-8">
@@ -32,7 +50,7 @@ export default function ViewProfile() {
           <TopNavBlack />
         </div>
         <div className="mt-8 mb-4 text-left">
-          <h1 className="text-2xl font-bold">Profile</h1>
+          <h1 className="text-2xl font-bold">Profile of {employeeData.name}</h1>
         </div>
 
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-10 gap-x-4">
@@ -46,22 +64,22 @@ export default function ViewProfile() {
                 onClick={() => handleViewImage("/Profile_image.jpg")}
               />
               <h2 className="mt-5 font-bold">Employee ID</h2>
-              <p>#E00318</p>
+              <p>{employeeData.id}</p>
 
               <h2 className="mt-5 font-bold">Name</h2>
-              <p>John Smith</p>
+              <p>{employeeData.name}</p>
 
               <h2 className="mt-5 font-bold">Contact</h2>
               <p>
-                john.smith@gmail.com <br />
+                {employeeData.email} <br />
                 +60 19 442 2659
               </p>
 
               <h2 className="mt-5 font-bold">Department</h2>
-              <p>Sales</p>
+              <p>{employeeData.department}</p>
 
               <h2 className="mt-5 font-bold">Job Title</h2>
-              <p>Sales Manager</p>
+              <p>{employeeData.jobTitle}</p>
 
               <h2 className="mt-5 font-bold">Joined Since</h2>
               <p>26 January 2015</p>
