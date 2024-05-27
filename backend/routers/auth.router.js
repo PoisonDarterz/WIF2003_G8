@@ -65,7 +65,7 @@ router.post('/register', async (req, res) => {
 
         // Send verification email
         const mailOptions = {
-            from: process.env.EMAIL,
+            from: process.env.EMAIL_USERNAME,
             to: user.email,
             subject: "Verify Your Email for Employee Connect Suite",
             html: `<h1>Thanks for registering on our site</h1>
@@ -164,7 +164,7 @@ router.post('/forgot-password', async (req, res) => {
 
         // Send reset password email
         const mailOptions = {
-            from: process.env.EMAIL,
+            from: process.env.EMAIL_USERNAME,
             to: user.email,
             subject: "Reset Your Password for Employee Connect Suite",
             html: `<h1>Reset Your Password</h1>
