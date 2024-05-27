@@ -14,6 +14,8 @@ const SignUp = () => {
 
     const [message, setMessage] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { employeeID, email, password, confirmPassword, role } = formData;
 
@@ -22,6 +24,14 @@ const SignUp = () => {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+
+    const handleTogglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleToggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
     };
 
     const handleSubmit = async (e) => {
@@ -70,6 +80,7 @@ const SignUp = () => {
                 {message && <p className={`mb-4 ${isSuccess ? 'text-green-500' : 'text-red-500'}`}>{message}</p>}
 
                 <form className="w-full max-w-md" onSubmit={handleSubmit}>
+                    {/* Employee ID Input */}
                     <div className="mb-6 w-full">
                         <label htmlFor="employeeID" className="block text-black text-sm font-bold mb-2 text-left">Employee ID</label>
                         <input 
@@ -83,6 +94,7 @@ const SignUp = () => {
                         />
                     </div>
 
+                    {/* Email Input */}
                     <div className="mb-6 w-full">
                         <label htmlFor="email" className="block text-black text-sm font-bold mb-2 text-left">Email</label>
                         <input 
@@ -96,32 +108,53 @@ const SignUp = () => {
                         />
                     </div>
 
-                    <div className="mb-6 w-full">
+                    {/* Password Input */}
+                    <div className="mb-6 w-full relative">
                         <label htmlFor="password" className="block text-black text-sm font-bold mb-2 text-left">Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            className="w-full p-2 border rounded-md" 
-                            placeholder="Enter your password" 
-                            value={formData.password}
-                            onChange={handleChange}
-                            required 
-                        />
+                        <div className="relative">
+                            <input 
+                                type={showPassword ? 'text' : 'password'}
+                                id="password" 
+                                className="w-full p-2 border rounded-md" 
+                                placeholder="Enter your password" 
+                                value={formData.password}
+                                onChange={handleChange}
+                                required 
+                            />
+                            <button 
+                                type="button"
+                                className="absolute right-0 top-0 mt-2 mr-2"
+                                onClick={handleTogglePasswordVisibility}
+                            >
+                                {showPassword ? 'Hide' : 'Show'}
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="mb-6 w-full">
+                    {/* Confirm Password Input */}
+                    <div className="mb-6 w-full relative">
                         <label htmlFor="confirmPassword" className="block text-black text-sm font-bold mb-2 text-left">Confirm Password</label>
-                        <input 
-                            type="password" 
-                            id="confirmPassword" 
-                            className="w-full p-2 border rounded-md" 
-                            placeholder="Confirm your password" 
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required 
-                        />
+                        <div className="relative">
+                            <input 
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                id="confirmPassword" 
+                                className="w-full p-2 border rounded-md" 
+                                placeholder="Confirm your password" 
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                required 
+                            />
+                            <button 
+                                type="button"
+                                className="absolute right-0 top-0 mt-2 mr-2"
+                                onClick={handleToggleConfirmPasswordVisibility}
+                            >
+                                {showConfirmPassword ? 'Hide' : 'Show'}
+                            </button>
+                        </div>
                     </div>
 
+                    {/* Role Select */}
                     <div className="mb-6 w-full">
                         <label htmlFor="role" className="block text-black text-sm font-bold mb-2 text-left">Role</label>
                         <select 
@@ -136,6 +169,7 @@ const SignUp = () => {
                         </select>
                     </div>
 
+                    {/* Submit Button */}
                     <button 
                         type="submit" 
                         className="w-full bg-black text-white p-2 rounded-md hover:bg-gray-900 mb-4"
@@ -143,6 +177,7 @@ const SignUp = () => {
                         Sign Up
                     </button>
 
+                    {/* Login Link */}
                     <p className="text-gray-500 text-sm mt-4">
                         Already have an account?
                         <Link to="/" className="text-black underline ml-1">Log In</Link>

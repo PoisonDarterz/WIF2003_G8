@@ -59,7 +59,7 @@ function App() {
           <Route path="/general/Profile" element={<Profile />} />
           <Route path="/general/ForgotPassword" element={<ForgotPassword />} />
           <Route path="/general/SignUp" element={<SignUp />} />
-          <Route path="/general/ResetPassword" element={<ResetPassword />} />
+          <Route path="/general/ResetPassword/:token" element={<ResetPassword />} />
 
           {/* Attendance module routes */}
           <Route path="/attendance" element={<Attendance />} />

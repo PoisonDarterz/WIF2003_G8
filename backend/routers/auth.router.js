@@ -19,7 +19,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-
 // Function to create JWT Token
 const createToken = (user) => {
     return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '3d' });
@@ -73,7 +72,7 @@ router.post('/register', async (req, res) => {
             subject: "Verify Your Email for Employee Connect Suite",
             html: `<h1>Thanks for registering on our site</h1>
                     <p>Click on the following link to verify your email:</p>
-                    <a href="http://${req.headers.host}/user/verify-email?token=${user.emailToken}">Verify Your Email</a> 
+                    <a href="http://${req.headers.host}/api/auth/verify-email?token=${user.emailToken}">Verify Your Email</a> 
                     <p>If you didn't register to this site, please ignore this email.</p>`,
         };
 
@@ -108,7 +107,7 @@ router.get('/verify-email', async (req, res) => {
         user.isVerified = true;
         await user.save();
 
-        return res.redirect(`http://localhost:3000/general/`);
+        return res.redirect(`http://localhost:3000/`);
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: "Failed to verify email!" });
@@ -199,10 +198,23 @@ router.post('/reset-password/:token', async (req, res) => {
         const resetToken = req.params.token;
         const { newPassword } = req.body;
 
-        // Find user by reset token and check token expiration
-        const user = await User.findOne({ resetToken, resetTokenExpiration: { $gt: Date.now() } });
+        // Validate new password
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            return res.status(400).json({ message: "Password must be at least 6 characters long and include uppercase, lowercase letters, and numbers." });
+        }
+
+        // Find user by reset token
+        const user = await User.findOne({ resetToken });
+
+        // Check if user exists
         if (!user) {
-            return res.status(400).json({ message: "Invalid or expired reset password token." });
+            return res.status(400).json({ message: "Invalid reset password token." });
+        }
+
+        // Check if reset token is expired
+        if (user.resetTokenExpiration < Date.now()) {
+            return res.status(400).json({ message: "Expired reset password token." });
         }
 
         // Hash new password and update user's password

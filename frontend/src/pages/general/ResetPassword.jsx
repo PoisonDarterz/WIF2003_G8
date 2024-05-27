@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const ResetPassword = () => {
     const outerBgColor = 'bg-teal-200'; // Background color for the outer div
     const innerBgColor = 'bg-gray-100'; // Background color for the inner rectangle
     const navigate = useNavigate();
+    const { token } = useParams(); // Extract token from URL
 
     const [formData, setFormData] = useState({
         newPassword: '',
         confirmPassword: ''
     });
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [message, setMessage] = useState('');
 
     const { newPassword, confirmPassword } = formData;
@@ -29,14 +32,24 @@ const ResetPassword = () => {
         }
 
         try {
-            const token = window.location.pathname.split('/').pop(); // Extract token from URL
             const response = await axios.post(`http://localhost:5000/api/auth/reset-password/${token}`, {
                 newPassword
             });
             setMessage(response.data.message);
+            if (response.status === 200) {
+                navigate('/'); 
+            }
         } catch (err) {
-            setMessage(err.response.data.message);
+            setMessage(err.response?.data?.message || 'Failed to reset password.');
         }
+    };
+
+    const handleTogglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleToggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
     };
 
     return (
@@ -57,29 +70,47 @@ const ResetPassword = () => {
                         {/* New Password Input */}
                         <div className="mb-6 w-full">
                             <label htmlFor="newPassword" className="block text-black text-sm font-bold mb-2 text-left">New Password</label>
-                            <input 
-                                type="password" 
-                                id="newPassword" 
-                                className="w-full p-2 border rounded-md" 
-                                placeholder="Enter new password" 
-                                value={newPassword}
-                                onChange={handleChange}
-                                required 
-                            />
+                            <div className="relative">
+                                <input 
+                                    type={showPassword ? 'text' : 'password'} 
+                                    id="newPassword" 
+                                    className="w-full p-2 border rounded-md" 
+                                    placeholder="Enter new password" 
+                                    value={newPassword}
+                                    onChange={handleChange}
+                                    required 
+                                />
+                                <button 
+                                    type="button" 
+                                    className="absolute top-0 right-0 mt-2 mr-2"
+                                    onClick={handleTogglePasswordVisibility}
+                                >
+                                    {showPassword ? 'Hide' : 'Show'}
+                                </button>
+                            </div>
                         </div>
 
                         {/* Confirm Password Input */}
                         <div className="mb-6 w-full">
                             <label htmlFor="confirmPassword" className="block text-black text-sm font-bold mb-2 text-left">Confirm Password</label>
-                            <input 
-                                type="password" 
-                                id="confirmPassword" 
-                                className="w-full p-2 border rounded-md" 
-                                placeholder="Confirm new password" 
-                                value={confirmPassword}
-                                onChange={handleChange}
-                                required 
-                            />
+                            <div className="relative">
+                                <input 
+                                    type={showConfirmPassword ? 'text' : 'password'} 
+                                    id="confirmPassword" 
+                                    className="w-full p-2 border rounded-md" 
+                                    placeholder="Confirm new password" 
+                                    value={confirmPassword}
+                                    onChange={handleChange}
+                                    required 
+                                />
+                                <button 
+                                    type="button" 
+                                    className="absolute top-0 right-0 mt-2 mr-2"
+                                    onClick={handleToggleConfirmPasswordVisibility}
+                                >
+                                    {showConfirmPassword ? 'Hide' : 'Show'}
+                                </button>
+                            </div>
                         </div>
 
                         {/* Message */}

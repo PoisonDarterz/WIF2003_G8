@@ -9,6 +9,7 @@ const LogIn = () => {
         password: ''
     });
     const [message, setMessage] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const { email, password } = formData;
 
@@ -17,6 +18,10 @@ const LogIn = () => {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+
+    const handleTogglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
 
     const handleSubmit = async (e) => {
@@ -70,17 +75,26 @@ const LogIn = () => {
                     </div>
 
                     {/* Password Input */}
-                    <div className="mb-6 w-full">
+                    <div className="mb-6 w-full relative">
                         <label htmlFor="password" className="block text-black text-sm font-bold mb-2 text-left">Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            className="w-full p-2 border rounded-md" 
-                            placeholder="Enter your password" 
-                            value={formData.password}
-                            onChange={handleChange}
-                            required 
-                        />
+                        <div className="relative">
+                            <input 
+                                type={showPassword ? 'text' : 'password'}
+                                id="password" 
+                                className="w-full p-2 border rounded-md" 
+                                placeholder="Enter your password" 
+                                value={formData.password}
+                                onChange={handleChange}
+                                required 
+                            />
+                            <button 
+                                type="button"
+                                className="absolute right-0 top-0 mt-2 mr-2"
+                                onClick={handleTogglePasswordVisibility}
+                            >
+                                {showPassword ? 'Hide' : 'Show'}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Login Button */}
