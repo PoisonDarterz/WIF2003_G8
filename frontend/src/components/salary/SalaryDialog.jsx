@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 
-function SalaryDialog({ isOpen, onRequestClose }) {
+function SalaryDialog({ isOpen, onRequestClose, handleAddRecord  }) {
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
 
-  const handleAddRecord = () => {
-    // handle adding the record here
+  const handleAdd = () => {
+    console.log('handleAdd called with:', { title, amount, notes });
+    handleAddRecord(title, amount, notes);
     onRequestClose();
   };
 
@@ -40,7 +41,7 @@ function SalaryDialog({ isOpen, onRequestClose }) {
       </div>
       <div className="flex justify-end mt-4">
         <button onClick={onRequestClose} className="px-4 py-2 bg-red-500 text-white rounded mr-2">Cancel</button>
-        <button onClick={handleAddRecord} className="px-4 py-2 bg-blue-500 text-white rounded">Add record</button>
+        <button onClick={handleAdd} className="px-4 py-2 bg-blue-500 text-white rounded">Add record</button>
       </div>
     </Modal>
   );

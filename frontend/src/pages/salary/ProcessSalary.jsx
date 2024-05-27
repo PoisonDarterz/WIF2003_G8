@@ -3,7 +3,8 @@ import TopNavBlack from "../../components/TopNavBlack";
 import EmpNameBox from "../../components/salary/EmpNameBox";
 import SalaryBox from "../../components/salary/SalaryBox";
 import SummaryBox from "../../components/salary/SalSummary";
-import SalaryDialog from "../../components/salary/SalaryDialog";
+import axios from 'axios';
+import { generatePreview } from '../../components/salary/generatePreview';
 
 
 function ProcessSalary() {
@@ -13,14 +14,42 @@ function ProcessSalary() {
     // add more employees as needed
   ]);
   
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [previewGenerated, setPreviewGenerated] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState('');
+  const [salaryDetails, setSalaryDetails] = useState(null);
+  const [category, setCategory] = useState('');
 
-  const openModal = () => {
-    setModalIsOpen(true);
+  const handlePreview = async () => {
+    const firstSelectedEmployee = employees.find(employee => employee.checked);
+    if (!firstSelectedEmployee) {
+      alert('No employee selected');
+      return;
+    }
+  
+    const pdfUrl = await generatePreview(firstSelectedEmployee, salaryDetails);
+    setPdfUrl(pdfUrl);
+    setPreviewGenerated(true);
+  
+    // Create a new 'a' element, set its 'href' to the PDF URL, and click it to start the download
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = 'salary-slip.pdf';  // set the file name here
+    link.click();
   };
 
-  const closeModal = () => {
-    setModalIsOpen(false);
+  const handleGenerate = async () => {
+    if (!previewGenerated) {
+      alert('Please preview the salary slip first');
+      return;
+    }
+
+    try {
+      const response = await axios.post('/generate-pdf', { pdfUrl });
+      setPdfUrl(response.data.pdfUrl);
+      alert('PDF generated and uploaded successfully');
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+    }
   };
   
   return (
@@ -42,10 +71,9 @@ function ProcessSalary() {
       </div>
       <div className="flex space-x-6">
         <EmpNameBox employees={employees} setEmployees={setEmployees} singleSelect={false} width='w-1/5' />
-        <SalaryBox openModal={openModal}/>
-        <SummaryBox employees={employees} />
+        <SalaryBox setSalaryDetails={setSalaryDetails} />
+        <SummaryBox employees={employees} handlePreview={handlePreview} handleGenerate={handleGenerate} salaryDetails={salaryDetails}/>
       </div>
-      <SalaryDialog isOpen={modalIsOpen} onRequestClose={closeModal} />
     </div>
   )
 }

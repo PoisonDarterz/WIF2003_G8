@@ -1,14 +1,13 @@
 import React from 'react';
 
-const summaryDetails = {
-  basic: 2000,
-  allowance: 500,
-  "Bonus - Deductions": 300,
-  "EPF \/ Socso": 200,
-};
+function SummaryBox({ employees, handlePreview, handleGenerate, salaryDetails }) {
+  const summaryDetails = {
+    basic: salaryDetails.basic.reduce((sum, item) => sum + item.amount, 0),
+    allowance: salaryDetails.allowances.reduce((sum, item) => sum + item.amount, 0),
+    "Bonus - Deductions": salaryDetails.bonuses.reduce((sum, item) => sum + item.amount, 0) - salaryDetails.deductions.reduce((sum, item) => sum + item.amount, 0),
+    "EPF \/ Socso": salaryDetails["EPF \/ Socso"].reduce((sum, item) => sum + item.amount, 0),
+  };
 
-
-function SummaryBox({ employees }) {
   const checkedEmployees = employees.filter(employee => employee.checked);
   const totalEach = Object.values(summaryDetails).reduce((a, b) => a + b, 0);
   const totalBatch = totalEach * employees.filter(employee => employee.checked).length;
@@ -40,8 +39,8 @@ function SummaryBox({ employees }) {
           <span>RM {totalBatch}</span>
         </div>
         <div className="flex justify-end mt-4">
-          <button style={{ backgroundColor: '#EBB99E', color: '#000000' }} className="mr-2 rounded px-4">Preview slip</button>
-          <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4">Generate</button>
+          <button style={{ backgroundColor: '#EBB99E', color: '#000000' }} className="mr-2 rounded px-4" onClick={handlePreview}>Preview slip</button>
+          <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4" onClick={handleGenerate}>Generate</button>
         </div>
       </div>
     </div>
