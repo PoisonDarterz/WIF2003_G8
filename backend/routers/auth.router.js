@@ -50,11 +50,14 @@ router.post('/register', async (req, res) => {
         // Generate a unique and complex email verification token
         const emailToken = crypto.randomBytes(32).toString('hex');
 
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         // Create new user
         const user = new User({
             employeeID,
             email,
-            password,
+            password: hashedPassword,
             role,
             emailToken,
             isVerified: false
@@ -71,7 +74,7 @@ router.post('/register', async (req, res) => {
             html: `<h1>Thanks for registering on our site</h1>
                     <p>Click on the following link to verify your email:</p>
                     <a href="http://${req.headers.host}/user/verify-email?token=${user.emailToken}">Verify Your Email</a> 
-                    <p>If you didn't request a password reset, please ignore this email.</p>`,
+                    <p>If you didn't register to this site, please ignore this email.</p>`,
         };
 
         // Sending mail
