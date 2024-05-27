@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 
-const loginRouter = require('./routers/login.router');
 const employeeRouter = require('./routers/employee.router');
 const authRouter = require('./routers/auth.router')
 

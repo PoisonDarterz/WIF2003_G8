@@ -4,28 +4,28 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 function ViewEmployeeList() {
-  const [searchQuery, setSearchQuery] = useState(""); 
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({ id: "", department: "", jobTitle: "" });
   const [currentPage, setCurrentPage] = useState(1);
   const [employeeData, setEmployeeData] = useState([]);
-  const recordsPerPage = 6; 
+  const recordsPerPage = 6;
 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/employees");
-        console.log("Fetched employees from frontend:", response.data); 
+        console.log("Fetched employees from frontend:", response.data);
         setEmployeeData(response.data);
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
     };
-  
+
     fetchEmployees();
   }, []);
 
   const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value); 
+    setSearchQuery(e.target.value);
   };
 
   const handleFilterChange = (e) => {
@@ -38,10 +38,10 @@ function ViewEmployeeList() {
 
   const filteredEmployeeData = employeeData.filter(employee =>
     employee.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    employee.id.toLowerCase().includes(filters.id.toLowerCase()) && 
-    employee.department.toLowerCase().includes(filters.department.toLowerCase()) &&
-    employee.jobTitle.toLowerCase().includes(filters.jobTitle.toLowerCase())
-  );  
+    employee.id.toLowerCase().includes(filters.id.toLowerCase()) &&
+    employee.roleId.departmentId.departmentName.toLowerCase().includes(filters.department.toLowerCase()) &&
+    employee.roleId.roleName.toLowerCase().includes(filters.jobTitle.toLowerCase())
+  );
 
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
@@ -62,17 +62,17 @@ function ViewEmployeeList() {
       </div>
 
       <div className="flex justify-between items-center mb-2">
-      <h2 className="font-bold mr-1">Filters:</h2>
-        <div>  
-                      
+        <h2 className="font-bold mr-1">Filters:</h2>
+        <div>
+
           <label className="mr-2">ID:</label>
           <input type="text" name="id" value={filters.id} onChange={handleFilterChange} className="border p-1 rounded mr-2" />
-          <label className="mr-2">Name:</label>   
-          <input type="text" name="name" value={searchQuery} onChange={handleSearchInputChange} className="border p-1 rounded mr-2"/>  
+          <label className="mr-2">Name:</label>
+          <input type="text" name="name" value={searchQuery} onChange={handleSearchInputChange} className="border p-1 rounded mr-2" />
           <label className="mr-2">Department:</label>
           <input type="text" name="department" value={filters.department} onChange={handleFilterChange} className="border p-1 rounded mr-2" />
           <label className="mr-2">Job title:</label>
-          <input type="text" name="jobTitle" value={filters.jobTitle} onChange={handleFilterChange} className="border p-1 rounded mr-2" /> 
+          <input type="text" name="jobTitle" value={filters.jobTitle} onChange={handleFilterChange} className="border p-1 rounded mr-2" />
         </div>
       </div>
       <div className="overflow-x-auto mt-10 p-4">
@@ -92,11 +92,11 @@ function ViewEmployeeList() {
               <tr className={`${i % 2 === 0 ? 'bg-[#fefefe]' : 'bg-[#eaf3ff]'} px-4 py-2`} key={data.id}>
                 <td className="w-[15%] px-4 py-4">{data.id}</td>
                 <td className="w-[20%] px-4 py-4">{data.name}</td>
-                <td className="w-[15%] px-4 py-4">{data.department}</td>
-                <td className="w-[20%] px-4 py-4">{data.jobTitle}</td>
-                <td className="w-[20%] px-4 py-4">{data.email}</td>
+                <td className="w-[15%] px-4 py-4">{data.roleId.departmentId.departmentName}</td>
+                <td className="w-[20%] px-4 py-4">{data.roleId.roleName}</td>
+                <td className="w-[20%] px-4 py-4">{data.email.email}</td>
                 <td className="w-[10%] px-4 py-4">
-                <Link to={`/info/viewProfile/${data.id}`}>
+                  <Link to={`/info/viewProfile/${data.id}`}>
                     <button className="px-2 py-1 text-sm text-[#2C74D8]">View</button>
                   </Link>
                 </td>

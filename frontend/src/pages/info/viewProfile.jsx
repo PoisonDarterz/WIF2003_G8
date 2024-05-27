@@ -8,6 +8,7 @@ export default function ViewProfile() {
   const [showImage, setShowImage] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [employeeData, setEmployeeData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const skillList = [
     { skill: "Market Analysis", desc: "desc", image: "/blank.png" },
@@ -31,6 +32,7 @@ export default function ViewProfile() {
   useEffect(() => {
     console.log(`Fetching data for employee ID: ${id}`);
     const fetchEmployee = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get(`http://localhost:5000/api/employees/${id}`);
         console.log("Fetched employee data:", response.data);
@@ -38,10 +40,15 @@ export default function ViewProfile() {
       } catch (error) {
         console.error("Error fetching employee data:", error);
       }
+      setIsLoading(false);
     };
 
     fetchEmployee();
   }, [id]); 
+  
+  if (isLoading) { // Render loading message if data is still being fetched
+    return <div>Loading...</div>;
+  }
 
   return (
     <form>
@@ -71,15 +78,15 @@ export default function ViewProfile() {
 
               <h2 className="mt-5 font-bold">Contact</h2>
               <p>
-                {employeeData.email} <br />
+                {employeeData.email.email} <br />
                 +60 19 442 2659
               </p>
 
               <h2 className="mt-5 font-bold">Department</h2>
-              <p>{employeeData.department}</p>
+              <p>{employeeData.roleId.departmentId.departmentName}</p>
 
               <h2 className="mt-5 font-bold">Job Title</h2>
-              <p>{employeeData.jobTitle}</p>
+              <p>{employeeData.roleId.roleName}</p>
 
               <h2 className="mt-5 font-bold">Joined Since</h2>
               <p>26 January 2015</p>
