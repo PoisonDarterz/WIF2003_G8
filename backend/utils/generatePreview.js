@@ -1,9 +1,9 @@
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
+const pdfMake = require('pdfmake/build/pdfmake');
+const pdfFonts = require('pdfmake/build/vfs_fonts');
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-export function generatePreview(employee, salaryDetails, returnDefinition = false) {
+function generatePreview(employee, salaryDetails, returnDefinition = false) {
   const grossPay = salaryDetails.basic[0].amount + salaryDetails.allowances.reduce((a, b) => a + b.amount, 0) + salaryDetails.bonuses.reduce((a, b) => a + b.amount, 0);
   const totalDeductions = salaryDetails.deductions.reduce((a, b) => a + b.amount, 0) + salaryDetails["EPF \/ Socso"].reduce((a, b) => a + b.amount, 0);
   const netPay = grossPay - totalDeductions;
@@ -88,3 +88,5 @@ export function generatePreview(employee, salaryDetails, returnDefinition = fals
     pdfDocGenerator.getDataUrl(resolve);
   });
 }
+
+module.exports = generatePreview;

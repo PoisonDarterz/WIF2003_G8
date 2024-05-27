@@ -9,13 +9,13 @@ function SummaryBox({ employees, handlePreview, handleGenerate, salaryDetails })
   };
 
   const checkedEmployees = employees.filter(employee => employee.checked);
-  const totalEach = Object.values(summaryDetails).reduce((a, b) => a + b, 0);
+  const totalEach = summaryDetails.basic + summaryDetails.allowance + summaryDetails["Bonus - Deductions"] - summaryDetails['EPF \/ Socso'];
   const totalBatch = totalEach * employees.filter(employee => employee.checked).length;
 
   return (
     <div className="h-[70vh] w-2/5 bg-[#EAF3FF] rounded-lg p-8 flex flex-col justify-between">
       <div>
-        <h2 className="text-lg font-bold mb-4">Summary:</h2>
+        <h2 className="text-lg font-bold mb-4">Summary for {salaryDetails.monthYear}:</h2>
         {Object.entries(summaryDetails).map(([key, value]) => (
           <div key={key} className="flex justify-between items-center mb-2">
             <span className="capitalize">{key}</span>

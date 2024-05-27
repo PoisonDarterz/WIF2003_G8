@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 
+const salaryRouter = require('./routers/salary.router');
 const employeeRouter = require('./routers/employee.router');
 const authRouter = require('./routers/auth.router')
 
@@ -25,6 +26,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRouter);
 app.use('/api/employees', employeeRouter);
+app.use('/api/salary', salaryRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

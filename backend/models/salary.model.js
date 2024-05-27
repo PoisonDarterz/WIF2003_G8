@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
-const SalaryDetailSchema = new mongoose.Schema({
-  category: {
-    type: String,
-    required: true
-  },
+const RecordSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -17,6 +13,14 @@ const SalaryDetailSchema = new mongoose.Schema({
     type: String,
     default: ''
   }
+});
+
+const SalaryDetailSchema = new mongoose.Schema({
+  category: {
+    type: String,
+    required: true
+  },
+  records: [RecordSchema]
 });
 
 const SalarySchema = new mongoose.Schema({
@@ -34,7 +38,7 @@ const SalarySchema = new mongoose.Schema({
   },
   employeeId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Employee', // assuming 'Employee' is the model name for your employee collection
+    ref: 'Employee',
     required: true
   },
   salaryDetails: [SalaryDetailSchema]

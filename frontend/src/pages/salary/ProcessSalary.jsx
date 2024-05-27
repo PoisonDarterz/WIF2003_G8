@@ -8,15 +8,14 @@ import { generatePreview } from '../../components/salary/generatePreview';
 
 
 function ProcessSalary() {
-  const [employees, setEmployees] = useState([
-    { id: 1, name: 'John Doe', checked: false },
-    { id: 2, name: 'Jane Doe', checked: false },
-    // add more employees as needed
-  ]);
+  const [employees, setEmployees] = useState([]);
+  const [searchId, setSearchId] = useState('');
+  const [searchJobTitle, setSearchJobTitle] = useState('');
   
   const [previewGenerated, setPreviewGenerated] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
   const [salaryDetails, setSalaryDetails] = useState({
+    monthYear: '',
     basic: [],
     allowances: [],
     deductions: [],
@@ -45,13 +44,23 @@ function ProcessSalary() {
       alert('Please preview the salary slip first');
       return;
     }
-
+  
     try {
-      const response = await axios.post('/generate-pdf', { pdfUrl });
-      setPdfUrl(response.data.pdfUrl);
-      alert('PDF generated and uploaded successfully');
+      // Get all selected employees
+      const selectedEmployees = employees.filter(employee => employee.checked);
+  
+      // Prepare the data to send to the server
+      const data = selectedEmployees.map(employee => ({
+        employee: employee,
+        salaryDetails: salaryDetails  
+      }));
+  
+      // Send the data to the server
+      const response = await axios.post("http://localhost:5000/api/salary/generate-salary", data);
+  
+      alert('Salary documents generated and saved successfully');
     } catch (error) {
-      console.error('Failed to generate PDF:', error);
+      console.error('Failed to generate salary documents:', error);
     }
   };
   
@@ -67,13 +76,13 @@ function ProcessSalary() {
       <div className="flex justify-between items-center mb-4">
         <div>
           <label className="mr-2">Filters: Employee ID:</label>
-          <input type="text" className="border p-1 rounded" />
+          <input type="text" className="border p-1 rounded" value={searchId} onChange={e => setSearchId(e.target.value)}/>
           <label className="ml-4 mr-2">Job title:</label>
-          <input type="text" className="border p-1 rounded" />
+          <input type="text" className="border p-1 rounded" value={searchJobTitle} onChange={e => setSearchJobTitle(e.target.value)}/>
         </div>
       </div>
       <div className="flex space-x-6">
-        <EmpNameBox employees={employees} setEmployees={setEmployees} singleSelect={false} width='w-1/5' />
+        <EmpNameBox employees={employees} setEmployees={setEmployees} searchId={searchId} searchJobTitle={searchJobTitle} singleSelect={false} width='w-1/5' />
         <SalaryBox setSalaryDetails={setSalaryDetails} />
         <SummaryBox employees={employees} handlePreview={handlePreview} handleGenerate={handleGenerate} salaryDetails={salaryDetails}/>
       </div>
