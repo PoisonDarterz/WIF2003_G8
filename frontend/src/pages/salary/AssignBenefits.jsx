@@ -2,24 +2,19 @@ import React, { useState } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
 import EmpNameBox from "../../components/salary/EmpNameBox";
 import BenefitsBox from "../../components/salary/BenefitsBox";
-import BenefitsDialog from "../../components/salary/BenefitsDialog";
 
 function AssignBenefits() {
-  const [employees, setEmployees] = useState([
-    { id: 1, name: 'John Doe', checked: false },
-    { id: 2, name: 'Jane Doe', checked: false },
-    // add more employees as needed
-  ]);
-
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
+  const [employees, setEmployees] = useState([]);
+  const [searchId, setSearchId] = useState('');
+  const [searchJobTitle, setSearchJobTitle] = useState('');
+  const [roleBenefits, setRoleBenefits] = useState([{
+    type:"",
+    benefits: [{name:"", notes:""}],
+  }]);
+  const [individualBenefits, setIndividualBenefits] = useState([{
+    benefits: "",
+    notes: "",
+  }]);
 
   return (
     <div className="p-8">
@@ -33,16 +28,15 @@ function AssignBenefits() {
       <div className="flex justify-between items-center mb-4">
         <div>
           <label className="mr-2">Filters: Employee ID:</label>
-          <input type="text" className="border p-1 rounded" />
+          <input type="text" className="border p-1 rounded" value={searchId} onChange={e => setSearchId(e.target.value)} />
           <label className="ml-4 mr-2">Job title:</label>
-          <input type="text" className="border p-1 rounded" />
+          <input type="text" className="border p-1 rounded" value={searchJobTitle} onChange={e => setSearchJobTitle(e.target.value)} />
         </div>
       </div>
       <div className="flex space-x-8">
-        <EmpNameBox employees={employees} setEmployees={setEmployees} singleSelect={true} width='w-1/4' />
-        <BenefitsBox openModal={openModal}/>
+        <EmpNameBox employees={employees} setEmployees={setEmployees} searchId={searchId} searchJobTitle={searchJobTitle} singleSelect={true} width='w-1/4' />
+        <BenefitsBox setRoleBenefits={setRoleBenefits} setIndividualBenefits={setIndividualBenefits} />
       </div>
-      <BenefitsDialog isOpen={modalIsOpen} onRequestClose={closeModal} />
     </div>
   )
 }

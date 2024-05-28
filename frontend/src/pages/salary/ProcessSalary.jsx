@@ -6,7 +6,6 @@ import SummaryBox from "../../components/salary/SalSummary";
 import axios from 'axios';
 import { generatePreview } from '../../components/salary/generatePreview';
 
-
 function ProcessSalary() {
   const [employees, setEmployees] = useState([]);
   const [searchId, setSearchId] = useState('');

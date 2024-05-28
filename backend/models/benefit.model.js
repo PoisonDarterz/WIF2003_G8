@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const BenefitSchema = new mongoose.Schema({
-  benefitId: {
-    type: String,
-    required: true,
-    unique: true
-  },
   type: {
     type: String,
     required: true
@@ -14,9 +9,9 @@ const BenefitSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  amount: {
-    type: Number,
-    required: true
+  notes: {
+    type: String,
+    default: ''
   },
   roleId: {
     type: mongoose.Schema.Types.ObjectId,
