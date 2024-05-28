@@ -1,2 +1,2 @@
-cd frontend & npm start
-cd ../backend & node server.js
+start cmd /k "cd frontend & npm start"
+start cmd /k "cd backend & nodemon server.js"

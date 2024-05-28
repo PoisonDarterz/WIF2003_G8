@@ -59,7 +59,7 @@ function App() {
           <Route path="/general/Profile" element={<Profile />} />
           <Route path="/general/ForgotPassword" element={<ForgotPassword />} />
           <Route path="/general/SignUp" element={<SignUp />} />
-          <Route path="/general/ResetPassword" element={<ResetPassword />} />
+          <Route path="/general/ResetPassword/:token" element={<ResetPassword />} />
 
           {/* Attendance module routes */}
           <Route path="/attendance" element={<Attendance />} />
@@ -84,7 +84,7 @@ function App() {
 
           {/* Info module routes */}
           <Route path="/info/employeeList" element={<ViewEmployeeList />} />
-          <Route path="/info/viewProfile" element={<ViewProfile />} />
+          <Route path="/info/viewProfile/:id" element={<ViewProfile />} />
           <Route path="/info/editMyProfile" element={<EditMyProfile />} />
           <Route path="/info/editEmployeeProfile" element={<EditEmployeeProfile />} />
 

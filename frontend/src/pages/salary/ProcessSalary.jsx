@@ -3,24 +3,65 @@ import TopNavBlack from "../../components/TopNavBlack";
 import EmpNameBox from "../../components/salary/EmpNameBox";
 import SalaryBox from "../../components/salary/SalaryBox";
 import SummaryBox from "../../components/salary/SalSummary";
-import SalaryDialog from "../../components/salary/SalaryDialog";
+import axios from 'axios';
+import { generatePreview } from '../../components/salary/generatePreview';
 
 
 function ProcessSalary() {
-  const [employees, setEmployees] = useState([
-    { id: 1, name: 'John Doe', checked: false },
-    { id: 2, name: 'Jane Doe', checked: false },
-    // add more employees as needed
-  ]);
+  const [employees, setEmployees] = useState([]);
+  const [searchId, setSearchId] = useState('');
+  const [searchJobTitle, setSearchJobTitle] = useState('');
   
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [previewGenerated, setPreviewGenerated] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState('');
+  const [salaryDetails, setSalaryDetails] = useState({
+    monthYear: '',
+    basic: [],
+    allowances: [],
+    deductions: [],
+  });
 
-  const openModal = () => {
-    setModalIsOpen(true);
+  const handlePreview = async () => {
+    const firstSelectedEmployee = employees.find(employee => employee.checked);
+    if (!firstSelectedEmployee) {
+      alert('No employee selected');
+      return;
+    }
+  
+    const pdfUrl = await generatePreview(firstSelectedEmployee, salaryDetails);
+    setPdfUrl(pdfUrl);
+    setPreviewGenerated(true);
+  
+    // Create a new 'a' element, set its 'href' to the PDF URL, and click it to start the download
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = 'salary-slip.pdf';  // set the file name here
+    link.click();
   };
 
-  const closeModal = () => {
-    setModalIsOpen(false);
+  const handleGenerate = async () => {
+    if (!previewGenerated) {
+      alert('Please preview the salary slip first');
+      return;
+    }
+  
+    try {
+      // Get all selected employees
+      const selectedEmployees = employees.filter(employee => employee.checked);
+  
+      // Prepare the data to send to the server
+      const data = selectedEmployees.map(employee => ({
+        employee: employee,
+        salaryDetails: salaryDetails  
+      }));
+  
+      // Send the data to the server
+      const response = await axios.post("http://localhost:5000/api/salary/generate-salary", data);
+  
+      alert('Salary documents generated and saved successfully');
+    } catch (error) {
+      console.error('Failed to generate salary documents:', error);
+    }
   };
   
   return (
@@ -35,17 +76,16 @@ function ProcessSalary() {
       <div className="flex justify-between items-center mb-4">
         <div>
           <label className="mr-2">Filters: Employee ID:</label>
-          <input type="text" className="border p-1 rounded" />
+          <input type="text" className="border p-1 rounded" value={searchId} onChange={e => setSearchId(e.target.value)}/>
           <label className="ml-4 mr-2">Job title:</label>
-          <input type="text" className="border p-1 rounded" />
+          <input type="text" className="border p-1 rounded" value={searchJobTitle} onChange={e => setSearchJobTitle(e.target.value)}/>
         </div>
       </div>
       <div className="flex space-x-6">
-        <EmpNameBox employees={employees} setEmployees={setEmployees} singleSelect={false} width='w-1/5' />
-        <SalaryBox openModal={openModal}/>
-        <SummaryBox employees={employees} />
+        <EmpNameBox employees={employees} setEmployees={setEmployees} searchId={searchId} searchJobTitle={searchJobTitle} singleSelect={false} width='w-1/5' />
+        <SalaryBox setSalaryDetails={setSalaryDetails} />
+        <SummaryBox employees={employees} handlePreview={handlePreview} handleGenerate={handleGenerate} salaryDetails={salaryDetails}/>
       </div>
-      <SalaryDialog isOpen={modalIsOpen} onRequestClose={closeModal} />
     </div>
   )
 }
