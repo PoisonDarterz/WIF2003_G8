@@ -20,15 +20,25 @@ const userSchema = new mongoose.Schema({
         enum: ['Admin', 'Employee'],
         default: 'Employee'
     },
-    emailToken:{
-      type: String,
+    emailToken: {
+        type: String
+    },
+    emailTokenExpiration: {
+        type: Date
     },
     isVerified: {
-      type: Boolean,
+        type: Boolean,
+        default: false
     },
-    date:{
-        type:Date,
-        default:Date.now()
+    resetToken: {
+        type: String
+    },
+    resetTokenExpiration: {
+        type: Date
+    },
+    date: {
+        type: Date,
+        default: Date.now()
     }
 });
 
