@@ -2,19 +2,79 @@ import React, { useState } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
 import EmpNameBox from "../../components/salary/EmpNameBox";
 import BenefitsBox from "../../components/salary/BenefitsBox";
+import axios from 'axios';
 
 function AssignBenefits() {
   const [employees, setEmployees] = useState([]);
   const [searchId, setSearchId] = useState('');
   const [searchJobTitle, setSearchJobTitle] = useState('');
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [roleBenefits, setRoleBenefits] = useState([{
-    type:"",
-    benefits: [{name:"", notes:""}],
+    type: "",
+    benefits: [{ name: "", notes: "" }],
   }]);
   const [individualBenefits, setIndividualBenefits] = useState([{
-    benefits: "",
+    name: "",
     notes: "",
   }]);
+
+  const handleSave = async (localBenefits) => {
+    const checkedEmployee = employees.find(employee => employee.checked);
+    if (!checkedEmployee) {
+      window.alert('No employee selected');
+      return;
+    }
+    const employeeId = checkedEmployee.id;
+    const roleBenefits = localBenefits.filter(benefit => benefit.type !== 'Individual');
+    const individualBenefits = localBenefits.find(benefit => benefit.type === 'Individual').benefits;
+    try {
+      // Make a PUT request to your server with the updated benefits
+      const response = await axios.put(`http://localhost:5000/api/benefits/update/${employeeId}`, {
+        roleBenefits: roleBenefits.map(benefit => ({
+          type: benefit.type,
+          benefits: benefit.benefits.map(benefitDetail => ({
+            benefit: benefitDetail.name,
+            notes: benefitDetail.notes,
+          })),
+        })),
+        individualBenefits: individualBenefits.map(benefit => ({
+          name: benefit.name,
+          notes: benefit.notes,
+        })),
+      });
+  
+      // Check if the request was successful
+      if (response.status === 200) {
+        setRoleBenefits(roleBenefits);
+        setIndividualBenefits(individualBenefits);
+        setUnsavedChanges(false);
+      } else {
+        console.error('Failed to save benefits:', response);
+      }
+    } catch (error) {
+      console.error('Failed to save benefits:', error);
+    }
+  };
+
+  const loadEmployeeBenefits = async (employeeId) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/benefits/fetch/${employeeId}`);
+      const { roleBenefits, individualBenefits } = response.data;
+      setRoleBenefits(roleBenefits.map(benefit => ({
+        type: benefit.type,
+        benefits: benefit.benefits.map(benefit => ({
+          name: benefit.name,
+          notes: benefit.notes,
+        })),
+      })));
+      setIndividualBenefits(individualBenefits.map(benefit => ({
+        name: benefit.name,
+        notes: benefit.notes,
+      })));
+    } catch (error) {
+      console.error('Failed to load employee benefits:', error);
+    }
+  };
 
   return (
     <div className="p-8">
@@ -34,8 +94,24 @@ function AssignBenefits() {
         </div>
       </div>
       <div className="flex space-x-8">
-        <EmpNameBox employees={employees} setEmployees={setEmployees} searchId={searchId} searchJobTitle={searchJobTitle} singleSelect={true} width='w-1/4' />
-        <BenefitsBox setRoleBenefits={setRoleBenefits} setIndividualBenefits={setIndividualBenefits} />
+        <EmpNameBox
+          employees={employees}
+          setEmployees={setEmployees}
+          searchId={searchId}
+          searchJobTitle={searchJobTitle}
+          singleSelect={true}
+          width='w-1/4'
+          unsavedChanges={unsavedChanges}
+          loadEmployeeBenefits={loadEmployeeBenefits}
+          AB
+        />
+        <BenefitsBox
+          handleSave={handleSave}
+          unsavedChanges={unsavedChanges}
+          setUnsavedChanges={setUnsavedChanges}
+          roleBenefits={roleBenefits}
+          individualBenefits={individualBenefits}
+        />
       </div>
     </div>
   )

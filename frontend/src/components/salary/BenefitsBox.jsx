@@ -1,62 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import BenefitsDialog from './BenefitsDialog';
 
-function BenefitsBox({ setRoleBenefits, setIndividualBenefits }) {
+function BenefitsBox({ handleSave, unsavedChanges, setUnsavedChanges, roleBenefits, individualBenefits }) {
 
-  const [localRoleBenefits, setLocalRoleBenefits] = useState([
-    {
-      type: "Financial",
-      benefits: [
-        { name: "Benefit 1", notes: "something" },
-        { name: "Benefit 2", notes: "something" },
-        { name: "Benefit 3", notes: "something" }
-      ]
-    },
-    {
-      type: "Health",
-      benefits: [
-        { name: "Benefit 1", notes: "something" },
-        { name: "Benefit 2", notes: "something" },
-        { name: "Benefit 3", notes: "something" }
-      ]
-    },
-    {
-      type: "Other",
-      benefits: [
-        { name: "Benefit 1", notes: "something" },
-        { name: "Benefit 2", notes: "something" },
-        { name: "Benefit 3", notes: "something" }
-      ]
-    }
-  ]);
+  const [localRoleBenefits, setLocalRoleBenefits] = useState([]);
+  const [localIndividualBenefits, setLocalIndividualBenefits] = useState([]);
+  const [localBenefits, setLocalBenefits] = useState([]);
 
-  const [localIndividualBenefits, setLocalIndividualBenefits] = useState([
-    { name: "Benefit 1", notes: "something" },
-    { name: "Benefit 2", notes: "something" },
-  ]);
+  useEffect(() => {
+    setLocalRoleBenefits(roleBenefits);
+    setLocalIndividualBenefits(individualBenefits);
+    const processedBenefits = processBenefits(roleBenefits, individualBenefits);
+    setLocalBenefits(processedBenefits);
+  }, [roleBenefits, individualBenefits]);
 
   const processBenefits = (roleBenefits, individualBenefits) => {
-    // Add type to role benefits
-    const roleBenefitsWithType = roleBenefits.map(benefit => ({
+    // Process role benefits
+    const roleBenefitsProcessed = roleBenefits.map(benefit => ({
       type: benefit.type,
-      benefits: benefit.benefits
+      benefits: benefit.benefits.map(benefit => ({
+        name: benefit.name,
+        notes: benefit.notes,
+      })),
     }));
 
-    // Add type to individual benefits
-    const individualBenefitsWithType = {
+    // Process individual benefits
+    const individualBenefitsProcessed = {
       type: "Individual",
-      benefits: individualBenefits
+      benefits: individualBenefits.map(benefit => ({
+        name: benefit.name,
+        notes: benefit.notes,
+      })),
     };
 
-    return [...roleBenefitsWithType, individualBenefitsWithType];
+    return [...roleBenefitsProcessed, individualBenefitsProcessed];
   };
 
-  const [localBenefits, setLocalBenefits] = useState(processBenefits(localRoleBenefits, localIndividualBenefits));
-
-  console.log(localBenefits);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+  const [benefitType, setBenefitType] = useState('');
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -65,8 +48,6 @@ function BenefitsBox({ setRoleBenefits, setIndividualBenefits }) {
   const closeModal = () => {
     setModalIsOpen(false);
   };
-
-  const [benefitType, setBenefitType] = useState('');
 
   const openAddRecordModal = (type) => {
     setBenefitType(type);
@@ -84,6 +65,7 @@ function BenefitsBox({ setRoleBenefits, setIndividualBenefits }) {
       }
       return newBenefits;
     });
+    setUnsavedChanges(true);
     closeModal();
   };
 
@@ -91,6 +73,7 @@ function BenefitsBox({ setRoleBenefits, setIndividualBenefits }) {
     const benefitCategory = localBenefits[categoryIndex];
     const benefit = benefitCategory.benefits[benefitIndex];
     setEditingRecord({ ...benefit, type: benefitCategory.type, categoryIndex, benefitIndex });
+    setUnsavedChanges(true);
     openModal();
   };
 
@@ -117,17 +100,23 @@ function BenefitsBox({ setRoleBenefits, setIndividualBenefits }) {
       }
       return newBenefits;
     });
+    setUnsavedChanges(true);
   };
 
-  // Update the parent component whenever localBenefits changes
-  useEffect(() => {
-    const roleBenefits = localBenefits.filter(benefit => benefit.type !== "Individual");
-    const individualBenefits = localBenefits.find(benefit => benefit.type === "Individual").benefits;
-    setRoleBenefits(roleBenefits);
-    setIndividualBenefits(individualBenefits);
-  }, [localBenefits, setRoleBenefits, setIndividualBenefits]);
+  const handleCancel = () => {
+    if (window.confirm('Are you sure you want to discard changes and refresh the page?')) {
+      window.location.reload();
+    }
+  };
 
-  console.log(editingRecord);
+  useEffect(() => {
+    window.onbeforeunload = unsavedChanges ? () => true : undefined;
+    return () => {
+      window.onbeforeunload = undefined;
+    };
+  }, [unsavedChanges]);
+
+
   
   return (
     <div className="h-[70vh] w-3/4 bg-[#EAF3FF] rounded-lg p-8 overflow-y-auto">
@@ -161,8 +150,8 @@ function BenefitsBox({ setRoleBenefits, setIndividualBenefits }) {
         </div>
       ))}
       <div className="flex justify-end mt-4">
-        <button style={{ backgroundColor: '#EBB99E', color: '#000000' }} className="mr-2 rounded px-4">Cancel changes</button>
-        <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4">Save</button>
+        <button style={{ backgroundColor: '#EBB99E', color: '#000000' }} className="mr-2 rounded px-4" onClick={handleCancel}>Cancel changes</button>
+        <button style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }} className="rounded px-4" onClick={() => handleSave(localBenefits)}>Save</button>
       </div>
       <BenefitsDialog
         isOpen={modalIsOpen}
