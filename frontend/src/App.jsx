@@ -86,7 +86,7 @@ function App() {
           <Route path="/info/employeeList" element={<ViewEmployeeList />} />
           <Route path="/info/viewProfile/:id" element={<ViewProfile />} />
           <Route path="/info/editMyProfile" element={<EditMyProfile />} />
-          <Route path="/info/editEmployeeProfile" element={<EditEmployeeProfile />} />
+          <Route path="/info/editEmployeeProfile/:id" element={<EditEmployeeProfile />} />
 
           {/* Salary module routes */}
           <Route path="/salary/view" element={<ViewSalary />} />

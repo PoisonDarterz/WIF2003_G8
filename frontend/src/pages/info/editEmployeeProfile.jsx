@@ -1,18 +1,45 @@
-import React, { useState } from "react";
-import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
+import React, { useState, useEffect } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
+import { Link, useParams } from "react-router-dom";
+import axios from "axios";
+import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 
 export default function EditEmployeeProfile() {
+  const {id} = useParams();
+  const [employeeData, setEmployeeData] = useState(null);
   const [department, setDepartment] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [educationList, setEducationList] = useState([]);
   const [skillsList, setSkillsList] = useState([]);
   const [awardsList, setAwardsList] = useState([]);
   const [profilePic, setProfilePic] = useState("/Profile_image.jpg");
+  const [isLoading, setIsLoading] = useState(true);
 
   const departments = ["Sales", "Marketing", "Engineering", "Human Resources", "Finance"]; 
   const jobTitles = ["Sales Manager", "Marketing Specialist", "Software Engineer", "HR Coordinator", "Financial Analyst"]; 
 
+  useEffect(() => {
+    const fetchEmployeeData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:5000/api/employees/${id}`);
+        const data = await response.json();
+        setEmployeeData(data);
+        setDepartment(data.department || "");
+        setJobTitle(data.jobTitle || "");
+        setEducationList(data.educationList || []);
+        setSkillsList(data.skillsList || []);
+        setAwardsList(data.awardsList || []);
+        setProfilePic(data.profilePic || "/Profile_image.jpg");
+      } catch (error) {
+        console.error("Error fetching employee data:", error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchEmployeeData();
+  }, [id]);
+  
   const handleDepartmentChange = (e) => {
     setDepartment(e.target.value);
   };
@@ -70,6 +97,10 @@ export default function EditEmployeeProfile() {
     listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
   };
 
+  if (isLoading) { 
+    return <div>Loading...</div>;
+  }
+
   return (
     <form>
       <div className="p-8">
@@ -99,6 +130,7 @@ export default function EditEmployeeProfile() {
                 id="employeeId"
                 name="employeeId"
                 type="text"
+                defaultValue={employeeData.employeeId}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
 
@@ -110,6 +142,7 @@ export default function EditEmployeeProfile() {
                 id="name"
                 name="name"
                 type="text"
+                defaultValue={employeeData.name}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
 
@@ -121,6 +154,7 @@ export default function EditEmployeeProfile() {
                 id="email"
                 name="email"
                 type="email"
+                defaultValue={employeeData.email}
                 autoComplete="email"
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
@@ -134,6 +168,7 @@ export default function EditEmployeeProfile() {
                 id="phone"
                 name="phone"
                 type="phone"
+                defaultValue={employeeData.phone}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
 
@@ -187,6 +222,7 @@ export default function EditEmployeeProfile() {
                 id="joinDate"
                 name="joinDate"
                 type="date"
+                defaultValue={employeeData.joinedSince}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
           </div>
@@ -202,7 +238,7 @@ export default function EditEmployeeProfile() {
                 name="bio"
                 rows={4}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                defaultValue={''}
+                defaultValue={employeeData.bio}
             />
             <div className="border-b border-gray-900/10 pb-12"></div>
 
