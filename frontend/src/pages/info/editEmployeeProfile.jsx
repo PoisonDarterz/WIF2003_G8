@@ -1,51 +1,61 @@
 import React, { useState, useEffect } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 
 export default function EditEmployeeProfile() {
   const {id} = useParams();
   const [employeeData, setEmployeeData] = useState(null);
-  const [department, setDepartment] = useState("");
-  const [jobTitle, setJobTitle] = useState("");
+  const [allEmployeeData, setAllEmployeeData] = useState(null);
+  const [departments, setDepartments] = useState([]);
+  const [jobTitles, setJobTitles] = useState([]);
   const [educationList, setEducationList] = useState([]);
   const [skillsList, setSkillsList] = useState([]);
   const [awardsList, setAwardsList] = useState([]);
   const [profilePic, setProfilePic] = useState("/Profile_image.jpg");
   const [isLoading, setIsLoading] = useState(true);
 
-  const departments = ["Sales", "Marketing", "Engineering", "Human Resources", "Finance"]; 
-  const jobTitles = ["Sales Manager", "Marketing Specialist", "Software Engineer", "HR Coordinator", "Financial Analyst"]; 
-
   useEffect(() => {
-    const fetchEmployeeData = async () => {
-      setIsLoading(true);
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/employees/${id}`);
-        const data = await response.json();
-        setEmployeeData(data);
-        setDepartment(data.department || "");
-        setJobTitle(data.jobTitle || "");
-        setEducationList(data.educationList || []);
-        setSkillsList(data.skillsList || []);
-        setAwardsList(data.awardsList || []);
-        setProfilePic(data.profilePic || "/Profile_image.jpg");
+        setIsLoading(true);
+  
+        // Fetch employee data
+        const allEmployeeResponse = await axios.get(`http://localhost:5000/api/employees`);
+        const employeeResponse = await axios.get(`http://localhost:5000/api/employees/${id}`);
+        setEmployeeData(employeeResponse.data);
+        setAllEmployeeData(allEmployeeResponse.data);
       } catch (error) {
-        console.error("Error fetching employee data:", error);
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
-
-    fetchEmployeeData();
+  
+    fetchData();
   }, [id]);
   
-  const handleDepartmentChange = (e) => {
-    setDepartment(e.target.value);
-  };
-
-  const handleJobTitleChange = (e) => {
-    setJobTitle(e.target.value);
+  useEffect(() => {
+    // Extract unique department names and job titles
+    if (allEmployeeData) {
+      const uniqueDepartments = new Set();
+      const uniqueJobTitles = new Set();
+  
+      allEmployeeData.forEach((employee) => {
+        uniqueDepartments.add(employee.roleId.departmentId.departmentName);
+        uniqueJobTitles.add(employee.roleId.roleName);
+      });
+  
+      setDepartments(Array.from(uniqueDepartments));
+      setJobTitles(Array.from(uniqueJobTitles));
+    }
+  }, [allEmployeeData]);
+  
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEmployeeData({ ...employeeData, [name]: value });
   };
 
   const handleFileChange = (e) => {
@@ -97,6 +107,35 @@ export default function EditEmployeeProfile() {
     listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
   };
 
+  // Inside handleDepartmentChange function
+  const handleDepartmentChange = (e) => {
+    const selectedDepartment = e.target.value;
+    setEmployeeData(prevState => ({
+      ...prevState,
+      roleId: {
+        ...prevState.roleId,
+        departmentId: {
+          ...prevState.roleId.departmentId,
+          departmentName: selectedDepartment
+        }
+      }
+    }));
+  };
+
+  // Inside handleJobTitleChange function
+  const handleJobTitleChange = (e) => {
+    const selectedJobTitle = e.target.value;
+    setEmployeeData(prevState => ({
+      ...prevState,
+      roleId: {
+        ...prevState.roleId,
+        roleName: selectedJobTitle
+      }
+    }));
+  };
+
+  
+
   if (isLoading) { 
     return <div>Loading...</div>;
   }
@@ -108,7 +147,7 @@ export default function EditEmployeeProfile() {
           <TopNavBlack />
         </div>
         <div className="mt-8 mb-4 text-left">
-          <h1 className="text-2xl font-bold">Edit Employee Profile</h1>
+          <h1 className="text-2xl font-bold">Edit Profile of {employeeData.name}</h1>
         </div>
 
         <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-x-4">
@@ -130,7 +169,8 @@ export default function EditEmployeeProfile() {
                 id="employeeId"
                 name="employeeId"
                 type="text"
-                defaultValue={employeeData.employeeId}
+                value={employeeData.id}
+                onChange={handleInputChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
 
@@ -142,7 +182,8 @@ export default function EditEmployeeProfile() {
                 id="name"
                 name="name"
                 type="text"
-                defaultValue={employeeData.name}
+                value={employeeData.name}
+                onChange={handleInputChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
 
@@ -154,7 +195,8 @@ export default function EditEmployeeProfile() {
                 id="email"
                 name="email"
                 type="email"
-                defaultValue={employeeData.email}
+                value={employeeData.email.email}
+                onChange={handleInputChange}
                 autoComplete="email"
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
@@ -168,53 +210,53 @@ export default function EditEmployeeProfile() {
                 id="phone"
                 name="phone"
                 type="phone"
-                defaultValue={employeeData.phone}
+                value={employeeData.phone}
+                onChange={handleInputChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
-
-            {/* Dropdown for department */}
-            <div>
+        {/* Department dropdown */}
+        <div>
             <label htmlFor="department" className="mt-5 block text-md font-medium leading-6 text-gray-900">
-                Department
+              Department
             </label>
             <select
-                id="department"
-                name="department"
-                value={department}
-                onChange={handleDepartmentChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              id="department"
+              name="department"
+              value={employeeData.roleId.departmentId.departmentName}
+              onChange={handleDepartmentChange}
+              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             >
-                <option value="">Select Department</option>
-                {departments.map((dept) => (
+              <option value="">Select Department</option>
+              {departments.map((dept) => (
                 <option key={dept} value={dept}>
-                    {dept}
+                  {dept}
                 </option>
-                ))}
+              ))}
             </select>
-            </div>
+          </div>
 
-            {/* Dropdown for job title */}
-            <div>
+          {/* Job title dropdown */}
+          <div>
             <label htmlFor="jobTitle" className="mt-5 block text-md font-medium leading-6 text-gray-900">
-                Job Title
+              Job Title
             </label>
             <select
-                id="jobTitle"
-                name="jobTitle"
-                value={jobTitle}
-                onChange={handleJobTitleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              id="jobTitle"
+              name="jobTitle"
+              value={employeeData.roleId.roleName}
+              onChange={handleJobTitleChange}
+              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             >
-                <option value="">Select Job Title</option>
-                {jobTitles.map((title) => (
-                <option key={title} value={title}>
-                    {title}
+              <option value="">Select Job Title</option>
+              {jobTitles.map((role) => (
+                <option key={role} value={role}>
+                  {role}
                 </option>
-                ))}
+              ))}
             </select>
-            </div>
+          </div>
 
-            {/* Input for join date */}
+          {/* Input for join date */}
             <label htmlFor="joinDate" className="mt-5 block text-md font-medium leading-6 text-gray-900">
                 Joined Since
             </label>
@@ -222,7 +264,8 @@ export default function EditEmployeeProfile() {
                 id="joinDate"
                 name="joinDate"
                 type="date"
-                defaultValue={employeeData.joinedSince}
+                value={employeeData.joinedSince ? new Date(employeeData.joinedSince).toISOString().split('T')[0] : ''}
+                onChange={handleInputChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
           </div>
@@ -238,7 +281,8 @@ export default function EditEmployeeProfile() {
                 name="bio"
                 rows={4}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                defaultValue={employeeData.bio}
+                value={employeeData.bio}
+                onChange={handleInputChange}
             />
             <div className="border-b border-gray-900/10 pb-12"></div>
 
