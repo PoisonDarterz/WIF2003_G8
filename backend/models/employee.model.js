@@ -38,10 +38,11 @@ const employeeSchema = new mongoose.Schema({
   roleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
   joinedSince: { type: Date },
   bio: { type: String },
-  edu: eduSchema,
-  skills: skillsSchema,
-  awards: awardsSchema,
+  edu: [eduSchema],
+  skills: [skillsSchema],
+  awards: [awardsSchema],
   individualBenefits: [IndividualBenefitSchema]
+
 });
 
 module.exports = mongoose.model('Employee', employeeSchema);
