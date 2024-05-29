@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
@@ -20,7 +19,6 @@ router.post('/generate-salary', async (req, res) => {
         // Loop through all checked employees
         for (const employee of checkedEmployees) {
             console.log(`Generating PDF for employee ${employee.employee.id}`);
-            console.log(employee);
 
             // Generate the PDF
             const pdfDocDefinition = generatePreview(employee.employee, employee.salaryDetails, true);
@@ -53,14 +51,17 @@ router.post('/generate-salary', async (req, res) => {
                 }
             }).filter(Boolean);
 
-            console.log('Salary details:', salaryDetails2);
+            const [year, month] = employee.salaryDetails.monthYear.split('-');
+            const employeeNumber = String(employee.employee.id).padStart(3, '0');
+            const salaryId = `${employeeNumber}${year.slice(-2)}${month}`;
 
             // Create a new Salary document
             const salary = new Salary({
+                slipId: salaryId,
                 dateIssued: new Date(),
                 month: employee.salaryDetails.monthYear,
                 documentURL,
-                employeeId: employee.employee._id,
+                employeeId: employee.employee.id,
                 salaryDetails: salaryDetails2
             });
 
@@ -74,5 +75,14 @@ router.post('/generate-salary', async (req, res) => {
         console.error('An error occurred:', error);
     }
 });
+
+router.get('/getAll', async (req, res) => {
+    try {
+      const salarySlips = await Salary.find();
+      res.json(salarySlips);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
 
 module.exports = router;
