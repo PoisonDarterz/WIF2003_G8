@@ -33,15 +33,29 @@ function SalaryDialog({ isOpen, onRequestClose, handleAddRecord, handleEditRecor
       <h2 className="text-2xl font-bold mb-4">{editMode ? 'Edit a record' : 'Add a record'}</h2>
       <label className="block mb-2">
         Title:
-        <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="block w-full border p-1 rounded mt-1" />
+        <input
+          type="text"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          className="block w-full border p-1 rounded mt-1"
+        />
       </label>
       <label className="block mb-2">
         Amount: RM
-        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} className="block w-full border p-1 rounded mt-1" />
+        <input
+          type="number"
+          value={amount}
+          onChange={e => setAmount(e.target.value)}
+          className="block w-full border p-1 rounded mt-1"
+        />
       </label>
       <label className="block mb-2">
         Additional notes for internal purposes:
-        <textarea value={notes} onChange={e => setNotes(e.target.value)} className="block w-full border p-1 rounded mt-1 h-20" />
+        <textarea
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          className="block w-full border p-1 rounded mt-1 h-20"
+        />
       </label>
       <h3 className="text-lg font-bold mb-4">Preview</h3>
       <div className="flex justify-between items-center mb-3">

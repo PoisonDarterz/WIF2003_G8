@@ -21,7 +21,6 @@ router.get('/', async (req, res) => {
           }
         }
       ]); 
-      console.log("Fetched employees:", employees); 
       res.json(employees);
   } catch (err) {
       console.log("Error fetching employees:", err); 

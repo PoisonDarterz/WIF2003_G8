@@ -14,7 +14,6 @@ function ViewEmployeeList() {
     const fetchEmployees = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/employees");
-        console.log("Fetched employees from frontend:", response.data);
         setEmployeeData(response.data);
       } catch (error) {
         console.error("Error fetching employees:", error);

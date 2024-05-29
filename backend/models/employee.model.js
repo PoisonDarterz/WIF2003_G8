@@ -18,6 +18,17 @@ const awardsSchema = new mongoose.Schema({
   awardsDocURL: { type: String },
 });
 
+const IndividualBenefitSchema = new mongoose.Schema({
+  benefitName: {
+    type: String,
+    required: true
+  },
+  notes: {
+    type: String,
+    default: ''
+  }
+});
+
 const employeeSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   profilePicURL: { type: String },
@@ -30,6 +41,8 @@ const employeeSchema = new mongoose.Schema({
   edu: [eduSchema],
   skills: [skillsSchema],
   awards: [awardsSchema],
+  individualBenefits: [IndividualBenefitSchema]
+
 });
 
 module.exports = mongoose.model('Employee', employeeSchema);

@@ -8,13 +8,14 @@ const app = express();
 const salaryRouter = require('./routers/salary.router');
 const employeeRouter = require('./routers/employee.router');
 const authRouter = require('./routers/auth.router')
+const benefitRouter = require('./routers/benefit.router');
 
 // Connect to MongoDB Atlas database
 mongoose.connect('mongodb+srv://empadmin:' + process.env.MONGODB_PASSWORD + '@employeeconnectsuite.1flw4yf.mongodb.net/test?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
-
+ 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/employees', employeeRouter);
 app.use('/api/salary', salaryRouter);
+app.use('/api/benefits', benefitRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

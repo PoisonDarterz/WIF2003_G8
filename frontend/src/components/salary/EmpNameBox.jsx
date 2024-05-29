@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function EmpNameBox({employees, setEmployees, searchId, searchJobTitle, singleSelect = false, width='w-1/4' }) {
+function EmpNameBox({employees, setEmployees, searchId, searchJobTitle, singleSelect = false, width='w-1/4', unsavedChanges, loadEmployeeBenefits, AB }) {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -21,6 +21,9 @@ function EmpNameBox({employees, setEmployees, searchId, searchJobTitle, singleSe
   );
 
   const handleCheckboxChange = (event, id) => {
+    if (unsavedChanges && !window.alert('You have unsaved changes. Click \"Cancel changes\" to discard them, or save your changes.')) {
+      return;
+    }
     if (singleSelect) {
       setEmployees(
         filteredEmployees.map(employee =>
@@ -33,6 +36,9 @@ function EmpNameBox({employees, setEmployees, searchId, searchJobTitle, singleSe
           employee.id === id ? { ...employee, checked: event.target.checked } : employee
         )
       );
+    }
+    if (AB){
+      loadEmployeeBenefits(id);
     }
   };
 
