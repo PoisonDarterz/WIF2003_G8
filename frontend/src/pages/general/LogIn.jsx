@@ -30,8 +30,10 @@ const LogIn = () => {
             const res = await axios.post('http://localhost:5000/api/auth/login', {
                 email,
                 password
+            }, {
+                withCredentials: true // Allow sending cookies
             });
-
+    
             setMessage('Login successful!');
             navigate('/home');
         } catch (err) {

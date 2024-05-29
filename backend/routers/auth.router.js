@@ -149,11 +149,39 @@ router.post('/login', async (req, res) => {
         // Create JWT token
         const token = createToken(user);
 
-        return res.status(200).json({ message: "Login successful", token });
+        // Set cookie
+        res.cookie('token', token, { httpOnly: true, secure: true });
+
+        // Log cookies in console
+        console.log("Cookies:", req.cookies);
+
+        // Send response
+        return res.status(200).json({
+            message: "Login successful",
+            token,
+            user: { _id: user._id, role: user.role },
+        });
 
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: "Failed to login!" });
+    }
+});
+
+// Logout
+router.post('/logout', (req, res) => {
+    try {
+        // Clear the token cookie
+        res.clearCookie('token');
+
+        // Log a message to the console
+        console.log('User logged out and token cookie cleared successfully.');
+
+        // Send a success message
+        return res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        console.error('An error occurred during logout:', error);
+        return res.status(500).json({ message: "Failed to logout" });
     }
 });
 

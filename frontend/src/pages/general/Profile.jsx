@@ -1,9 +1,25 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import TopNavBlack from "../../components/TopNavBlack";
+import axios from 'axios';
 
 const Profile = () => {
+    const navigate = useNavigate(); // Initialize the navigate function
+
     const backgroundImage = process.env.PUBLIC_URL + '/Home.png';  // Path to the background image
+
+    const handleLogout = async () => {
+        try {
+            // Perform logout request
+            await axios.post('http://localhost:5000/api/auth/logout');
+
+            // Redirect to login page
+            navigate('/'); // Redirect to the login page upon successful logout
+        } catch (error) {
+            console.error('Logout failed:', error);
+            // Handle logout failure if necessary
+        }
+    };
 
     return (
         <div className="relative">
@@ -30,7 +46,7 @@ const Profile = () => {
                         </div>
                         <div className="border-b border-black pb-5"></div>
                         <div className="flex justify-center"> 
-                            <Link to="/" className="mt-5 text-red-500 font-semibold hover:underline">Log Out</Link>
+                            <button onClick={handleLogout} className="mt-5 text-red-500 font-semibold hover:underline">Log Out</button>
                         </div>
                     </div>
                 </div>
