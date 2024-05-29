@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
+import AttendanceDetailsModal from "../attendance/AttendanceDetailsModal";
 
 const AttendanceHistoryTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [selectedDate, setSelectedDate] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [selectedAttendance, setSelectedAttendance] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,6 +69,11 @@ const AttendanceHistoryTable = () => {
     return `${day}/${month}/${year}`;
   };
 
+  const handleViewClick = (attendance) => {
+    setSelectedAttendance(attendance);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
@@ -117,7 +125,10 @@ const AttendanceHistoryTable = () => {
               <td className="py-3 px-6 text-center">{data.clockOut}</td>
               <td className="py-3 px-6 text-center">{data.status}</td>
               <td className="py-3 px-6 text-center">
-                <button className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                <button
+                  className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                  onClick={() => handleViewClick(data)}
+                >
                   View
                 </button>
               </td>
@@ -158,6 +169,11 @@ const AttendanceHistoryTable = () => {
           Next
         </button>
       </div>
+      <AttendanceDetailsModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        attendance={selectedAttendance}
+      />
     </div>
   );
 };

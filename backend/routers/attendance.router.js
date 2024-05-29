@@ -47,12 +47,10 @@ router.post("/clockin", async (req, res) => {
       if (req.body.reason) {
         existingRecord.reason = req.body.reason;
         await existingRecord.save();
-        res
-          .status(200)
-          .json({
-            record: existingRecord,
-            message: "Reason updated successfully!",
-          });
+        res.status(200).json({
+          record: existingRecord,
+          message: "Reason updated successfully!",
+        });
       } else {
         res
           .status(400)
