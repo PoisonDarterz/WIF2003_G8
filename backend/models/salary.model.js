@@ -24,6 +24,10 @@ const SalaryDetailSchema = new mongoose.Schema({
 });
 
 const SalarySchema = new mongoose.Schema({
+  slipId: {
+    type: String,
+    required: true
+  },
   dateIssued: {
     type: Date,
     required: true
@@ -37,7 +41,7 @@ const SalarySchema = new mongoose.Schema({
     required: true
   },
   employeeId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'Employee',
     required: true
   },
