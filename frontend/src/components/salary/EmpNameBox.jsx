@@ -1,36 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const employees = [
-  { id: 1, name: 'John Doe' },
-  { id: 2, name: 'Jane Doe' },
-  // add more employees as needed
-];
+function EmpNameBox({employees, setEmployees, searchId, searchJobTitle, singleSelect = false, width='w-1/4', unsavedChanges, loadEmployeeBenefits, AB }) {
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/employees'); 
+        setEmployees(response.data.map(employee => ({ id: employee.id, name: employee.name, roleId: employee.roleId, _id: employee._id  })));
+      } catch (error) {
+        console.error('Error fetching employees:', error);
+      }
+    };
 
-function EmpNameBox({ employees: initialEmployees = [], setEmployees: setEmployeesProp, singleSelect = false, width='w-1/4' }) {
-  const [localEmployees, setLocalEmployees] = useState(initialEmployees);
-  
-  const employees = setEmployeesProp ? initialEmployees : localEmployees;
-  const setEmployees = setEmployeesProp || setLocalEmployees;
+    fetchEmployees();
+  }, [setEmployees]);
+
+  const filteredEmployees = employees.filter(employee => 
+    (searchId ? employee.id.toLowerCase().includes(searchId.toLowerCase()) : true) && 
+    (searchJobTitle ? (employee.roleId ? employee.roleId.roleName.toLowerCase().includes(searchJobTitle.toLowerCase()) : false) : true)
+  );
 
   const handleCheckboxChange = (event, id) => {
+    if (unsavedChanges && !window.alert('You have unsaved changes. Click \"Cancel changes\" to discard them, or save your changes.')) {
+      return;
+    }
     if (singleSelect) {
       setEmployees(
-        employees.map(employee =>
+        filteredEmployees.map(employee =>
           employee.id === id ? { ...employee, checked: event.target.checked } : { ...employee, checked: false }
         )
       );
     } else {
       setEmployees(
-        employees.map(employee =>
+        filteredEmployees.map(employee =>
           employee.id === id ? { ...employee, checked: event.target.checked } : employee
         )
       );
+    }
+    if (AB){
+      loadEmployeeBenefits(id);
     }
   };
 
   return (
     <div className={`h-[70vh] ${width} bg-[#EAF3FF] rounded-lg p-8 overflow-y-auto`}>
-      {employees.map((employee) => (
+      {filteredEmployees.map((employee) => (
         <div key={employee.id} className="flex items-center m-2">
           <label htmlFor={`employee-${employee.id}`} className="flex items-center cursor-pointer">
             <input

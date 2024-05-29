@@ -1,15 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ForgotPassword = () => {
     const outerBgColor = 'bg-teal-200'; // Background color for the outer div
     const innerBgColor = 'bg-gray-100'; // Background color for the inner rectangle
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const [email, setEmail] = useState('');
+    const [message, setMessage] = useState('');
+
+    const handleChange = (e) => {
+        setEmail(e.target.value);
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Navigate to ResetPassword page
-        navigate('/general/ResetPassword');
+        try {
+            const response = await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
+            setMessage(response.data.message);
+        } catch (error) {
+            setMessage(error.response.data.message);
+        }
     };
 
     return (
@@ -35,9 +47,14 @@ const ForgotPassword = () => {
                                 id="email" 
                                 className="w-full p-2 border rounded-md" 
                                 placeholder="Enter your email" 
+                                value={email}
+                                onChange={handleChange}
                                 required 
                             />
                         </div>
+
+                        {/* Message */}
+                        {message && <p className="text-red-500 mb-4">{message}</p>}
 
                         {/* Reset Button */}
                         <button 

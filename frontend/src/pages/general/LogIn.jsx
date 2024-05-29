@@ -1,17 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const LogIn = () => {
     const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+    const [message, setMessage] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+
+    const { email, password } = formData;
 
     const leftBgColor = 'bg-teal-200'; // Background color for the left side
     const rightBgColor = 'bg-gray-100'; // Background color for the right side
 
-    const handleSubmit = (e) => {
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+
+    const handleTogglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Logic for handling login
-        // For now, just navigate to the home page
-        navigate('/home');
+        try {
+            const res = await axios.post('http://localhost:5000/api/auth/login', {
+                email,
+                password
+            });
+
+            setMessage('Login successful!');
+            navigate('/home');
+        } catch (err) {
+            if (err.response && err.response.data.message) {
+                setMessage(err.response.data.message);
+            } else {
+                setMessage('Login failed. Please try again.');
+            }
+        }
     };
 
     return (
@@ -27,6 +56,8 @@ const LogIn = () => {
             <div className={`w-1/2 ${rightBgColor} flex flex-col justify-center items-center p-10 text-black`}>
                 <h2 className="text-4xl font-bold mb-4">Login</h2>
 
+                {message && <p className="mb-4 text-red-500">{message}</p>}
+
                 {/* Form */}
                 <form className="w-full max-w-md" onSubmit={handleSubmit}>
                     {/* Email Input */}
@@ -37,20 +68,33 @@ const LogIn = () => {
                             id="email" 
                             className="w-full p-2 border rounded-md" 
                             placeholder="Enter your email" 
+                            value={formData.email}
+                            onChange={handleChange}
                             required 
                         />
                     </div>
 
                     {/* Password Input */}
-                    <div className="mb-6 w-full">
+                    <div className="mb-6 w-full relative">
                         <label htmlFor="password" className="block text-black text-sm font-bold mb-2 text-left">Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            className="w-full p-2 border rounded-md" 
-                            placeholder="Enter your password" 
-                            required 
-                        />
+                        <div className="relative">
+                            <input 
+                                type={showPassword ? 'text' : 'password'}
+                                id="password" 
+                                className="w-full p-2 border rounded-md" 
+                                placeholder="Enter your password" 
+                                value={formData.password}
+                                onChange={handleChange}
+                                required 
+                            />
+                            <button 
+                                type="button"
+                                className="absolute right-0 top-0 mt-2 mr-2"
+                                onClick={handleTogglePasswordVisibility}
+                            >
+                                {showPassword ? 'Hide' : 'Show'}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Login Button */}
