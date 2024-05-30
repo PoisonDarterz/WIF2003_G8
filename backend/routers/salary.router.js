@@ -84,6 +84,21 @@ router.get('/getAll', async (req, res) => {
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
-  });
+});
+
+router.get('/my-salary', authenticateUser, checkRole('Employee'), async (req, res) => {
+    try {
+        const salarySlips = await Salary.find({ employeeId: req.user.employeeID });
+        
+        if (salarySlips.length === 0) {
+            return res.status(404).json({ message: "No salary slips found for the logged-in user" });
+        }
+        
+        res.json(salarySlips); // Send the salary slips in the response
+    } catch (err) {
+        console.error("Error fetching salary slips:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 module.exports = router;
