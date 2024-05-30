@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
 import SideNavBar from "../../components/attendance/SideNavBar";
+import axios from "axios";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 
 const RecordAttendance = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [canClockOut, setCanClockOut] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [reason, setReason] = useState("");
+  const [reasonError, setReasonError] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -12,75 +23,68 @@ const RecordAttendance = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleClockIn = () => {
-    const clockInTime = new Date();
-    const existingRecords =
-      JSON.parse(localStorage.getItem("attendanceRecords")) || [];
-    const today = new Date();
-    const alreadyLoggedIn = existingRecords.some(
-      (record) =>
-        record.year === today.getFullYear() &&
-        record.month === today.getMonth() + 1 &&
-        record.date === today.getDate()
-    );
-
-    if (alreadyLoggedIn) {
-      alert("You can't log in twice on the same day!");
-      return;
-    }
-
-    // Check if the clock-in time is outside of working hours
-    if (clockInTime.getHours() >= 21 || clockInTime.getHours() < 7) {
-      alert(
-        "Clock in Time not available. Please clock in within the working hours 8:00am - 5:00pm"
+  const handleClockIn = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/attendance/clockin",
+        { reason: reason }
       );
-      return;
+
+      const { record, message } = response.data;
+
+      if (record && (record.status === "Present" || record.status === "Late")) {
+        setCanClockOut(true);
+      } else {
+        setCanClockOut(false);
+      }
+      const userConfirmed = window.confirm(message);
+      if (
+        userConfirmed &&
+        (record.status === "Late" || record.status === "Absent")
+      ) {
+        setShowDialog(true);
+      }
+    } catch (error) {
+      console.error("Error clocking in:", error);
+      alert(
+        error.response?.data?.message || "An error occurred during clock-in."
+      );
     }
-
-    const status =
-      clockInTime.getHours() < 8
-        ? "Present"
-        : clockInTime.getHours() < 12
-        ? "Late"
-        : "Absent";
-
-    const attendanceRecord = {
-      month: clockInTime.getMonth() + 1,
-      date: clockInTime.getDate(),
-      year: clockInTime.getFullYear(),
-      clockIn: clockInTime.toLocaleTimeString(),
-      clockOut: "-",
-      status: status,
-    };
-
-    existingRecords.push(attendanceRecord);
-    localStorage.setItem("attendanceRecords", JSON.stringify(existingRecords));
-    window.dispatchEvent(new Event("storageUpdated"));
   };
 
-  const handleClockOut = () => {
-    const clockOutTime = new Date();
-    const existingRecords =
-      JSON.parse(localStorage.getItem("attendanceRecords")) || [];
-    const today = new Date();
-    const todayRecord = existingRecords.find(
-      (record) =>
-        record.year === today.getFullYear() &&
-        record.month === today.getMonth() + 1 &&
-        record.date === today.getDate()
-    );
-
-    if (!todayRecord || todayRecord.clockOut !== "-") {
-      alert("Please clock in first!");
-      return;
+  const handleClockOut = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/attendance/clockout"
+      );
+      console.log("Clock-out successful:", response.data);
+    } catch (error) {
+      console.error("Error clocking out:", error);
+      alert(error.response.data.message);
     }
-
-    todayRecord.clockOut = clockOutTime.toLocaleTimeString();
-    localStorage.setItem("attendanceRecords", JSON.stringify(existingRecords));
-    window.dispatchEvent(new Event("storageUpdated"));
   };
 
-  // Todo: If the status is Absent, no need record clock-in and clock-out time
+  const handleReasonSubmit = async () => {
+    if (!reason.trim()) {
+      setReasonError(true);
+      return;
+    }
+    setShowDialog(false);
+    setReasonError(false);
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/attendance/clockin",
+        { reason: reason }
+      );
+      console.log("Reason submitted successfully:", response.data);
+    } catch (error) {
+      console.error("Error submitting reason:", error);
+      alert(
+        error.response?.data?.message ||
+          "An error occurred while submitting the reason."
+      );
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen">
@@ -140,6 +144,7 @@ const RecordAttendance = () => {
               </button>
               <button
                 onClick={handleClockOut}
+                disabled={!canClockOut}
                 className="bg-[#EBB99E] hover:bg-opacity-90 text-gray-800 font-bold py-3 px-6 rounded focus:outline-none focus:shadow-outline"
                 type="button"
                 style={{ width: "200px" }}
@@ -148,6 +153,27 @@ const RecordAttendance = () => {
               </button>
             </div>
           </div>
+          <Dialog open={showDialog}>
+            <DialogTitle>Reason for Being Late/Absent</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="reason"
+                label="Reason"
+                type="text"
+                fullWidth
+                variant="standard"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                error={reasonError}
+                helperText={reasonError ? "Please state your reason" : ""}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleReasonSubmit}>Submit</Button>
+            </DialogActions>
+          </Dialog>
         </div>
       </div>
     </div>

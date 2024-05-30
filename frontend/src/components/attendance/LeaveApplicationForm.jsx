@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaUpload, FaCalendarAlt } from "react-icons/fa";
+import axios from "axios";
 
 const LeaveApplicationForm = () => {
   const [employeeName, setEmployeeName] = useState("");
@@ -11,16 +12,9 @@ const LeaveApplicationForm = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [file, setFile] = useState(null);
-  const [leaveRecords, setLeaveRecords] = useState([]);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    const existingRecords =
-      JSON.parse(localStorage.getItem("leaveRecords")) || [];
-    setLeaveRecords(existingRecords);
-  }, []);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!employeeName || !employeeID || !department || !startDate || !endDate) {
@@ -28,46 +22,47 @@ const LeaveApplicationForm = () => {
       return;
     }
 
-    const leaveRecord = {
-      monthIssued: `${startDate.toLocaleString("default", {
-        month: "long",
-      })} ${startDate.getFullYear()}`,
-      startDate: `${startDate.getDate()}/${
-        startDate.getMonth() + 1
-      }/${startDate.getFullYear()}`,
-      endDate: `${endDate.getDate()}/${
-        endDate.getMonth() + 1
-      }/${endDate.getFullYear()}`,
-      leaveType: leaveType,
-      status: "Pending",
-      file: file,
-    };
+    const formData = new FormData();
+    formData.append("employeeName", employeeName);
+    formData.append("employeeID", employeeID);
+    formData.append("department", department);
+    formData.append("leaveType", leaveType);
+    formData.append("startDate", startDate);
+    formData.append("endDate", endDate);
+    if (file) {
+      formData.append("file", file);
+    }
 
-    const updatedRecords = [...leaveRecords, leaveRecord];
-    updatedRecords.sort(
-      (a, b) => new Date(b.startDate) - new Date(a.startDate)
-    );
-    localStorage.setItem("leaveRecords", JSON.stringify(updatedRecords));
-    setLeaveRecords(updatedRecords);
-
-    setEmployeeName("");
-    setEmployeeID("");
-    setDepartment("");
-    setLeaveType("Sick");
-    setStartDate(null);
-    setEndDate(null);
-    setFile(null);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/leave/apply",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      alert(response.data.message);
+      setEmployeeName("");
+      setEmployeeID("");
+      setDepartment("");
+      setLeaveType("Sick");
+      setStartDate(null);
+      setEndDate(null);
+      setFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("There was an error submitting the form!", error);
     }
   };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const fileUrl = URL.createObjectURL(file);
-      setFile(fileUrl);
+      setFile(file);
     }
   };
 

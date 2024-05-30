@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -8,105 +9,47 @@ const LeaveHistoryTable = () => {
   const [leaveData, setLeaveData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
-  const [updatedLeaveData, setUpdatedLeaveData] = useState([]);
 
   useEffect(() => {
-    const preloadData = [
-      {
-        monthIssued: "October 2023",
-        startDate: "31/10/2023",
-        endDate: "1/11/2023",
-        leaveType: "Sick",
-        status: "Accepted",
-      },
-      {
-        monthIssued: "October 2023",
-        startDate: "28/10/2023",
-        endDate: "30/10/2023",
-        leaveType: "Vacation",
-        status: "Pending",
-      },
-      {
-        monthIssued: "October 2023",
-        startDate: "20/10/2023",
-        endDate: "25/10/2023",
-        leaveType: "Personal Leave",
-        status: "Rejected",
-      },
-      {
-        monthIssued: "October 2023",
-        startDate: "19/10/2023",
-        endDate: "18/10/2023",
-        leaveType: "Others (Medical Appointment)",
-        status: "Accepted",
-      },
-      {
-        monthIssued: "September 2023",
-        startDate: "19/9/2023",
-        endDate: "11/9/2023",
-        leaveType: "Sick",
-        status: "Accepted",
-      },
-      {
-        monthIssued: "September 2023",
-        startDate: "5/9/2023",
-        endDate: "10/9/2023",
-        leaveType: "Vacation",
-        status: "Accepted",
-      },
-    ];
-
-    const handleStorageUpdate = () => {
-      const loadedRecords =
-        JSON.parse(localStorage.getItem("leaveRecords")) || [];
-      setLeaveData(loadedRecords);
-      setFilteredData(loadedRecords);
-      setUpdatedLeaveData([]);
+    const fetchLeaveData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/leave/applications"
+        );
+        setLeaveData(response.data);
+        setFilteredData(response.data);
+      } catch (error) {
+        console.error("Error fetching leave data:", error);
+      }
     };
 
-    const existingRecords =
-      JSON.parse(localStorage.getItem("leaveRecords")) || [];
-    if (existingRecords.length === 0) {
-      localStorage.setItem("leaveRecords", JSON.stringify(preloadData));
-    }
-
-    handleStorageUpdate();
-
-    window.addEventListener("storage", handleStorageUpdate);
-    return () => {
-      window.removeEventListener("storage", handleStorageUpdate);
-    };
+    fetchLeaveData();
   }, []);
 
   useEffect(() => {
     if (selectedDate) {
       const selectedMonth = selectedDate.getMonth() + 1;
       const selectedYear = selectedDate.getFullYear();
-      const filtered = [...leaveData, ...updatedLeaveData]
+      const filtered = leaveData
         .filter(
           (data) =>
-            new Date(data.startDate.split("/").reverse().join("-")).getMonth() +
-              1 ===
-              selectedMonth &&
-            new Date(
-              data.startDate.split("/").reverse().join("-")
-            ).getFullYear() === selectedYear
+            new Date(data.startDate).getMonth() + 1 === selectedMonth &&
+            new Date(data.startDate).getFullYear() === selectedYear
         )
-        .sort((a, b) => {
-          const dateA = new Date(a.startDate.split("/").reverse().join("-"));
-          const dateB = new Date(b.startDate.split("/").reverse().join("-"));
-          return dateB - dateA;
-        });
+        .sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
       setFilteredData(filtered);
     } else {
-      const sorted = [...leaveData, ...updatedLeaveData].sort((a, b) => {
-        const dateA = new Date(a.startDate.split("/").reverse().join("-"));
-        const dateB = new Date(b.startDate.split("/").reverse().join("-"));
-        return dateB - dateA;
-      });
+      const sorted = leaveData.sort(
+        (a, b) => new Date(b.startDate) - new Date(a.startDate)
+      );
       setFilteredData(sorted);
     }
-  }, [leaveData, updatedLeaveData, selectedDate]);
+  }, [leaveData, selectedDate]);
+
+  const formatDate = (dateString) => {
+    const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+    return new Date(dateString).toLocaleDateString("en-GB", options);
+  };
 
   const indexOfLastEntry = currentPage * entriesPerPage;
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
@@ -167,14 +110,18 @@ const LeaveHistoryTable = () => {
               }`}
             >
               <td className="py-3 px-6 text-center">{data.monthIssued}</td>
-              <td className="py-3 px-6 text-center">{data.startDate}</td>
-              <td className="py-3 px-6 text-center">{data.endDate}</td>
+              <td className="py-3 px-6 text-center">
+                {formatDate(data.startDate)}
+              </td>
+              <td className="py-3 px-6 text-center">
+                {formatDate(data.endDate)}
+              </td>
               <td className="py-3 px-6 text-center">{data.leaveType}</td>
               <td className="py-3 px-6 text-center">{data.status}</td>
               <td className="py-3 px-6 text-center">
                 {data.file && (
                   <a
-                    href={data.file}
+                    href={`http://localhost:5000/${data.file}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
