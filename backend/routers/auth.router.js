@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const { authenticateUser } = require('../middlewares/auth.middleware');
+const Employee = require('../models/employee.model');
 
 // Load environment variables from a .env file if present
 require('dotenv').config();
@@ -266,6 +268,24 @@ router.post('/reset-password/:token', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: "Failed to reset password." });
+    }
+});
+
+// Route to fetch user profile data
+router.get('/my-profile', authenticateUser, async (req, res) => {
+    try {
+        const email = req.user.id;
+        
+        const userProfile = await Employee.findOne({ email: email });
+  
+        if (!userProfile) {
+            console.log('User profile not found');
+            return res.status(404).json({ message: 'User profile not found' });
+        }
+        res.status(200).json(userProfile);
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
 });
 
