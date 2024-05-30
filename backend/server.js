@@ -2,8 +2,7 @@ require("dotenv").config({ path: "../.env" });
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const fs = require("fs");
-const path = require("path");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 const salaryRouter = require("./routers/salary.router");
@@ -13,12 +12,6 @@ const benefitRouter = require("./routers/benefit.router");
 const communityRouter = require("./routers/community.router");
 const attendanceRouter = require("./routers/attendance.router");
 const leaveRouter = require("./routers/leave.router");
-
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, "../leaveUploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
-}
 
 // Connect to MongoDB Atlas database
 mongoose.connect(
