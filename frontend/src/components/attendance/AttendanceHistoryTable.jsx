@@ -1,155 +1,36 @@
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axios from "axios";
+import AttendanceDetailsModal from "../attendance/AttendanceDetailsModal";
 
 const AttendanceHistoryTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [selectedDate, setSelectedDate] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [selectedAttendance, setSelectedAttendance] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const preloadData = [
-      {
-        month: 4,
-        date: 4,
-        year: 2023,
-        clockIn: "08:00:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Present",
-      },
-      {
-        month: 4,
-        date: 3,
-        year: 2023,
-        clockIn: "08:10:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Late",
-      },
-      {
-        month: 4,
-        date: 2,
-        year: 2023,
-        clockIn: "08:00:00 AM",
-        clockOut: "08:00:00 PM",
-        status: "Present",
-      },
-      {
-        month: 4,
-        date: 1,
-        year: 2023,
-        clockIn: "09:00:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Late",
-      },
-      {
-        month: 3,
-        date: 31,
-        year: 2023,
-        clockIn: "08:00:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Present",
-      },
-      {
-        month: 3,
-        date: 30,
-        year: 2023,
-        clockIn: "-",
-        clockOut: "-",
-        status: "Absent",
-      },
-      {
-        month: 4,
-        date: 1,
-        year: 2023,
-        clockIn: "09:00:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Late",
-      },
-      {
-        month: 3,
-        date: 31,
-        year: 2023,
-        clockIn: "08:00:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Present",
-      },
-      {
-        month: 3,
-        date: 30,
-        year: 2023,
-        clockIn: "-",
-        clockOut: "-",
-        status: "Absent",
-      },
-      {
-        month: 3,
-        date: 29,
-        year: 2023,
-        clockIn: "08:05:00 AM",
-        clockOut: "05:10:00 PM",
-        status: "Present",
-      },
-      {
-        month: 3,
-        date: 28,
-        year: 2023,
-        clockIn: "08:00:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Present",
-      },
-      {
-        month: 3,
-        date: 27,
-        year: 2023,
-        clockIn: "08:20:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Late",
-      },
-      {
-        month: 3,
-        date: 26,
-        year: 2023,
-        clockIn: "08:00:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Present",
-      },
-      {
-        month: 3,
-        date: 25,
-        year: 2023,
-        clockIn: "08:00:00 AM",
-        clockOut: "05:00:00 PM",
-        status: "Present",
-      },
-    ];
-
-    const handleStorageUpdate = () => {
-      let loadedRecords =
-        JSON.parse(localStorage.getItem("attendanceRecords")) || [];
-      loadedRecords.sort((a, b) => {
-        if (b.year !== a.year) {
-          return b.year - a.year;
-        }
-        if (b.month !== a.month) {
-          return b.month - a.month;
-        }
-        return b.date - a.date;
-      });
-      setAttendanceData(loadedRecords);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/attendance"
+        );
+        console.log("Fetched data:", response.data);
+        const sortedData = response.data.sort((a, b) => {
+          const dateA = new Date(a.year, a.month - 1, a.date);
+          const dateB = new Date(b.year, b.month - 1, b.date);
+          return dateB - dateA;
+        });
+        setAttendanceData(sortedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
-    const existingRecords =
-      JSON.parse(localStorage.getItem("attendanceRecords")) || [];
-    if (existingRecords.length === 0) {
-      localStorage.setItem("attendanceRecords", JSON.stringify(preloadData));
-    }
 
-    handleStorageUpdate();
-
-    window.addEventListener("storageUpdated", handleStorageUpdate);
-    return () => {
-      window.removeEventListener("storageUpdated", handleStorageUpdate);
-    };
+    fetchData();
   }, []);
 
   const filteredData = attendanceData.filter((data) => {
@@ -186,6 +67,11 @@ const AttendanceHistoryTable = () => {
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+  };
+
+  const handleViewClick = (attendance) => {
+    setSelectedAttendance(attendance);
+    setIsModalOpen(true);
   };
 
   return (
@@ -239,7 +125,10 @@ const AttendanceHistoryTable = () => {
               <td className="py-3 px-6 text-center">{data.clockOut}</td>
               <td className="py-3 px-6 text-center">{data.status}</td>
               <td className="py-3 px-6 text-center">
-                <button className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                <button
+                  className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                  onClick={() => handleViewClick(data)}
+                >
                   View
                 </button>
               </td>
@@ -280,6 +169,11 @@ const AttendanceHistoryTable = () => {
           Next
         </button>
       </div>
+      <AttendanceDetailsModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        attendance={selectedAttendance}
+      />
     </div>
   );
 };

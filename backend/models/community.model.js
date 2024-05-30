@@ -1,11 +1,11 @@
 // models/community.model.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const ReplySchema = new mongoose.Schema({
-  employee: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Employee', 
-    required: true 
+  employee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
+    required: true,
   },
   replyTime: { type: Date, default: Date.now },
   replyText: { type: String, required: true },
@@ -14,10 +14,10 @@ const ReplySchema = new mongoose.Schema({
 });
 
 const CommentSchema = new mongoose.Schema({
-  employee: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Employee', 
-    required: true 
+  employee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
+    required: true,
   },
   commentTime: { type: Date, default: Date.now },
   commentText: { type: String, required: true },
@@ -27,11 +27,14 @@ const CommentSchema = new mongoose.Schema({
 });
 
 const CommunitySchema = new mongoose.Schema({
-  postId: { type: mongoose.Schema.Types.ObjectId, default: new mongoose.Types.ObjectId },
-  employee: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Employee', 
-    required: true 
+  postId: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: new mongoose.Types.ObjectId(),
+  },
+  employee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
+    required: true,
   },
   postTime: { type: Date, default: Date.now },
   postImageSrc: { type: String },
@@ -40,6 +43,4 @@ const CommunitySchema = new mongoose.Schema({
   comments: [CommentSchema],
 });
 
-module.exports = mongoose.model('Community', CommunitySchema);
-
-
+module.exports = mongoose.model("Community", CommunitySchema);
