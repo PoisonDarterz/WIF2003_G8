@@ -9,7 +9,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(
-  "DefaultEndpointsProtocol=https;AccountName=james0803leave;AccountKey=KXOIKK94YFaRXsWQUj1kTD3PmlXkYCmKUxbHryrBCl81B2BCeV02Gkw4wUx5oNayPV4312fDmktF+AStEYG/dQ==;EndpointSuffix=core.windows.net"
+  process.env.JAMES_CONNECTION_STRING
 );
 const containerClient =
   blobServiceClient.getContainerClient("leaveapplication");
