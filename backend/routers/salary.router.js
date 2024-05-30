@@ -5,12 +5,13 @@ const { BlobServiceClient } = require('@azure/storage-blob');
 const pdfMake = require('pdfmake/build/pdfmake');
 const Salary = require('../models/salary.model');  // 
 const generatePreview = require('../utils/generatePreview');
+const { authenticateUser, checkRole } = require('../middlewares/auth.middleware');
 
 // Azure Blob Storage setup
 const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.CONNECTION_STRING);
 const containerClient = blobServiceClient.getContainerClient('salaryslips');
 
-router.post('/generate-salary', async (req, res) => {
+router.post('/generate-salary', authenticateUser, checkRole('Admin'), async (req, res) => {
     try {
         console.log('Received request to generate salary');
         const checkedEmployees = req.body;
