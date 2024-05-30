@@ -1,4 +1,5 @@
-require("dotenv").config({ path: "../.env" });
+require("dotenv").config({ path: "../.env" }); // Add this line at the top
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -30,13 +31,15 @@ db.once("open", function () {
   console.log("We're connected to the database!");
 });
 
-app.use(cors());
-app.use(express.json());
-
 app.use(
-  "/leaveUploads",
-  express.static(path.join(__dirname, "../leaveUploads"))
+  cors({
+    origin: "http://localhost:3000", // Allow requests from this origin
+    credentials: true, // Allow sending cookies from the frontend
+  })
 );
+
+app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api/employees", employeeRouter);
