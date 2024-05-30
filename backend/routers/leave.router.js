@@ -8,6 +8,7 @@ require("dotenv").config();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+// Azure Blob Storage setup
 const blobServiceClient = BlobServiceClient.fromConnectionString(
   process.env.JAMES_CONNECTION_STRING
 );
