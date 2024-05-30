@@ -1,20 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const { BlobServiceClient } = require("@azure/storage-blob");
 const LeaveApplication = require("../models/leave.model");
+require("dotenv").config();
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "../leaveUploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Route to handle form submission
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  "DefaultEndpointsProtocol=https;AccountName=james0803leave;AccountKey=KXOIKK94YFaRXsWQUj1kTD3PmlXkYCmKUxbHryrBCl81B2BCeV02Gkw4wUx5oNayPV4312fDmktF+AStEYG/dQ==;EndpointSuffix=core.windows.net"
+);
+const containerClient =
+  blobServiceClient.getContainerClient("leaveapplication");
+
 router.post("/apply", upload.single("file"), async (req, res) => {
   try {
     const {
@@ -25,7 +24,7 @@ router.post("/apply", upload.single("file"), async (req, res) => {
       startDate,
       endDate,
     } = req.body;
-    const file = req.file ? req.file.path : null;
+    const file = req.file;
 
     // Get the current date for "month issued"
     const currentDate = new Date();
@@ -34,6 +33,18 @@ router.post("/apply", upload.single("file"), async (req, res) => {
       year: "numeric",
     });
 
+    let fileUrl = null;
+    if (file) {
+      const blobName = Date.now() + "-" + file.originalname;
+      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+      await blockBlobClient.uploadData(file.buffer, {
+        blobHTTPHeaders: {
+          blobContentType: file.mimetype,
+        },
+      });
+      fileUrl = blockBlobClient.url;
+    }
+
     const leaveApplication = new LeaveApplication({
       employeeName,
       employeeID,
@@ -41,7 +52,7 @@ router.post("/apply", upload.single("file"), async (req, res) => {
       leaveType,
       startDate,
       endDate,
-      file,
+      file: fileUrl,
       monthIssued,
     });
 
@@ -54,7 +65,6 @@ router.post("/apply", upload.single("file"), async (req, res) => {
   }
 });
 
-// Route to get all leave applications
 router.get("/applications", async (req, res) => {
   try {
     const applications = await LeaveApplication.find();
