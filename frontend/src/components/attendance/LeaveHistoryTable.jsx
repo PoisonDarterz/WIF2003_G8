@@ -121,7 +121,7 @@ const LeaveHistoryTable = () => {
               <td className="py-3 px-6 text-center">
                 {data.file && (
                   <a
-                    href={`http://localhost:5000/${data.file}`}
+                    href={data.file}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
