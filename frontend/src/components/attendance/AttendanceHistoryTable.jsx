@@ -16,7 +16,8 @@ const AttendanceHistoryTable = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/attendance"
+          "http://localhost:5000/api/attendance",
+          { withCredentials: true }
         );
         console.log("Fetched data:", response.data);
         const sortedData = response.data.sort((a, b) => {

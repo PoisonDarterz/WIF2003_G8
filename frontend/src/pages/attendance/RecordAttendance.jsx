@@ -27,7 +27,8 @@ const RecordAttendance = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/attendance/clockin",
-        { reason: reason, withCredentials: true }
+        { reason: reason },
+        { withCredentials: true }
       );
 
       const { record, message } = response.data;
@@ -77,7 +78,8 @@ const RecordAttendance = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/attendance/clockin",
-        { reason: reason, withCredentials: true }
+        { reason: reason },
+        { withCredentials: true }
       );
       console.log("Reason submitted successfully:", response.data);
     } catch (error) {

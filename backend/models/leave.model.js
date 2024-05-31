@@ -11,6 +11,11 @@ const leaveApplicationSchema = new mongoose.Schema(
     file: { type: String },
     status: { type: String, default: "Pending" },
     monthIssued: { type: String },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+      required: true,
+    },
   },
   { timestamps: true }
 );

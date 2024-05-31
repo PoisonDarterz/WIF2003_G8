@@ -41,6 +41,7 @@ const LeaveApplicationForm = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          withCredentials: true,
         }
       );
       alert(response.data.message);

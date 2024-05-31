@@ -6,9 +6,9 @@ const {
   checkRole,
 } = require("../middlewares/auth.middleware");
 
-router.get("/", async (req, res) => {
+router.get("/", authenticateUser, async (req, res) => {
   try {
-    const records = await Attendance.find().sort({
+    const records = await Attendance.find({ employeeId: req.user._id }).sort({
       year: -1,
       month: -1,
       date: -1,
