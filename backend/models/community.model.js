@@ -27,20 +27,20 @@ const CommentSchema = new mongoose.Schema({
 });
 
 const CommunitySchema = new mongoose.Schema({
-  postId: {
-    type: mongoose.Schema.Types.ObjectId,
-    default: new mongoose.Types.ObjectId(),
-  },
-  employee: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee",
-    required: true,
-  },
-  postTime: { type: Date, default: Date.now },
-  postImageSrc: { type: String },
-  postCaption: { type: String, required: true },
-  likes: { type: Number, default: 0 },
-  comments: [CommentSchema],
+    postId: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: new mongoose.Types.ObjectId(),
+    },
+    employee: {
+        type: {id: String, name: String, profilePicURL: String},
+        ref: "Employee.id",
+        required: true,
+    },
+    postTime: { type: Date, default: Date.now },
+    postImageSrc: { type: String },
+    postCaption: { type: String, required: true },
+    likes: { type: Number, default: 0 },
+    comments: [CommentSchema],
 });
 
 module.exports = mongoose.model("Community", CommunitySchema);
