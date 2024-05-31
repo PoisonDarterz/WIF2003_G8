@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from "react";
 import TopNavBlack from "../../components/TopNavBlack";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 
 export default function EditEmployeeProfile() {
-  const {id} = useParams();
-  const [employeeData, setEmployeeData] = useState(null);
+  const navigate = useNavigate();
+  const {id} = useParams();  
+  const [employeeData, setEmployeeData] = useState({
+    id: "",
+    profilePicURL: "",
+    name: "", 
+    email: { email: "" }, 
+    phone: "", 
+    roleId: { departmentId: { departmentName: "" }, roleName: "" }, 
+    joinedSince: "",
+    bio: "", 
+    edu: [],
+    skills: [],
+    awards: [],
+    emailContact: "",
+  });  
   const [allEmployeeData, setAllEmployeeData] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [jobTitles, setJobTitles] = useState([]);
@@ -15,17 +29,31 @@ export default function EditEmployeeProfile() {
   const [awardsList, setAwardsList] = useState([]);
   const [profilePic, setProfilePic] = useState("/Profile_image.jpg");
   const [isLoading, setIsLoading] = useState(true);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editType, setEditType] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
-  
+        setIsLoading(true);  
         // Fetch employee data
         const allEmployeeResponse = await axios.get(`http://localhost:5000/api/employees`);
         const employeeResponse = await axios.get(`http://localhost:5000/api/employees/${id}`);
-        setEmployeeData(employeeResponse.data);
+        
+        const employee = employeeResponse.data;
+        if (!employee.emailContact) {
+          employee.emailContact = employee.email.email;
+        }
+
+        setEmployeeData(employee);
         setAllEmployeeData(allEmployeeResponse.data);
+        const eduData = employee.edu.map(edu => ({ ...edu, confirmed: true }));
+        const skillsData = employee.skills.map(skill => ({ ...skill, confirmed: true }));
+        const awardsData = employee.awards.map(award => ({ ...award, confirmed: true }));
+
+        setEducationList(eduData);
+        setSkillsList(skillsData);
+        setAwardsList(awardsData);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -51,11 +79,31 @@ export default function EditEmployeeProfile() {
       setJobTitles(Array.from(uniqueJobTitles));
     }
   }, [allEmployeeData]);
+
+  const saveProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const updatedEmployeeData = {
+        ...employeeData,
+        joinedSince: new Date(employeeData.joinedSince).toISOString(),
+        edu: educationList.filter(edu => edu.confirmed),
+        skills: skillsList.filter(skill => skill.confirmed),
+        awards: awardsList.filter(award => award.confirmed),
+      };
+      const response = await axios.put(`http://localhost:5000/api/employees/${id}`, updatedEmployeeData);
+      console.log("Profile updated successfully", response.data);
+      navigate(`/info/viewProfile/${id}`);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
   
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEmployeeData({ ...employeeData, [name]: value });
+    if (value !== null) { 
+      setEmployeeData({ ...employeeData, [name]: value });
+    }
   };
 
   const handleFileChange = (e) => {
@@ -70,22 +118,37 @@ export default function EditEmployeeProfile() {
   };
 
   const handleAddEducation = () => {
-    setEducationList([...educationList, { title: "", description: "", evidence: "", confirmed: false }]);
+    setEducationList([...educationList, { eduTitle: '', eduDesc: '', eduDocURL: '', confirmed: false }]);
+    setEditIndex(educationList.length);
+    setEditType("edu");
   };
 
   const handleAddSkill = () => {
-    setSkillsList([...skillsList, { skill: "", description: "", evidence: "", confirmed: false }]);
+    setSkillsList([...skillsList, { skillsTitle: "", skillsDesc: "", skillsDocURL: "", confirmed: false }]);
+    setEditIndex(skillsList.length);
+    setEditType("skills");
   };
 
   const handleAddAward = () => {
-    setAwardsList([...awardsList, { award: "", description: "", evidence: "", confirmed: false }]);
+    setAwardsList([...awardsList, { awardsTitle: "", awardsDesc: "", awardsDocURL: "", confirmed: false }]);
+    setEditIndex(awardsList.length);
+    setEditType("awards");
   };
+
+  const handleEditItem = (index, listType) => {
+    const itemToEdit = listType[index];
+    setEditIndex(index);
+    setEditType(listType);
+  };
+  
 
   const handleConfirmItem = (index, listType) => {
     const updatedList = [...listType];
     updatedList[index].confirmed = true;
     listType === educationList ? setEducationList(updatedList) :
     listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
+    setEditIndex(null);
+    setEditType("");
   };
 
   const handleDeleteItem = (index, listType) => {
@@ -95,9 +158,10 @@ export default function EditEmployeeProfile() {
     listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
   };
 
-  const handleCancelEditSection = (index, listType) =>{
-
-  };
+  // const handleCancelEditSection = () =>{
+  //   setEditIndex(null);
+  //   setEditType("");
+  // };  
 
   const handleChange = (e, index, listType) => {
     const { name, value } = e.target;
@@ -132,22 +196,20 @@ export default function EditEmployeeProfile() {
         roleName: selectedJobTitle
       }
     }));
-  };
-
-  
+  };  
 
   if (isLoading) { 
     return <div>Loading...</div>;
   }
 
   return (
-    <form>
+    <form onSubmit={saveProfile}>
       <div className="p-8">
         <div className="mt-[-32px] ml-[-32px] mr-[-32px]">
           <TopNavBlack />
         </div>
         <div className="mt-8 mb-4 text-left">
-          <h1 className="text-2xl font-bold">Edit Profile of {employeeData.name}</h1>
+          <h1 className="text-2xl font-bold">Edit Profile</h1>
         </div>
 
         <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-x-4">
@@ -158,7 +220,7 @@ export default function EditEmployeeProfile() {
               <img className="h-48 w-36 mr-4 rounded-lg" src={profilePic} alt="Profile Picture" />
               <label htmlFor="profilePic" className="text-black">
                 Change Photo
-                <input type="file" id="profilePic" onChange={handleFileChange}/>
+                {/* <input type="file" id="profilePic" onChange={handleFileChange}/> */}
               </label>
             </div>
             {/* Input for employee ID */}
@@ -195,7 +257,7 @@ export default function EditEmployeeProfile() {
                 id="email"
                 name="email"
                 type="email"
-                value={employeeData.email.email}
+                value={employeeData.emailContact}
                 onChange={handleInputChange}
                 autoComplete="email"
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -264,7 +326,7 @@ export default function EditEmployeeProfile() {
                 id="joinDate"
                 name="joinDate"
                 type="date"
-                value={employeeData.joinedSince ? new Date(employeeData.joinedSince).toISOString().split('T')[0] : ''}
+                value={employeeData.joinedSince.split("T")[0]}
                 onChange={handleInputChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
@@ -286,48 +348,48 @@ export default function EditEmployeeProfile() {
             />
             <div className="border-b border-gray-900/10 pb-12"></div>
 
-            {/* Education Section */}
+           {/* Education Section */}
             <div>
-              <label className="mt-5 block text-md font-medium leading-6 text-gray-900">Education and Experiences</label>
-              {educationList.map((education, index) => (
+              <label className="mt-5 block text-md font-medium leading-6 text-gray-900">Education</label>
+              {educationList.map((edu, index) => (
                 <div key={index} className="mt-2">
-                  {education.confirmed ? (
-                    <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
-                    <div>
-                        <h4 className="text-sm font-semibold">{education.title}</h4>
-                        <p>{education.description}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        {/* <button type="button" onClick={() => handleModifyItem(index, educationList)} className="text-indigo-600"><AiOutlineEdit /></button> */}
-                        <button type="button" className="text-indigo-600"><AiOutlineEdit /></button>
-                        <button type="button" onClick={() => handleDeleteItem(index, educationList)} className="text-red-500"><AiOutlineDelete /></button>
-                      </div>
-                    </div>
-                  ) : (
+                  {editIndex === index && editType === "edu" ? (
                     <div className="flex flex-col gap-4 bg-[#eaf3ff] p-4 rounded-lg">
                       <input
                         type="text"
-                        name="title"
-                        placeholder="Education and Experiences"
-                        value={education.title}
+                        name="eduTitle"
+                        value={edu.eduTitle}
                         onChange={(e) => handleChange(e, index, educationList)}
+                        placeholder="Title"
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <textarea
-                        name="description"
-                        placeholder="Description"
-                        value={education.description}
+                        name="eduDesc"
+                        value={edu.eduDesc}
                         onChange={(e) => handleChange(e, index, educationList)}
+                        placeholder="Description"
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <input
                         type="file"
-                        id={`evidence${index}`}
-                        name={`evidence${index}`}
+                        id={`eduEvidence${index}`}
+                        name={`eduEvidence${index}`}
                       />
                       <div className="flex justify-center gap-10 items-center">
-                        <button type="button" onClick={() => handleConfirmItem(index, educationList)} className="text-indigo-600">Add</button>
-                        <button type="button" onClick={() => handleCancelEditSection(index, educationList)} className="text-red-500">Cancel</button>
+                        <button type="button" onClick={() => handleConfirmItem(index, educationList)} className="text-indigo-600">Confirm</button>
+                        {/* <button type="button" onClick={handleCancelEditSection} className="text-red-500">Cancel</button> */}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
+                      <div>
+                        <h4 className="text-sm font-semibold">{edu.eduTitle}</h4>
+                        <p>{edu.eduDesc}</p>
+                        <p className="text-blue-500">{edu.eduDocURL}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => handleEditItem(index, "edu")} className="text-indigo-600"><AiOutlineEdit /></button>
+                        <button type="button" onClick={() => handleDeleteItem(index, educationList)} className="text-red-500"><AiOutlineDelete /></button>
                       </div>
                     </div>
                   )}
@@ -337,54 +399,55 @@ export default function EditEmployeeProfile() {
                 type="button"
                 onClick={handleAddEducation}
                 className="mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                + Add Education and Experiences
+              >
+                + Add Education & Experiences
               </button>
             </div>
             <div className="border-b border-gray-900/10 pb-12"></div>
 
+
             {/* Skills Section */}
             <div>
               <label className="mt-5 block text-md font-medium leading-6 text-gray-900">Skills</label>
-              {skillsList.map((skill, index) => (
+              {skillsList.map((skills, index) => (
                 <div key={index} className="mt-2">
-                  {skill.confirmed ? (
-                    <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
-                    <div>
-                        <h4 className="text-sm font-semibold">{skill.skill}</h4>
-                        <p>{skill.description}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        {/* <button type="button" onClick={() => handleModifyItem(index, skillsList)} className="text-indigo-600"><AiOutlineEdit /></button> */}
-                        <button type="button" className="text-indigo-600"><AiOutlineEdit /></button>
-                        <button type="button" onClick={() => handleDeleteItem(index, skillsList)} className="text-red-500"><AiOutlineDelete /></button>
-                      </div>
-                    </div>
-                  ) : (
+                  {editIndex === index && editType === "skills" ? (
                     <div className="flex flex-col gap-4 bg-[#eaf3ff] p-4 rounded-lg">
                       <input
                         type="text"
-                        name="skill"
-                        placeholder="Skill"
-                        value={skill.skill}
+                        name="skillsTitle"
+                        value={skills.skillsTitle}
                         onChange={(e) => handleChange(e, index, skillsList)}
+                        placeholder="Title"
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <textarea
-                        name="description"
-                        placeholder="Description"
-                        value={skill.description}
+                        name="skillsDesc"
+                        value={skills.skillsDesc}
                         onChange={(e) => handleChange(e, index, skillsList)}
+                        placeholder="Description"
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <input
                         type="file"
-                        id={`skillEvidence${index}`}
-                        name={`skillEvidence${index}`}
+                        id={`skillsEvidence${index}`}
+                        name={`skillsEvidence${index}`}
                       />
                       <div className="flex justify-center gap-10 items-center">
-                        <button type="button" onClick={() => handleConfirmItem(index, skillsList)} className="text-indigo-600">Add</button>
-                        <button type="button" onClick={() => handleCancelEditSection(index, skillsList)} className="text-red-500">Cancel</button>
+                        <button type="button" onClick={() => handleConfirmItem(index, skillsList)} className="text-indigo-600">Confirm</button>
+                        {/* <button type="button" onClick={handleCancelEditSection} className="text-red-500">Cancel</button> */}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
+                      <div>
+                        <h4 className="text-sm font-semibold">{skills.skillsTitle}</h4>
+                        <p>{skills.skillsDesc}</p>
+                        <p className="text-blue-500">{skills.skillsDocURL}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => handleEditItem(index, "skills")} className="text-indigo-600"><AiOutlineEdit /></button>
+                        <button type="button" onClick={() => handleDeleteItem(index, skillsList)} className="text-red-500"><AiOutlineDelete /></button>
                       </div>
                     </div>
                   )}
@@ -394,54 +457,54 @@ export default function EditEmployeeProfile() {
                 type="button"
                 onClick={handleAddSkill}
                 className="mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                + Add Skill
+              >
+                + Add Skills
               </button>
             </div>
             <div className="border-b border-gray-900/10 pb-12"></div>
 
             {/* Awards Section */}
             <div>
-              <label className="mt-5 block text-md font-medium leading-6 text-gray-900">Professional Affiliations or Awards</label>
-              {awardsList.map((award, index) => (
+              <label className="mt-5 block text-md font-medium leading-6 text-gray-900">Awards</label>
+              {awardsList.map((awards, index) => (
                 <div key={index} className="mt-2">
-                  {award.confirmed ? (
-                    <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
-                    <div>
-                        <h4 className="text-sm font-semibold">{award.award}</h4>
-                        <p>{award.description}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        {/* <button type="button" onClick={() => handleModifyItem(index, awardsList)} className="text-indigo-600"><AiOutlineEdit /></button> */}
-                        <button type="button" className="text-indigo-600"><AiOutlineEdit /></button>
-                        <button type="button" onClick={() => handleDeleteItem(index, awardsList)} className="text-red-500"><AiOutlineDelete /></button>
-                      </div>
-                    </div>
-                  ) : (
+                  {editIndex === index && editType === "awards" ? (
                     <div className="flex flex-col gap-4 bg-[#eaf3ff] p-4 rounded-lg">
                       <input
                         type="text"
-                        name="award"
-                        placeholder="Professional Affiliation or Award"
-                        value={award.award}
+                        name="awardsTitle"
+                        value={awards.awardsTitle}
                         onChange={(e) => handleChange(e, index, awardsList)}
+                        placeholder="Title"
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <textarea
-                        name="description"
-                        placeholder="Description"
-                        value={award.description}
+                        name="awardsDesc"
+                        value={awards.awardsDesc}
                         onChange={(e) => handleChange(e, index, awardsList)}
+                        placeholder="Description"
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <input
                         type="file"
-                        id={`awardEvidence${index}`}
-                        name={`awardEvidence${index}`}
+                        id={`awardsDocURL${index}`}
+                        name={`awardsDocURL${index}`}
                       />
                       <div className="flex justify-center gap-10 items-center">
-                        <button type="button" onClick={() => handleConfirmItem(index, awardsList)} className="text-indigo-600">Add</button>
-                        <button type="button" onClick={() => handleCancelEditSection(index, awardsList)} className="text-red-500">Cancel</button>
+                        <button type="button" onClick={() => handleConfirmItem(index, awardsList)} className="text-indigo-600">Confirm</button>
+                        {/* <button type="button" onClick={handleCancelEditSection} className="text-red-500">Cancel</button> */}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
+                      <div>
+                        <h4 className="text-sm font-semibold">{awards.awardsTitle}</h4>
+                        <p>{awards.awardsDesc}</p>
+                        <p className="text-blue-500">{awards.awardsDocURL}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => handleEditItem(index, "awards")} className="text-indigo-600"><AiOutlineEdit /></button>
+                        <button type="button" onClick={() => handleDeleteItem(index, awardsList)} className="text-red-500"><AiOutlineDelete /></button>
                       </div>
                     </div>
                   )}
@@ -452,12 +515,13 @@ export default function EditEmployeeProfile() {
                 onClick={handleAddAward}
                 className="mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                + Add Affiliation or Award
+                + Add Awards
               </button>
             </div>
+            <div className="border-b border-gray-900/10 pb-12"></div>
           </div>
         </div>
-        <div className="border-b border-gray-900/10 pb-12"></div>
+        <div className="border-b border-gray-900/10 pb-12"></div> 
 
         {/* Button to save profile */}
         <div className="mt-6 flex items-center justify-center gap-x-6">
@@ -475,7 +539,6 @@ export default function EditEmployeeProfile() {
             Cancel
           </button>
         </div>
-
       </div>
     </form>
   );

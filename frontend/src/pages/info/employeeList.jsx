@@ -14,7 +14,14 @@ function ViewEmployeeList() {
     const fetchEmployees = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/employees");
-        setEmployeeData(response.data);
+        const employees = response.data.map(employee => {
+          if (!employee.emailContact) {
+            employee.emailContact = employee.email.email;
+          }
+          return employee;
+        });
+
+        setEmployeeData(employees);
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
@@ -93,7 +100,7 @@ function ViewEmployeeList() {
                 <td className="w-[20%] px-4 py-4">{data.name}</td>
                 <td className="w-[15%] px-4 py-4">{data.roleId.departmentId.departmentName}</td>
                 <td className="w-[20%] px-4 py-4">{data.roleId.roleName}</td>
-                <td className="w-[20%] px-4 py-4">{data.email.email}</td>
+                <td className="w-[20%] px-4 py-4">{data.emailContact}</td>
                 <td className="w-[10%] px-4 py-4">
                   <Link to={`/info/viewProfile/${data.id}`}>
                     <button className="px-2 py-1 text-sm text-[#2C74D8]">View</button>

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Employee = require('../models/employee.model');
+const User = require('../models/user.model');
 const Department = require('../models/department.model');
 const Role = require('../models/role.model')
 
@@ -21,7 +22,16 @@ router.get('/', async (req, res) => {
           }
         }
       ]); 
-      res.json(employees);
+
+      const employeesData = employees.map(employee => {
+        const emailContact = employee.emailContact || employee.email.email;
+        return {
+          ...employee.toObject(),
+          emailContact: emailContact
+        };
+      });
+  
+      res.json(employeesData);
   } catch (err) {
       console.log("Error fetching employees:", err); 
       res.status(500).json({ message: err.message });
@@ -44,18 +54,66 @@ router.get('/:id', async (req, res) => {
             path: 'departmentId',
             model: 'Department'
           }
-        }
+        },
+        { path: 'edu' },
+        { path: 'skills' },
+        { path: 'awards' }
       ]); 
-      console.log(`Fetched employee with ID: ${employeeId}`);
       if (!employee) {
         return res.status(404).json({ message: 'Employee not found' });
       }
-  
-      res.json(employee); 
+
+      const emailContact = employee.emailContact || employee.email.email;
+
+      const employeeData = {
+        ...employee.toObject(),
+        emailContact: emailContact
+      };
+
+      res.json(employeeData); 
+      console.log(`Fetched employee with ID: ${employeeId}`);
     } catch (err) {
       console.error("Error fetching employee:", err);
       res.status(500).json({ message: err.message });
     }
   });
+
+// Update employee profile
+router.put('/:id', async (req, res) => {
+  try {
+    const { edu, skills, awards, ...employeeData } = req.body;
+
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { id: req.params.id },
+      { $set: { edu, skills, awards }, ...employeeData },
+      { new: true }
+    ).populate([
+      {
+        path: 'email',
+        model: 'User'
+      },
+      {
+        path: 'roleId',
+        model: 'Role',
+        populate: {
+          path: 'departmentId',
+          model: 'Department'
+        }
+      },
+      { path: 'edu' },
+      { path: 'skills' },
+      { path: 'awards' }
+    ]);
+
+    if (!updatedEmployee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    res.json(updatedEmployee);
+  } catch (err) {
+    console.error("Error updating employee:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = router;
