@@ -82,15 +82,33 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { edu, skills, awards, ...employeeData } = req.body;
-    const updatedEmployee = await Employee.findOneAndUpdate({ id: req.params.id }, {
-      ...employeeData,
-      edu: edu,
-      skills: skills,
-      awards: awards
-    }, { new: true });
+
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { id: req.params.id },
+      { $set: { edu, skills, awards }, ...employeeData },
+      { new: true }
+    ).populate([
+      {
+        path: 'email',
+        model: 'User'
+      },
+      {
+        path: 'roleId',
+        model: 'Role',
+        populate: {
+          path: 'departmentId',
+          model: 'Department'
+        }
+      },
+      { path: 'edu' },
+      { path: 'skills' },
+      { path: 'awards' }
+    ]);
+
     if (!updatedEmployee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
+
     res.json(updatedEmployee);
   } catch (err) {
     console.error("Error updating employee:", err);
