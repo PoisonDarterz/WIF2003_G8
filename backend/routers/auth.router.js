@@ -6,6 +6,8 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const { authenticateUser } = require("../middlewares/auth.middleware");
+const Employee = require("../models/employee.model");
 
 // Load environment variables from a .env file if present
 require("dotenv").config();
@@ -45,12 +47,10 @@ router.post("/register", async (req, res) => {
     // Validate password
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
     if (!passwordRegex.test(password)) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Password must be at least 6 characters long and include uppercase, lowercase letters, and numbers.",
-        });
+      return res.status(400).json({
+        message:
+          "Password must be at least 6 characters long and include uppercase, lowercase letters, and numbers.",
+      });
     }
 
     // Generate a unique and complex email verification token
@@ -96,12 +96,10 @@ router.post("/register", async (req, res) => {
           .json({ message: "Failed to send verification email." });
       } else {
         console.log("Verification email is sent to your email account");
-        return res
-          .status(201)
-          .json({
-            message:
-              "User created successfully. Please verify your email to complete registration.",
-          });
+        return res.status(201).json({
+          message:
+            "User created successfully. Please verify your email to complete registration.",
+        });
       }
     });
   } catch (err) {
@@ -122,12 +120,9 @@ router.get("/verify-email", async (req, res) => {
 
     // Check if the email token has expired
     if (user.emailTokenExpiration < Date.now()) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Email verification token has expired. Please register again.",
-        });
+      return res.status(400).json({
+        message: "Email verification token has expired. Please register again.",
+      });
     }
 
     user.emailToken = null;
@@ -264,12 +259,10 @@ router.post("/reset-password/:token", async (req, res) => {
     // Validate new password
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
     if (!passwordRegex.test(newPassword)) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Password must be at least 6 characters long and include uppercase, lowercase letters, and numbers.",
-        });
+      return res.status(400).json({
+        message:
+          "Password must be at least 6 characters long and include uppercase, lowercase letters, and numbers.",
+      });
     }
 
     // Find user by reset token
@@ -296,6 +289,24 @@ router.post("/reset-password/:token", async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Failed to reset password." });
+  }
+});
+
+// Route to fetch user profile data
+router.get("/my-profile", authenticateUser, async (req, res) => {
+  try {
+    const email = req.user.id;
+
+    const userProfile = await Employee.findOne({ email: email });
+
+    if (!userProfile) {
+      console.log("User profile not found");
+      return res.status(404).json({ message: "User profile not found" });
+    }
+    res.status(200).json(userProfile);
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
