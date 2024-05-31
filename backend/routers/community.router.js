@@ -42,7 +42,11 @@ router.post('/posts', async (req, res) => {
 
     // Create new community post
     const newCommunityPost = await Community.create({
-      employee: employeeId,
+      employee: {
+        id: employee.id,
+        name: employee.name,
+        profilePicURL: employee.profilePicURL
+      },
       postImageSrc,
       postCaption
     });
@@ -74,7 +78,11 @@ router.post('/posts/:postId/comments', async (req, res) => {
 
     // Add comment to the post
     communityPost.comments.push({
-      employee: employeeId,
+      employee: {
+        id: employee.id,
+        name: employee.name,
+        profilePicURL: employee.profilePicURL
+      },
       commentText
     });
 
@@ -113,7 +121,11 @@ router.post('/posts/:postId/comments/:commentId/replies', async (req, res) => {
 
     // Add reply to the comment
     comment.replies.push({
-      employee: employeeId,
+      employee: {
+        id: employee.id,
+        name: employee.name,
+        profilePicURL: employee.profilePicURL
+      },
       replyText
     });
 
@@ -133,7 +145,8 @@ router.post('/posts/:postId/comments/:commentId/upvote', async (req, res) => {
   try {
     const communityPost = await Community.findById(postId);
     if (!communityPost) {
-      return res.status(404).json({ message: "Community post not found" });
+      return res.status(404).
+json({ message: "Community post not found" });
     }
 
     const comment = communityPost.comments.id(commentId);
@@ -237,4 +250,5 @@ router.post('/posts/:postId/comments/:commentId/replies/:replyId/downvote', asyn
 });
 
 module.exports = router;
+
 
