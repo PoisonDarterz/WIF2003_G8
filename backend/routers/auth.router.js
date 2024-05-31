@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const { authenticateUser } = require('../middlewares/auth.middleware');
+const Employee = require('../models/employee.model');
 
 // Load environment variables from a .env file if present
 require('dotenv').config();
@@ -21,7 +23,7 @@ const transporter = nodemailer.createTransport({
 
 // Function to create JWT Token
 const createToken = (user) => {
-    return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '3d' });
+    return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
 };
 
 // SignUp
@@ -49,16 +51,20 @@ router.post('/register', async (req, res) => {
         // Generate a unique and complex email verification token
         const emailToken = crypto.randomBytes(32).toString('hex');
 
+        // Set email token expiration date (e.g., 1 day from now)
+        const emailTokenExpiration = Date.now() + 24 * 60 * 60 * 1000;
+
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create new user
+        // Create new user with emailTokenExpiration
         const user = new User({
             employeeID,
             email,
             password: hashedPassword,
             role,
             emailToken,
+            emailTokenExpiration, 
             isVerified: false
         });
 
@@ -103,7 +109,13 @@ router.get('/verify-email', async (req, res) => {
             return res.redirect(`http://localhost:3000/general/SignUp`);
         }
 
+        // Check if the email token has expired
+        if (user.emailTokenExpiration < Date.now()) {
+            return res.status(400).json({ message: "Email verification token has expired. Please register again." });
+        }
+
         user.emailToken = null;
+        user.emailTokenExpiration = null;
         user.isVerified = true;
         await user.save();
 
@@ -139,11 +151,39 @@ router.post('/login', async (req, res) => {
         // Create JWT token
         const token = createToken(user);
 
-        return res.status(200).json({ message: "Login successful", token });
+        // Set cookie
+        res.cookie('token', token, { httpOnly: true, secure: true });
+
+        // Log cookies in console
+        console.log("Cookies:", req.cookies);
+
+        // Send response
+        return res.status(200).json({
+            message: "Login successful",
+            token,
+            user: { _id: user._id, role: user.role },
+        });
 
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: "Failed to login!" });
+    }
+});
+
+// Logout
+router.post('/logout', (req, res) => {
+    try {
+        // Clear the token cookie
+        res.clearCookie('token');
+
+        // Log a message to the console
+        console.log('User logged out and token cookie cleared successfully.');
+
+        // Send a success message
+        return res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        console.error('An error occurred during logout:', error);
+        return res.status(500).json({ message: "Failed to logout" });
     }
 });
 
@@ -161,7 +201,7 @@ router.post('/forgot-password', async (req, res) => {
         // Generate reset password token
         const resetToken = crypto.randomBytes(32).toString('hex');
         user.resetToken = resetToken;
-        user.resetTokenExpiration = Date.now() + 3600000; // Token expires in 1 hour
+        user.resetTokenExpiration = Date.now() + 24 * 60 * 60 * 1000 //expire in 1d
         await user.save();
 
         // Send reset password email
@@ -228,6 +268,24 @@ router.post('/reset-password/:token', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: "Failed to reset password." });
+    }
+});
+
+// Route to fetch user profile data
+router.get('/my-profile', authenticateUser, async (req, res) => {
+    try {
+        const email = req.user.id;
+        
+        const userProfile = await Employee.findOne({ email: email });
+  
+        if (!userProfile) {
+            console.log('User profile not found');
+            return res.status(404).json({ message: 'User profile not found' });
+        }
+        res.status(200).json(userProfile);
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
 });
 

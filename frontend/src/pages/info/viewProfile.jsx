@@ -10,6 +10,12 @@ export default function ViewProfile() {
   const [employeeData, setEmployeeData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+  
+
   const skillList = [
     { skill: "Market Analysis", desc: "desc", image: "/blank.png" },
     { skill: "Negotiation", desc: "desc", image: "/blank.png" }
@@ -35,7 +41,6 @@ export default function ViewProfile() {
       setIsLoading(true);
       try {
         const response = await axios.get(`http://localhost:5000/api/employees/${id}`);
-        console.log("Fetched employee data:", response.data);
         setEmployeeData(response.data);
       } catch (error) {
         console.error("Error fetching employee data:", error);
@@ -79,7 +84,7 @@ export default function ViewProfile() {
               <h2 className="mt-5 font-bold">Contact</h2>
               <p>
                 {employeeData.email.email} <br />
-                +60 19 442 2659
+                {employeeData.phone}
               </p>
 
               <h2 className="mt-5 font-bold">Department</h2>
@@ -89,7 +94,7 @@ export default function ViewProfile() {
               <p>{employeeData.roleId.roleName}</p>
 
               <h2 className="mt-5 font-bold">Joined Since</h2>
-              <p>26 January 2015</p>
+              <p>{formatDate(employeeData.joinedSince)}</p>
             </div>
           </div>
 
@@ -97,14 +102,7 @@ export default function ViewProfile() {
           <div className="bg-[#eaf3ff] p-5 sm:col-span-8 text-left ml-5 rounded-lg">
             <h2 className="font-bold">Bio</h2>
             <p>
-              I am an experienced Sales Manager with a strong track record in
-              driving revenue growth and exceeding sales targets. With over a
-              decade of experience in the sales industry, I have developed a
-              deep understanding of market dynamics and customer needs. My role
-              involves leading a team of sales professionals, developing
-              strategic sales plans, and fostering strong relationships with
-              clients. I thrive in fast-paced environments and am passionate
-              about delivering exceptional results.
+              {employeeData.bio}
             </p>
             <div className="border-b border-gray-900/10 pb-12"></div>
             <h2 className="mt-5 font-bold">Education and Experiences</h2>
@@ -177,7 +175,8 @@ export default function ViewProfile() {
             <div className="border-b border-gray-900/10 pb-12"></div>
 
             <div className="mt-6 flex items-center justify-end gap-x-6">
-              <Link to="/info/editEmployeeProfile">
+              <Link to={`/info/editEmployeeProfile/${employeeData.id}`}>
+
                 <button
                   type="button"
                   className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
