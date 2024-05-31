@@ -6,8 +6,9 @@ const Employee = require('../models/employee.model');
 // GET all community posts
 router.get('/posts', async (req, res) => {
   try {
-    const communityPosts = await Community.find().populate('employee', 'id name profilePicURL').populate('comments.employee', 'id name profilePicURL').populate('comments.replies.employee', 'id name profilePicURL');
-    res.json(communityPosts);
+    //const communityPosts = await Community.find().populate('employee', 'id name profilePicURL').populate('comments.employee', 'id name profilePicURL').populate('comments.replies.employee', 'id name profilePicURL');
+    console.log("hi");
+    res.json({communityPosts});
   } catch (err) {
     console.error("Error getting community posts:", err);
     res.status(500).json({ message: "Server error" });
