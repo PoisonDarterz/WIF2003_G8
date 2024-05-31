@@ -15,17 +15,6 @@ export default function ViewProfile() {
     return date.toLocaleDateString();
   };
   
-
-  const skillList = [
-    { skill: "Market Analysis", desc: "desc", image: "/blank.png" },
-    { skill: "Negotiation", desc: "desc", image: "/blank.png" }
-  ];
-
-  const awardList = [
-    { award: "award1", desc: "desc", image: "/blank.png" },
-    { award: "award2", desc: "desc", image: "/blank.png" }
-  ];
-
   const handleViewImage = (url) => {
     setImageUrl(url);
     setShowImage(true);
@@ -41,7 +30,13 @@ export default function ViewProfile() {
       setIsLoading(true);
       try {
         const response = await axios.get(`http://localhost:5000/api/employees/${id}`);
-        setEmployeeData(response.data);
+        
+        const employee = response.data;
+        if (!employee.emailContact) {
+          employee.emailContact = employee.email.email;
+        }
+
+        setEmployeeData(employee);
       } catch (error) {
         console.error("Error fetching employee data:", error);
       }
@@ -83,7 +78,7 @@ export default function ViewProfile() {
 
               <h2 className="mt-5 font-bold">Contact</h2>
               <p>
-                {employeeData.email.email} <br />
+                {employeeData.emailContact} <br />
                 {employeeData.phone}
               </p>
 
@@ -105,8 +100,29 @@ export default function ViewProfile() {
               {employeeData.bio}
             </p>
             <div className="border-b border-gray-900/10 pb-12"></div>
-            <h2 className="mt-5 font-bold">Education and Experiences</h2>
-            <p>Bachelor of Finance, University Malaya</p>
+             <table className="mt-5 w-full table-auto rounded-lg">
+              <thead>
+                <tr className="text-md font-medium text-black rounded-lg">
+                  <th className="w-[30%] px-4 py-2 bg-gray-200 font-bold">Education and Experiences</th>
+                  <th className="w-[50%] px-4 py-2 bg-gray-200 font-bold">Description</th>
+                  <th className="w-[20%] px-4 py-2 bg-gray-200 font-bold">Support Document</th>
+                </tr>
+              </thead>
+              <tbody className="text-md font-normal text-gray-700">
+                {employeeData.edu.map((edu, i) => (
+                  <tr
+                    className={`${i % 2 === 0 ? "bg-[#fefefe]" : "bg-gray-50"} px-4 py-2`}
+                    key={i}
+                  >
+                    <td className="w-[30%] px-4 py-4">{edu.eduTitle}</td>
+                    <td className="w-[50%] px-4 py-4">{edu.eduDesc}</td>
+                    <td className="w-[20%] px-4 py-4">
+                      <a href={edu.eduDocURL} target="_blank" rel="noopener noreferrer">View Document</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             <div className="border-b border-gray-900/10 pb-12"></div>
 
             <table className="mt-5 w-full table-auto rounded-lg">
@@ -118,22 +134,15 @@ export default function ViewProfile() {
                 </tr>
               </thead>
               <tbody className="text-md font-normal text-gray-700">
-                {skillList.map((skill, i) => (
+                {employeeData.skills.map((skills, i) => (
                   <tr
-                    className={`${
-                      i % 2 === 0 ? "bg-[#fefefe]" : "bg-gray-50"
-                    } px-4 py-2`}
+                    className={`${i % 2 === 0 ? "bg-[#fefefe]" : "bg-gray-50"} px-4 py-2`}
                     key={i}
                   >
-                    <td className="w-[30%] px-4 py-4">{skill.skill}</td>
-                    <td className="w-[50%] px-4 py-4">{skill.desc}</td>
+                    <td className="w-[30%] px-4 py-4">{skills.skillsTitle}</td>
+                    <td className="w-[50%] px-4 py-4">{skills.skillsDesc}</td>
                     <td className="w-[20%] px-4 py-4">
-                      <img
-                        className="h-20 w-20 cursor-pointer"
-                        src={skill.image}
-                        alt={skill.skill}
-                        onClick={() => handleViewImage(skill.image)}
-                      />
+                      <a href={skills.skillsDocURL} target="_blank" rel="noopener noreferrer">View Document</a>
                     </td>
                   </tr>
                 ))}
@@ -150,22 +159,15 @@ export default function ViewProfile() {
                 </tr>
               </thead>
               <tbody className="text-md font-normal text-gray-700">
-                {awardList.map((award, i) => (
+                {employeeData.awards.map((awards, i) => (
                   <tr
-                    className={`${
-                      i % 2 === 0 ? "bg-[#fefefe]" : "bg-gray-50"
-                    } px-4 py-2`}
+                    className={`${i % 2 === 0 ? "bg-[#fefefe]" : "bg-gray-50"} px-4 py-2`}
                     key={i}
                   >
-                    <td className="w-[30%] px-4 py-4">{award.award}</td>
-                    <td className="w-[50%] px-4 py-4">{award.desc}</td>
+                    <td className="w-[30%] px-4 py-4">{awards.awardsTitle}</td>
+                    <td className="w-[50%] px-4 py-4">{awards.awardsDesc}</td>
                     <td className="w-[20%] px-4 py-4">
-                      <img
-                        className="h-20 w-20 cursor-pointer"
-                        src={award.image}
-                        alt={award.award}
-                        onClick={() => handleViewImage(award.image)}
-                      />
+                      <a href={awards.awardsDocURL} target="_blank" rel="noopener noreferrer">View Document</a>
                     </td>
                   </tr>
                 ))}

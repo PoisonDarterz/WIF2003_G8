@@ -41,7 +41,8 @@ const employeeSchema = new mongoose.Schema({
   edu: [eduSchema],
   skills: [skillsSchema],
   awards: [awardsSchema],
-  individualBenefits: [IndividualBenefitSchema]
+  individualBenefits: [IndividualBenefitSchema],
+  emailContact:{ type: String }
 
 });
 

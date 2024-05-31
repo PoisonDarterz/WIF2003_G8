@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Community = require('../models/community.model');
+const Employee = require('../models/employee.model');
 
 // GET all community posts
 router.get('/posts', async (req, res) => {
   try {
-    const communityPosts = await Community.find().populate('employee', 'id name profilePicURL');
+    const communityPosts = await Community.find().populate('employee', 'id name profilePicURL').populate('comments.employee', 'id name profilePicURL').populate('comments.replies.employee', 'id name profilePicURL');
     res.json(communityPosts);
   } catch (err) {
     console.error("Error getting community posts:", err);
@@ -17,7 +18,7 @@ router.get('/posts', async (req, res) => {
 router.get('/posts/:postId', async (req, res) => {
   const { postId } = req.params;
   try {
-    const communityPost = await Community.findOne({ postId: postId }).populate('employee', 'id name profilePicURL');
+    const communityPost = await Community.findById(postId).populate('employee', 'id name profilePicURL').populate('comments.employee', 'id name profilePicURL').populate('comments.replies.employee', 'id name profilePicURL');
     if (!communityPost) {
       return res.status(404).json({ message: "Community post not found" });
     }
@@ -31,7 +32,25 @@ router.get('/posts/:postId', async (req, res) => {
 // POST a new community post
 router.post('/posts', async (req, res) => {
   try {
-    const newCommunityPost = await Community.create(req.body);
+    const { employeeId, postImageSrc, postCaption } = req.body;
+
+    // Find the employee
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // Create new community post
+    const newCommunityPost = await Community.create({
+      employee: {
+        id: employee.id,
+        name: employee.name,
+        profilePicURL: employee.profilePicURL
+      },
+      postImageSrc,
+      postCaption
+    });
+
     res.status(201).json(newCommunityPost);
   } catch (err) {
     console.error("Error creating community post:", err);
@@ -39,33 +58,37 @@ router.post('/posts', async (req, res) => {
   }
 });
 
-// DELETE a specific community post by postId
-router.delete('/posts/:postId', async (req, res) => {
-  const { postId } = req.params;
-  try {
-    const deletedCommunityPost = await Community.findOneAndDelete({ postId: postId });
-    if (!deletedCommunityPost) {
-      return res.status(404).json({ message: "Community post not found" });
-    }
-    res.json({ message: "Community post deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting community post:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
 // POST a new comment for a specific community post
 router.post('/posts/:postId/comments', async (req, res) => {
   const { postId } = req.params;
+  const { employeeId, commentText } = req.body;
+
   try {
-    const communityPost = await Community.findOne({ postId: postId });
+    // Find the employee
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // Find the community post
+    const communityPost = await Community.findById(postId);
     if (!communityPost) {
       return res.status(404).json({ message: "Community post not found" });
     }
-    // Assuming req.body contains the necessary data for creating a comment
-    communityPost.comments.push(req.body);
+
+    // Add comment to the post
+    communityPost.comments.push({
+      employee: {
+        id: employee.id,
+        name: employee.name,
+        profilePicURL: employee.profilePicURL
+      },
+      commentText
+    });
+
     await communityPost.save();
-    res.status(201).json(communityPost.comments[communityPost.comments.length - 1]);
+
+    res.status(201).json(communityPost);
   } catch (err) {
     console.error("Error creating comment:", err);
     res.status(500).json({ message: "Server error" });
@@ -75,23 +98,157 @@ router.post('/posts/:postId/comments', async (req, res) => {
 // POST a new reply for a specific comment of a community post
 router.post('/posts/:postId/comments/:commentId/replies', async (req, res) => {
   const { postId, commentId } = req.params;
+  const { employeeId, replyText } = req.body;
+
   try {
-    const communityPost = await Community.findOne({ postId: postId });
+    // Find the employee
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // Find the community post
+    const communityPost = await Community.findById(postId);
     if (!communityPost) {
       return res.status(404).json({ message: "Community post not found" });
     }
+
+    // Find the comment
     const comment = communityPost.comments.id(commentId);
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
-    // Assuming req.body contains the necessary data for creating a reply
-    comment.replies.push(req.body);
+
+    // Add reply to the comment
+    comment.replies.push({
+      employee: {
+        id: employee.id,
+        name: employee.name,
+        profilePicURL: employee.profilePicURL
+      },
+      replyText
+    });
+
     await communityPost.save();
-    res.status(201).json(comment.replies[comment.replies.length - 1]);
+
+    res.status(201).json(communityPost);
   } catch (err) {
     console.error("Error creating reply:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
+// Upvote a comment
+router.post('/posts/:postId/comments/:commentId/upvote', async (req, res) => {
+  const { postId, commentId } = req.params;
+
+  try {
+    const communityPost = await Community.findById(postId);
+    if (!communityPost) {
+      return res.status(404).
+json({ message: "Community post not found" });
+    }
+
+    const comment = communityPost.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    comment.upvotes += 1;
+    await communityPost.save();
+
+    res.status(200).json({ message: "Comment upvoted successfully" });
+  } catch (err) {
+    console.error("Error upvoting comment:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Downvote a comment
+router.post('/posts/:postId/comments/:commentId/downvote', async (req, res) => {
+  const { postId, commentId } = req.params;
+
+  try {
+    const communityPost = await Community.findById(postId);
+    if (!communityPost) {
+      return res.status(404).json({ message: "Community post not found" });
+    }
+
+    const comment = communityPost.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    comment.downvotes += 1;
+    await communityPost.save();
+
+    res.status(200).json({ message: "Comment downvoted successfully" });
+  } catch (err) {
+    console.error("Error downvoting comment:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Upvote a reply
+router.post('/posts/:postId/comments/:commentId/replies/:replyId/upvote', async (req, res) => {
+  const { postId, commentId, replyId } = req.params;
+
+  try {
+    const communityPost = await Community.findById(postId);
+    if (!communityPost) {
+      return res.status(404).json({ message: "Community post not found" });
+    }
+
+    const comment = communityPost.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const reply = comment.replies.id(replyId);
+    if (!reply) {
+      return res.status(404).json({ message: "Reply not found" });
+    }
+
+    reply.upvotes += 1;
+    await communityPost.save();
+
+    res.status(200).json({ message: "Reply upvoted successfully" });
+  } catch (err) {
+    console.error("Error upvoting reply:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Downvote a reply
+router.post('/posts/:postId/comments/:commentId/replies/:replyId/downvote', async (req, res) => {
+  const { postId, commentId, replyId } = req.params;
+
+  try {
+    const communityPost = await Community.findById(postId);
+    if (!communityPost) {
+      return res.status(404).json({ message: "Community post not found" });
+    }
+
+    const comment = communityPost.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const reply = comment.replies.id(replyId);
+    if (!reply) {
+      return res.status(404).json({ message: "Reply not found" });
+    }
+
+    reply.downvotes += 1;
+    await communityPost.save();
+
+    res.status(200).json({ message: "Reply downvoted successfully" });
+  } catch (err) {
+    console.error("Error downvoting reply:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
+
+
