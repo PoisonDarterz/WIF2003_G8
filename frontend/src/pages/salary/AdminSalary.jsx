@@ -5,7 +5,7 @@ import PreviewPopup from '../../components/salary/PreviewPopup';
 function AdminSalary() {
   const [slipData, setSlipData] = useState([]);
   const [originalData, setOriginalData] = useState([]);
-  const [searchEmployeeId, setSearchEmployeeId] = useState('');
+  const [searchSlipId, setSearchSlipId] = useState('');
   const [searchDateFrom, setSearchDateFrom] = useState('');
   const [searchDateTo, setSearchDateTo] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,11 +21,16 @@ function AdminSalary() {
     setPreviewData(null);
   };
 
+  const convertDate = (inputFormat) => {
+    let splitDate = inputFormat.split("/");
+    return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
+  } 
+
   const filteredData = slipData.filter(slip => {
     return (
-      (searchEmployeeId === '' || slip.employeeId?.includes(searchEmployeeId)) &&
-      (searchDateFrom === '' || new Date(slip.dateIssued) >= new Date(searchDateFrom)) &&
-      (searchDateTo === '' || new Date(slip.dateIssued) <= new Date(searchDateTo))
+      (searchSlipId === '' || slip.id.includes(searchSlipId)) &&
+      (searchDateFrom === '' || new Date(convertDate(slip.date)) >= new Date(searchDateFrom)) &&
+      (searchDateTo === '' || new Date(convertDate(slip.date)) <= new Date(searchDateTo))
     );
   });
 
@@ -59,7 +64,6 @@ function AdminSalary() {
       .catch(error => console.error('Error:', error));
   }, []);
 
-
   return (
     <div className="p-8">
       {previewData && <PreviewPopup data={previewData} onClose={handleClosePreview} />}
@@ -73,7 +77,7 @@ function AdminSalary() {
       <div className="flex justify-between items-center mb-4">
         <div>
           <label className="mr-2">Filters: Employee ID:</label>
-          <input type="text" className="border p-1 rounded" value={searchEmployeeId} onChange={e => setSearchEmployeeId(e.target.value)} />
+          <input type="text" className="border p-1 rounded" value={searchSlipId} onChange={e => setSearchSlipId(e.target.value)} />
           <label className="ml-4 mr-2">Date issued: From:</label>
           <input type="date" className="border p-1 rounded" value={searchDateFrom} onChange={e => setSearchDateFrom(e.target.value)} />
           <label className="ml-4 mr-2">To:</label>
@@ -91,7 +95,7 @@ function AdminSalary() {
             </tr>
           </thead>
           <tbody className="text-sm font-normal text-gray-700">
-            {filteredData.map((data, i) => (
+            {currentRecords.map((data, i) => (
               <tr className={`${i % 2 === 0 ? 'bg-[#fefefe]' : 'bg-[#eaf3ff]'} px-4 py-2`}>
                 <td className="w-[18%] px-4 py-4">{data.id}</td>
                 <td className="w-[18%] px-4 py-4">{data.month}</td>
