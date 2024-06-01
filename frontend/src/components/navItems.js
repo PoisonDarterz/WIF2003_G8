@@ -1,4 +1,34 @@
-export const navItems = [
+const adminNavItems = [
+  {
+    title: "Admin View",
+    link: "/salary/adminview",
+  },
+  {
+    title: "Benefits",
+    link: "/salary/benefits",
+  },
+  {
+    title: "Process Salary",
+    link: "/salary/process",
+  },
+  {
+    title: "Assign Benefits",
+    link: "/salary/assign",
+  },
+];
+
+const employeeNavItems = [
+  {
+    title: "View Salary",
+    link: "/salary/view",
+  },
+  {
+    title: "Benefits",
+    link: "/salary/benefits",
+  },
+];
+
+export const navItems = (role) => [
   {
     title: "HOME",
     link: "/home",
@@ -12,28 +42,7 @@ export const navItems = [
   {
     title: "SALARY",
     link: "/salary/view",
-    submenu: [
-      {
-        title: "View Salary",
-        link: "/salary/view",
-      },
-      {
-        title: "Admin View",
-        link: "/salary/adminview",
-      },
-      {
-        title: "Benefits",
-        link: "/salary/benefits",
-      },
-      {
-        title: "Process Salary",
-        link: "/salary/process",
-      },
-      {
-        title: "Assign Benefits",
-        link: "/salary/assign",
-      },
-    ],
+    submenu: role === 'Admin' ? adminNavItems : employeeNavItems,
   },
   {
     title: "INFORMATION",
