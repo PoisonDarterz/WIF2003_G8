@@ -3,13 +3,9 @@ import BenefitsDialog from './BenefitsDialog';
 
 function BenefitsBox({ handleSave, unsavedChanges, setUnsavedChanges, roleBenefits, individualBenefits }) {
 
-  const [localRoleBenefits, setLocalRoleBenefits] = useState([]);
-  const [localIndividualBenefits, setLocalIndividualBenefits] = useState([]);
   const [localBenefits, setLocalBenefits] = useState([]);
 
   useEffect(() => {
-    setLocalRoleBenefits(roleBenefits);
-    setLocalIndividualBenefits(individualBenefits);
     const processedBenefits = processBenefits(roleBenefits, individualBenefits);
     setLocalBenefits(processedBenefits);
   }, [roleBenefits, individualBenefits]);
@@ -116,8 +112,6 @@ function BenefitsBox({ handleSave, unsavedChanges, setUnsavedChanges, roleBenefi
     };
   }, [unsavedChanges]);
 
-
-  
   return (
     <div className="h-[70vh] w-3/4 bg-[#EAF3FF] rounded-lg p-8 overflow-y-auto">
       {localBenefits.map((benefitCategory, index) => (

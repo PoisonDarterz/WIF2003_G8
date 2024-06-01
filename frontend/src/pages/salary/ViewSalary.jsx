@@ -22,11 +22,17 @@ function ViewSalary() {
     setPreviewData(null);
   };
 
+  const convertDate = (inputFormat) => {
+    let splitDate = inputFormat.split("/");
+    return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
+  }
+
   const filteredData = slipData.filter(slip => {
+    console.log(new Date(convertDate(slip.date)), new Date(searchDateFrom), new Date(searchDateTo));
     return (
       (searchSalaryId === '' || slip.id.includes(searchSalaryId)) &&
-      (searchDateFrom === '' || new Date(slip.dateIssued) >= new Date(searchDateFrom)) &&
-      (searchDateTo === '' || new Date(slip.dateIssued) <= new Date(searchDateTo))
+      (searchDateFrom === '' || new Date(convertDate(slip.date)) >= new Date(searchDateFrom)) &&
+      (searchDateTo === '' || new Date(convertDate(slip.date)) <= new Date(searchDateTo))
     );
   });  
 
@@ -67,7 +73,6 @@ function ViewSalary() {
         }
       } catch (err) {
         console.error("Error fetching salary slips:", err);
-        // Handle errors if necessary
       }
     };
     fetchSalarySlips();
@@ -104,7 +109,7 @@ function ViewSalary() {
             </tr>
           </thead>
           <tbody className="text-sm font-normal text-gray-700">
-            {filteredData.map((data, i) => (
+            {currentRecords.map((data, i) => (
               <tr className={`${i % 2 === 0 ? 'bg-[#fefefe]' : 'bg-[#eaf3ff]'} px-4 py-2`}>
                 <td className="w-[18%] px-4 py-4">{data.id}</td>
                 <td className="w-[18%] px-4 py-4">{data.month}</td>
