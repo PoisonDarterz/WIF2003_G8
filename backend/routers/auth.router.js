@@ -71,6 +71,7 @@ router.post('/register', async (req, res) => {
         // Save user to database
         await user.save();
 
+        // Auto create employee data
         const employee = new Employee({
             id: employeeID,
             name: "Update Name",

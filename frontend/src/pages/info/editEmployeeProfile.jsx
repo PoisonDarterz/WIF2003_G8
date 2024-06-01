@@ -21,8 +21,8 @@ export default function EditEmployeeProfile() {
     awards: [],
     emailContact: "",
   });  
-  const [allEmployeeData, setAllEmployeeData] = useState(null);
-  const [departments, setDepartments] = useState([]);
+  const [roleData, setRoleData] = useState(null);
+  const [department, setDepartment] = useState([]);
   const [jobTitles, setJobTitles] = useState([]);
   const [educationList, setEducationList] = useState([]);
   const [skillsList, setSkillsList] = useState([]);
@@ -37,19 +37,14 @@ export default function EditEmployeeProfile() {
       try {
         setIsLoading(true);  
         // Fetch employee data
-        const allEmployeeResponse = await axios.get(`http://localhost:5000/api/employees`);
+        const roleResponse = await axios.get(`http://localhost:5000/api/roles`);
         const employeeResponse = await axios.get(`http://localhost:5000/api/employees/${id}`);
         
-        const employee = employeeResponse.data;
-        if (!employee.emailContact) {
-          employee.emailContact = employee.email.email;
-        }
-
-        setEmployeeData(employee);
-        setAllEmployeeData(allEmployeeResponse.data);
-        const eduData = employee.edu.map(edu => ({ ...edu, confirmed: true }));
-        const skillsData = employee.skills.map(skill => ({ ...skill, confirmed: true }));
-        const awardsData = employee.awards.map(award => ({ ...award, confirmed: true }));
+        setRoleData(roleResponse.data);
+        setEmployeeData(employeeResponse.data);
+        const eduData = employeeData.edu.map(edu => ({ ...edu, confirmed: true }));
+        const skillsData = employeeData.skills.map(skill => ({ ...skill, confirmed: true }));
+        const awardsData = employeeData.awards.map(award => ({ ...award, confirmed: true }));
 
         setEducationList(eduData);
         setSkillsList(skillsData);
@@ -66,28 +61,21 @@ export default function EditEmployeeProfile() {
   
   useEffect(() => {
     // Extract unique department names and job titles
-    if (allEmployeeData) {
+    if (roleData) {
       const uniqueDepartments = [];
       const uniqueJobTitles = [];
   
-      allEmployeeData.forEach((employee) => {
-        // Check if the department is already in the array
-        const departmentExists = uniqueDepartments.find(department => department._id === employee.roleId.departmentId._id);
-        if (!departmentExists) {
-          uniqueDepartments.push(employee.roleId.departmentId);
-        }
-  
+      roleData.forEach((role) => {
         // Check if the job title is already in the array
-        const jobTitleExists = uniqueJobTitles.find(role => role._id === employee.roleId._id);
+        const jobTitleExists = uniqueJobTitles.find(job => job._id === role._id);
         if (!jobTitleExists) {
-          uniqueJobTitles.push(employee.roleId);
+          uniqueJobTitles.push(role);
         }
       });
   
-      setDepartments(uniqueDepartments);
       setJobTitles(uniqueJobTitles);
     }
-  }, [allEmployeeData]);
+  }, [roleData]);
   
 
   const saveProfile = async (e) => {
@@ -197,33 +185,17 @@ export default function EditEmployeeProfile() {
     listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
   };
 
-  const handleDepartmentChange = (e) => {
-    const selectedDepartmentId = e.target.value;
-    const selectedDepartment = departments.find(department => department._id === selectedDepartmentId);
-
-    if (selectedDepartment) {
+  const handleJobTitleChange = (e) => {
+    const selectedJobTitleId = e.target.value;
+    const selectedJobTitle = jobTitles.find(jobTitle => jobTitle._id === selectedJobTitleId);
+    if (selectedJobTitle) {
         setEmployeeData(prevState => ({
             ...prevState,
-            roleId: {
-                ...prevState.roleId,
-                departmentId: selectedDepartment
-            }
+            roleId: selectedJobTitle            
         }));
-        }
-    };
-
-    const handleJobTitleChange = (e) => {
-        const selectedJobTitleId = e.target.value;
-        const selectedJobTitle = jobTitles.find(jobTitle => jobTitle._id === selectedJobTitleId);
-
-        if (selectedJobTitle) {
-            setEmployeeData(prevState => ({
-                ...prevState,
-                roleId: selectedJobTitle
-            }));
-        }
-    };
-
+        setDepartment(selectedJobTitle.departmentId.departmentName);
+    }
+  };
 
   if (isLoading) { 
     return <div>Loading...</div>;
@@ -277,16 +249,16 @@ export default function EditEmployeeProfile() {
             />
 
             {/* Input for email */}
-            <label htmlFor="email" className="mt-5 block text-md font-medium leading-6 text-gray-900">
+            <label htmlFor="emailContact" className="mt-5 block text-md font-medium leading-6 text-gray-900">
                 Email Address
             </label>
             <input
-                id="email"
-                name="email"
+                id="emailContact"
+                name="emailContact"
                 type="email"
                 value={employeeData.emailContact}
                 onChange={handleInputChange}
-                autoComplete="email"
+                autoComplete="emailContact"
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
 
@@ -303,26 +275,6 @@ export default function EditEmployeeProfile() {
                 onChange={handleInputChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
-        {/* Department dropdown */}
-        <div>
-            <label htmlFor="department" className="mt-5 block text-md font-medium leading-6 text-gray-900">
-              Department
-            </label>
-            <select
-              id="department"
-              name="department"
-              value={employeeData.roleId.departmentId._id}
-              onChange={handleDepartmentChange}
-              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            >
-              <option value="">Select Department</option>
-              {departments.map((dept) => (
-                <option key={dept._id} value={dept._id}>
-                  {dept.departmentName}
-                </option>
-              ))}
-            </select>
-          </div>
 
           {/* Job title dropdown */}
           <div>
@@ -345,13 +297,26 @@ export default function EditEmployeeProfile() {
             </select>
           </div>
 
+          {/* Department dropdown */}
+          <div>
+              <label htmlFor="departmentName" className="mt-5 block text-md font-medium leading-6 text-gray-900">
+                Department
+              </label>
+              <div
+                id="departmentName"
+                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+              >
+                {employeeData.roleId.departmentId.departmentName || department}
+              </div>
+            </div>
+
           {/* Input for join date */}
-            <label htmlFor="joinDate" className="mt-5 block text-md font-medium leading-6 text-gray-900">
+            <label htmlFor="joinedSince" className="mt-5 block text-md font-medium leading-6 text-gray-900">
                 Joined Since
             </label>
             <input
-                id="joinDate"
-                name="joinDate"
+                id="joinedSince"
+                name="joinedSince"
                 type="date"
                 value={employeeData.joinedSince ? employeeData.joinedSince.split("T")[0] : ''}
                 onChange={handleInputChange}
