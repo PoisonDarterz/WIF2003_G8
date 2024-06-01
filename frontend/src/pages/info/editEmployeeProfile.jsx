@@ -28,7 +28,6 @@ export default function EditEmployeeProfile() {
   const [skillsList, setSkillsList] = useState([]);
   const [awardsList, setAwardsList] = useState([]);
   const [profilePic, setProfilePic] = useState("");
-  const [profilePic, setProfilePic] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [editIndex, setEditIndex] = useState(null);
   const [editType, setEditType] = useState("");
@@ -282,10 +281,8 @@ const saveProfile = async (e) => {
             {/* Profile Picture */}
             <div className="flex items-center">
             <img className="h-48 w-36 mr-4 rounded-lg" src={profilePic || employeeData.profilePicURL || "/Profile_image.jpg"} alt="Profile Picture" />
-            <img className="h-48 w-36 mr-4 rounded-lg" src={profilePic || employeeData.profilePicURL || "/Profile_image.jpg"} alt="Profile Picture" />
               <label htmlFor="profilePic" className="text-black">
                 Change Photo
-                <input type="file" id="profilePic" onChange={handleFileChange}/>
                 <input type="file" id="profilePic" onChange={handleFileChange}/>
               </label>
             </div>
@@ -352,14 +349,11 @@ const saveProfile = async (e) => {
               id="jobTitle"
               name="jobTitle"
               value={employeeData.roleId._id}
-              value={employeeData.roleId._id}
               onChange={handleJobTitleChange}
               className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             >
               <option value="">Select Job Title</option>
               {jobTitles.map((role) => (
-                <option key={role._id} value={role._id}>
-                  {role.roleName}
                 <option key={role._id} value={role._id}>
                   {role.roleName}
                 </option>
