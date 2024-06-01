@@ -4,11 +4,11 @@ import SalaryDialog from './SalaryDialog';
 function SalaryBox({ openModal, setSalaryDetails }) {
   const [localSalaryDetails, setLocalSalaryDetails] = useState({
     monthYear: '',
-    basic: [{ name: ' Basic Salary', amount: 2000 }],
-    allowances: [{ name: 'Allowance 1', amount: 300 }, { name: 'Allowance 2', amount: 200 }],
-    bonuses: [{ name: 'Bonus 1', amount: 300 }, { name: 'Bonus 2', amount: 50 }],
-    deductions: [{ name: 'Deduction 1', amount: 50 }],
-    "EPF \/ Socso": [{ name: 'EPF', amount: 150 }, { name: 'SOCSO', amount: 50 }],
+    basic: [],
+    allowances: [],
+    bonuses: [],
+    deductions: [],
+    "EPF \/ Socso": [],
   });
 
   const [modalIsOpen, setModalIsOpen] = useState(false);

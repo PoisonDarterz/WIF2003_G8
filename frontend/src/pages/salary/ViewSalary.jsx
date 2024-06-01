@@ -46,7 +46,6 @@ function ViewSalary() {
           withCredentials: true,
         });
 
-
         // Check if response data is an array before mapping
         if (Array.isArray(response.data)) {
           const formattedData = response.data.map(slip => {
