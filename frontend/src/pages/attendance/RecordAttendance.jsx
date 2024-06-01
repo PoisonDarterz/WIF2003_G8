@@ -27,7 +27,8 @@ const RecordAttendance = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/attendance/clockin",
-        { reason: reason }
+        { reason: reason },
+        { withCredentials: true }
       );
 
       const { record, message } = response.data;
@@ -55,7 +56,10 @@ const RecordAttendance = () => {
   const handleClockOut = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/attendance/clockout"
+        "http://localhost:5000/api/attendance/clockout",
+        {
+          withCredentials: true,
+        }
       );
       console.log("Clock-out successful:", response.data);
     } catch (error) {
@@ -74,7 +78,8 @@ const RecordAttendance = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/attendance/clockin",
-        { reason: reason }
+        { reason: reason },
+        { withCredentials: true }
       );
       console.log("Reason submitted successfully:", response.data);
     } catch (error) {

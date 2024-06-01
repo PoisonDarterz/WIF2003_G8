@@ -14,8 +14,10 @@ const LeaveHistoryTable = () => {
     const fetchLeaveData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/leave/applications"
+          "http://localhost:5000/api/leave/applications",
+          { withCredentials: true }
         );
+        console.log(response.data);
         setLeaveData(response.data);
         setFilteredData(response.data);
       } catch (error) {
