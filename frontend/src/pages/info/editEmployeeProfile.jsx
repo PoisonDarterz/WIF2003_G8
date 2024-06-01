@@ -27,7 +27,7 @@ export default function EditEmployeeProfile() {
   const [educationList, setEducationList] = useState([]);
   const [skillsList, setSkillsList] = useState([]);
   const [awardsList, setAwardsList] = useState([]);
-  const [profilePic, setProfilePic] = useState("/Profile_image.jpg");
+  const [profilePic, setProfilePic] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [editIndex, setEditIndex] = useState(null);
   const [editType, setEditType] = useState("");
@@ -67,37 +67,59 @@ export default function EditEmployeeProfile() {
   useEffect(() => {
     // Extract unique department names and job titles
     if (allEmployeeData) {
-      const uniqueDepartments = new Set();
-      const uniqueJobTitles = new Set();
+      const uniqueDepartments = [];
+      const uniqueJobTitles = [];
   
       allEmployeeData.forEach((employee) => {
-        uniqueDepartments.add(employee.roleId.departmentId.departmentName);
-        uniqueJobTitles.add(employee.roleId.roleName);
+        // Check if the department is already in the array
+        const departmentExists = uniqueDepartments.find(department => department._id === employee.roleId.departmentId._id);
+        if (!departmentExists) {
+          uniqueDepartments.push(employee.roleId.departmentId);
+        }
+  
+        // Check if the job title is already in the array
+        const jobTitleExists = uniqueJobTitles.find(role => role._id === employee.roleId._id);
+        if (!jobTitleExists) {
+          uniqueJobTitles.push(employee.roleId);
+        }
       });
   
-      setDepartments(Array.from(uniqueDepartments));
-      setJobTitles(Array.from(uniqueJobTitles));
+      setDepartments(uniqueDepartments);
+      setJobTitles(uniqueJobTitles);
     }
   }, [allEmployeeData]);
+  
 
   const saveProfile = async (e) => {
     e.preventDefault();
     try {
+      // Upload file to server
+      // const formData = new FormData();
+      // formData.append("file", profilePic);
+
+      // const response = await axios.post(`http://localhost:5000/api/employees/${id}`, formData, {
+      //   headers: {
+      //     "Content-Type": "multipart/form-data"
+      //   }
+      // });
+      // console.log("File uploaded successfully", response.data);
+  
       const updatedEmployeeData = {
         ...employeeData,
         joinedSince: new Date(employeeData.joinedSince).toISOString(),
         edu: educationList.filter(edu => edu.confirmed),
         skills: skillsList.filter(skill => skill.confirmed),
         awards: awardsList.filter(award => award.confirmed),
+        // profilePicURL: response.data.profilePicURL // Use the new profile pic URL
       };
-      const response = await axios.put(`http://localhost:5000/api/employees/${id}`, updatedEmployeeData);
-      console.log("Profile updated successfully", response.data);
+  
+      const updateResponse = await axios.put(`http://localhost:5000/api/employees/${id}`, updatedEmployeeData);
+      console.log("Profile updated successfully", updateResponse.data);
       navigate(`/info/viewProfile/${id}`);
     } catch (error) {
       console.error("Error updating profile:", error);
     }
-  };
-  
+  };  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -106,7 +128,7 @@ export default function EditEmployeeProfile() {
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -171,32 +193,33 @@ export default function EditEmployeeProfile() {
     listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
   };
 
-  // Inside handleDepartmentChange function
   const handleDepartmentChange = (e) => {
-    const selectedDepartment = e.target.value;
-    setEmployeeData(prevState => ({
-      ...prevState,
-      roleId: {
-        ...prevState.roleId,
-        departmentId: {
-          ...prevState.roleId.departmentId,
-          departmentName: selectedDepartment
-        }
-      }
-    }));
-  };
+    const selectedDepartmentId = e.target.value;
+    const selectedDepartment = departments.find(department => department._id === selectedDepartmentId);
 
-  // Inside handleJobTitleChange function
-  const handleJobTitleChange = (e) => {
-    const selectedJobTitle = e.target.value;
-    setEmployeeData(prevState => ({
-      ...prevState,
-      roleId: {
-        ...prevState.roleId,
-        roleName: selectedJobTitle
-      }
-    }));
-  };  
+    if (selectedDepartment) {
+        setEmployeeData(prevState => ({
+            ...prevState,
+            roleId: {
+                ...prevState.roleId,
+                departmentId: selectedDepartment
+            }
+        }));
+        }
+    };
+
+    const handleJobTitleChange = (e) => {
+        const selectedJobTitleId = e.target.value;
+        const selectedJobTitle = jobTitles.find(jobTitle => jobTitle._id === selectedJobTitleId);
+
+        if (selectedJobTitle) {
+            setEmployeeData(prevState => ({
+                ...prevState,
+                roleId: selectedJobTitle
+            }));
+        }
+    };
+
 
   if (isLoading) { 
     return <div>Loading...</div>;
@@ -217,10 +240,10 @@ export default function EditEmployeeProfile() {
           <div className="sm:col-span-1 text-left p-5">
             {/* Profile Picture */}
             <div className="flex items-center">
-              <img className="h-48 w-36 mr-4 rounded-lg" src={profilePic} alt="Profile Picture" />
+            <img className="h-48 w-36 mr-4 rounded-lg" src={profilePic || employeeData.profilePicURL || "/Profile_image.jpg"} alt="Profile Picture" />
               <label htmlFor="profilePic" className="text-black">
                 Change Photo
-                {/* <input type="file" id="profilePic" onChange={handleFileChange}/> */}
+                <input type="file" id="profilePic" onChange={handleFileChange}/>
               </label>
             </div>
             {/* Input for employee ID */}
@@ -284,14 +307,14 @@ export default function EditEmployeeProfile() {
             <select
               id="department"
               name="department"
-              value={employeeData.roleId.departmentId.departmentName}
+              value={employeeData.roleId.departmentId._id}
               onChange={handleDepartmentChange}
               className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             >
               <option value="">Select Department</option>
               {departments.map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
+                <option key={dept._id} value={dept._id}>
+                  {dept.departmentName}
                 </option>
               ))}
             </select>
@@ -305,14 +328,14 @@ export default function EditEmployeeProfile() {
             <select
               id="jobTitle"
               name="jobTitle"
-              value={employeeData.roleId.roleName}
+              value={employeeData.roleId._id}
               onChange={handleJobTitleChange}
               className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             >
               <option value="">Select Job Title</option>
               {jobTitles.map((role) => (
-                <option key={role} value={role}>
-                  {role}
+                <option key={role._id} value={role._id}>
+                  {role.roleName}
                 </option>
               ))}
             </select>
@@ -518,7 +541,6 @@ export default function EditEmployeeProfile() {
                 + Add Awards
               </button>
             </div>
-            <div className="border-b border-gray-900/10 pb-12"></div>
           </div>
         </div>
         <div className="border-b border-gray-900/10 pb-12"></div> 

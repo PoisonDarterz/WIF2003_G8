@@ -1,9 +1,59 @@
 const express = require('express');
 const router = express.Router();
+const multer = require("multer");
+const { BlobServiceClient } = require("@azure/storage-blob");
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 1000000 }  // Set file size limit to 1MB (adjust as needed)
+});
+
+
 const Employee = require('../models/employee.model');
 const User = require('../models/user.model');
 const Department = require('../models/department.model');
-const Role = require('../models/role.model')
+const Role = require('../models/role.model');
+
+require("dotenv").config();
+
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  process.env.CONNECTION_STRING
+);
+const containerClient = blobServiceClient.getContainerClient("profilepic");
+
+router.post('/:id', upload.single("file"), async (req, res) => {
+  try {
+    const { file } = req;
+    let fileUrl;
+
+    if (file) {
+      const blobName = Date.now() + "-" + file.originalname;
+      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+      await blockBlobClient.uploadData(file.buffer, {
+        blobHTTPHeaders: {
+          blobContentType: file.mimetype,
+        },
+      });
+      fileUrl = blockBlobClient.url;
+    }
+
+    // Find the employee and update the profile picture URL if a file was uploaded
+    const employee = await Employee.findByIdAndUpdate(
+      { id: req.params.id },
+      { profilePicURL: fileUrl },
+      { new: true }
+    );
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    res.json(employee);
+  } catch (err) {
+    console.error("Error uploading file:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // Get all employees
 router.get('/', async (req, res) => {
@@ -22,16 +72,8 @@ router.get('/', async (req, res) => {
           }
         }
       ]); 
-
-      const employeesData = employees.map(employee => {
-        const emailContact = employee.emailContact || employee.email.email;
-        return {
-          ...employee.toObject(),
-          emailContact: emailContact
-        };
-      });
   
-      res.json(employeesData);
+      res.json(employees);
   } catch (err) {
       console.log("Error fetching employees:", err); 
       res.status(500).json({ message: err.message });
@@ -63,14 +105,7 @@ router.get('/:id', async (req, res) => {
         return res.status(404).json({ message: 'Employee not found' });
       }
 
-      const emailContact = employee.emailContact || employee.email.email;
-
-      const employeeData = {
-        ...employee.toObject(),
-        emailContact: emailContact
-      };
-
-      res.json(employeeData); 
+      res.json(employee); 
       console.log(`Fetched employee with ID: ${employeeId}`);
     } catch (err) {
       console.error("Error fetching employee:", err);
