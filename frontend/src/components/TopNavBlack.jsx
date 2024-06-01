@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { navItems } from "./navItems";
+<<<<<<< HEAD
 import axios from "axios";
 
 function TopNavBlack() {
   const [activeLink, setActiveLink] = useState("");
+=======
+import axios from 'axios';
+
+function TopNavBlack() {
+  const [activeLink, setActiveLink] = useState('');
+>>>>>>> f23a074e6145f0920fdd054b0847a7203a1ee0c4
   const [items, setItems] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
     // Fetch user role from backend
+<<<<<<< HEAD
     axios
       .get("http://localhost:5000/api/auth/user-role", {
         withCredentials: true,
@@ -19,11 +27,20 @@ function TopNavBlack() {
         setItems(navItems(role));
       })
       .catch((error) => {
+=======
+    axios.get('http://localhost:5000/api/auth/user-role', { withCredentials: true })
+      .then(response => {
+        const role = response.data.role;
+        setItems(navItems(role));
+      })
+      .catch(error => {
+>>>>>>> f23a074e6145f0920fdd054b0847a7203a1ee0c4
         console.error(error);
       });
   }, []);
 
   useEffect(() => {
+<<<<<<< HEAD
     if (location.pathname.startsWith("/attendance")) {
       setActiveLink("ATTENDANCE");
     } else if (location.pathname.startsWith("/salary")) {
@@ -36,6 +53,20 @@ function TopNavBlack() {
       setActiveLink("HELPDESK");
     } else if (location.pathname.startsWith("/home")) {
       setActiveLink("HOME");
+=======
+    if (location.pathname.startsWith('/attendance')) {
+      setActiveLink('ATTENDANCE');
+    } else if (location.pathname.startsWith('/salary')) {
+      setActiveLink('SALARY');
+    } else if (location.pathname.startsWith('/info')) {
+      setActiveLink('INFORMATION');
+    } else if (location.pathname.startsWith('/community')) {
+      setActiveLink('COMMUNITY');
+    } else if (location.pathname.startsWith('/helpdesk')) {
+      setActiveLink('HELPDESK');
+    } else if (location.pathname.startsWith('/home')) {
+      setActiveLink('HOME');
+>>>>>>> f23a074e6145f0920fdd054b0847a7203a1ee0c4
     }
   }, [location]);
 
