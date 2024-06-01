@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCheckCircle, FaTimesCircle, FaPauseCircle } from "react-icons/fa";
+import axios from "axios";
 
 const ReviewLeaveTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,161 +17,34 @@ const ReviewLeaveTable = () => {
   };
 
   useEffect(() => {
-    const dummyData = [
-      {
-        employeeId: "EMP001",
-        employeeName: "John Doe",
-        startDate: "01/05/2023",
-        endDate: "15/05/2023",
-        typeOfLeave: "Sick",
-      },
-      {
-        employeeId: "EMP002",
-        employeeName: "Jane Smith",
-        startDate: "01/06/2023",
-        endDate: "10/06/2023",
-        typeOfLeave: "Vacation",
-      },
-      {
-        employeeId: "EMP003",
-        employeeName: "Michael Johnson",
-        startDate: "15/07/2023",
-        endDate: "22/07/2023",
-        typeOfLeave: "Personal Leave",
-      },
-      {
-        employeeId: "EMP004",
-        employeeName: "Emily Williams",
-        startDate: "01/08/2023",
-        endDate: "07/08/2023",
-        typeOfLeave: "Sick",
-      },
-      {
-        employeeId: "EMP005",
-        employeeName: "David Brown",
-        startDate: "10/09/2023",
-        endDate: "17/09/2023",
-        typeOfLeave: "Vacation",
-      },
-      {
-        employeeId: "EMP006",
-        employeeName: "Sarah Davis",
-        startDate: "01/10/2023",
-        endDate: "15/10/2023",
-        typeOfLeave: "Others",
-      },
-      {
-        employeeId: "EMP007",
-        employeeName: "Christopher Miller",
-        startDate: "01/11/2023",
-        endDate: "07/11/2023",
-        typeOfLeave: "Sick",
-      },
-      {
-        employeeId: "EMP008",
-        employeeName: "Jessica Wilson",
-        startDate: "15/12/2023",
-        endDate: "22/12/2023",
-        typeOfLeave: "Vacation",
-      },
-      {
-        employeeId: "EMP009",
-        employeeName: "Matthew Moore",
-        startDate: "01/01/2024",
-        endDate: "15/01/2024",
-        typeOfLeave: "Sick",
-      },
-      {
-        employeeId: "EMP010",
-        employeeName: "Ashley Taylor",
-        startDate: "01/02/2024",
-        endDate: "10/02/2024",
-        typeOfLeave: "Personal Leave",
-      },
-      {
-        employeeId: "EMP011",
-        employeeName: "Daniel Anderson",
-        startDate: "15/03/2024",
-        endDate: "22/03/2024",
-        typeOfLeave: "Vacation",
-      },
-      {
-        employeeId: "EMP012",
-        employeeName: "Olivia Thomas",
-        startDate: "01/04/2024",
-        endDate: "07/04/2024",
-        typeOfLeave: "Sick",
-      },
-      {
-        employeeId: "EMP013",
-        employeeName: "William Jackson",
-        startDate: "10/05/2024",
-        endDate: "17/05/2024",
-        typeOfLeave: "Others",
-      },
-      {
-        employeeId: "EMP014",
-        employeeName: "Sophia White",
-        startDate: "01/06/2024",
-        endDate: "15/06/2024",
-        typeOfLeave: "Vacation",
-      },
-      {
-        employeeId: "EMP015",
-        employeeName: "Joseph Harris",
-        startDate: "01/07/2024",
-        endDate: "07/07/2024",
-        typeOfLeave: "Sick",
-      },
-      {
-        employeeId: "EMP016",
-        employeeName: "Isabella Martin",
-        startDate: "15/08/2024",
-        endDate: "22/08/2024",
-        typeOfLeave: "Personal Leave",
-      },
-      {
-        employeeId: "EMP017",
-        employeeName: "William Thompson",
-        startDate: "01/09/2024",
-        endDate: "07/09/2024",
-        typeOfLeave: "Vacation",
-      },
-      {
-        employeeId: "EMP018",
-        employeeName: "Mia Garcia",
-        startDate: "10/10/2024",
-        endDate: "17/10/2024",
-        typeOfLeave: "Sick",
-      },
-      {
-        employeeId: "EMP019",
-        employeeName: "Alexander Martinez",
-        startDate: "01/11/2024",
-        endDate: "15/11/2024",
-        typeOfLeave: "Others",
-      },
-      {
-        employeeId: "EMP020",
-        employeeName: "Abigail Robinson",
-        startDate: "01/12/2024",
-        endDate: "10/12/2024",
-        typeOfLeave: "Vacation",
-      },
-    ];
+    const fetchLeaveData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/leave/all-applications",
+          {
+            withCredentials: true,
+          }
+        );
+        const data = response.data;
 
-    const filteredData = dummyData.filter((item) => {
-      const itemStartDate = parseDate(item.startDate);
-      const selectedMonth = startDate ? startDate.getMonth() : null;
-      const selectedYear = startDate ? startDate.getFullYear() : null;
-      return startDate
-        ? itemStartDate.getMonth() === selectedMonth &&
-            itemStartDate.getFullYear() === selectedYear
-        : true;
-    });
+        const filteredData = data.filter((item) => {
+          const itemStartDate = new Date(item.startDate);
+          const selectedMonth = startDate ? startDate.getMonth() : null;
+          const selectedYear = startDate ? startDate.getFullYear() : null;
+          return startDate
+            ? itemStartDate.getMonth() === selectedMonth &&
+                itemStartDate.getFullYear() === selectedYear
+            : true;
+        });
 
-    setLeaveData(filteredData);
-    setTotalPages(Math.ceil(filteredData.length / entriesPerPage));
+        setLeaveData(filteredData);
+        setTotalPages(Math.ceil(filteredData.length / entriesPerPage));
+      } catch (error) {
+        console.error("Error fetching leave data:", error);
+      }
+    };
+
+    fetchLeaveData();
   }, [startDate, entriesPerPage]);
 
   const handlePageChange = (pageNumber) => {
@@ -185,16 +59,75 @@ const ReviewLeaveTable = () => {
     setCurrentPage(currentPage + 1);
   };
 
-  const handleAccept = (id) => {
-    console.log("Leave Application Accepted", id);
+  const handleAccept = async (id) => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/leave/application/${id}/status`,
+        { status: "Accepted" },
+        { withCredentials: true }
+      );
+      setLeaveData((prevData) =>
+        prevData.map((item) =>
+          item._id === id ? { ...item, status: "Accepted" } : item
+        )
+      );
+      alert("Leave application accepted.");
+    } catch (error) {
+      console.error("Error updating leave status:", error);
+    }
   };
 
-  const handleReject = (id) => {
-    console.log("Leave Application Rejected", id);
+  const handleReject = async (id) => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/leave/application/${id}/status`,
+        { status: "Rejected" },
+        { withCredentials: true }
+      );
+      setLeaveData((prevData) =>
+        prevData.map((item) =>
+          item._id === id ? { ...item, status: "Rejected" } : item
+        )
+      );
+      alert("Leave application rejected.");
+    } catch (error) {
+      console.error("Error updating leave status:", error);
+    }
   };
 
-  const handlePending = (id) => {
-    console.log("Leave Application still on Pending", id);
+  const handlePending = async (id) => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/leave/application/${id}/status`,
+        { status: "Pending" },
+        { withCredentials: true }
+      );
+      setLeaveData((prevData) =>
+        prevData.map((item) =>
+          item._id === id ? { ...item, status: "Pending" } : item
+        )
+      );
+      alert("Leave application marked as pending.");
+    } catch (error) {
+      console.error("Error updating leave status:", error);
+    }
+  };
+
+  const handleView = async (id) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/leave/application/${id}`,
+        { withCredentials: true }
+      );
+      const application = response.data;
+      if (application.file) {
+        window.open(application.file, "_blank");
+      } else {
+        alert("No file attached to this leave application.");
+      }
+    } catch (error) {
+      console.error("Error fetching leave application:", error);
+    }
   };
 
   const indexOfLastEntry = currentPage * entriesPerPage;
@@ -239,33 +172,38 @@ const ReviewLeaveTable = () => {
               }`}
             >
               <td className="py-3 px-6 text-center">
-                {application.employeeId}
+                {application.employeeID}
               </td>
               <td className="py-3 px-6 text-center">
                 {application.employeeName}
               </td>
-              <td className="py-3 px-6 text-center">{application.startDate}</td>
-              <td className="py-3 px-6 text-center">{application.endDate}</td>
               <td className="py-3 px-6 text-center">
-                {application.typeOfLeave}
+                {new Date(application.startDate).toLocaleDateString()}
               </td>
               <td className="py-3 px-6 text-center">
-                <button className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                {new Date(application.endDate).toLocaleDateString()}
+              </td>
+              <td className="py-3 px-6 text-center">{application.leaveType}</td>
+              <td className="py-3 px-6 text-center">
+                <button
+                  className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                  onClick={() => handleView(application._id)}
+                >
                   View
                 </button>
               </td>
               <td className="py-3 px-6 text-center flex justify-center items-center space-x-2">
                 <FaCheckCircle
                   style={{ color: "green", cursor: "pointer" }}
-                  onClick={() => handleAccept(application.id)}
+                  onClick={() => handleAccept(application._id)}
                 />
                 <FaTimesCircle
                   style={{ color: "red", cursor: "pointer" }}
-                  onClick={() => handleReject(application.id)}
+                  onClick={() => handleReject(application._id)}
                 />
                 <FaPauseCircle
                   style={{ color: "#ed8332", cursor: "pointer" }}
-                  onClick={() => handlePending(application.id)}
+                  onClick={() => handlePending(application._id)}
                 />
               </td>
             </tr>

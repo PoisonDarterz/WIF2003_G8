@@ -41,6 +41,7 @@ const LogIn = () => {
       const { token, user } = res.data;
       localStorage.setItem("token", token);
       localStorage.setItem("role", user.role); // Store user role in local storage
+      localStorage.setItem("employeeID", user.employeeID);
 
       setMessage("Login successful!");
       navigate("/home");
