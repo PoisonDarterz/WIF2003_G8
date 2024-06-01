@@ -66,9 +66,9 @@ export default function ViewProfile() {
             <div>
               <img
                 className="h-48 w-36 rounded-lg cursor-pointer"
-                src="/Profile_image.jpg"
+                src={employeeData.profilePicURL || "/Profile_image.jpg"}
                 alt="Profile Picture"
-                onClick={() => handleViewImage("/Profile_image.jpg")}
+                onClick={() => handleViewImage(employeeData.profilePicURL || "/Profile_image.jpg")}
               />
               <h2 className="mt-5 font-bold">Employee ID</h2>
               <p>{employeeData.id}</p>
