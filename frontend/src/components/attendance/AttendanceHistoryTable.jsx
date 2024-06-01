@@ -16,7 +16,7 @@ const AttendanceHistoryTable = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/attendance",
+          "http://localhost:5000/api/attendance/attendances",
           { withCredentials: true }
         );
         console.log("Fetched data:", response.data);
@@ -26,6 +26,7 @@ const AttendanceHistoryTable = () => {
           return dateB - dateA;
         });
         setAttendanceData(sortedData);
+        console.log("Sorted data: " + sortedData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
