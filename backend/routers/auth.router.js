@@ -71,6 +71,15 @@ router.post('/register', async (req, res) => {
         // Save user to database
         await user.save();
 
+        const employee = new Employee({
+            id: employeeID,
+            name: "Update Name",
+            email: user._id,
+            emailContact: email,
+            roleId: "665aa21a2da0bfb2731bdf71"
+        });
+        await employee.save();
+
         // Send verification email
         const mailOptions = {
             from: process.env.EMAIL_USERNAME,

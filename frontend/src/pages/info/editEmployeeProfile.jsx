@@ -104,14 +104,18 @@ export default function EditEmployeeProfile() {
       // });
       // console.log("File uploaded successfully", response.data);
   
-      const updatedEmployeeData = {
-        ...employeeData,
-        joinedSince: new Date(employeeData.joinedSince).toISOString(),
-        edu: educationList.filter(edu => edu.confirmed),
-        skills: skillsList.filter(skill => skill.confirmed),
-        awards: awardsList.filter(award => award.confirmed),
-        // profilePicURL: response.data.profilePicURL // Use the new profile pic URL
-      };
+      const joinedSinceISOString = employeeData.joinedSince
+      ? new Date(employeeData.joinedSince).toISOString()
+      : '';
+
+    const updatedEmployeeData = {
+      ...employeeData,
+      joinedSince: joinedSinceISOString,
+      edu: educationList.filter(edu => edu.confirmed),
+      skills: skillsList.filter(skill => skill.confirmed),
+      awards: awardsList.filter(award => award.confirmed),
+      // profilePicURL: response.data.profilePicURL // Use the new profile pic URL
+    };
   
       const updateResponse = await axios.put(`http://localhost:5000/api/employees/${id}`, updatedEmployeeData);
       console.log("Profile updated successfully", updateResponse.data);
@@ -349,7 +353,7 @@ export default function EditEmployeeProfile() {
                 id="joinDate"
                 name="joinDate"
                 type="date"
-                value={employeeData.joinedSince.split("T")[0]}
+                value={employeeData.joinedSince ? employeeData.joinedSince.split("T")[0] : ''}
                 onChange={handleInputChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
