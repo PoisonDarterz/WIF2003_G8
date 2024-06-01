@@ -13,6 +13,7 @@ const benefitRouter = require("./routers/benefit.router");
 const communityRouter = require("./routers/community.router");
 const attendanceRouter = require("./routers/attendance.router");
 const leaveRouter = require("./routers/leave.router");
+const ticketRouter = require("./routers/ticket.router");
 
 // Connect to MongoDB Atlas database
 mongoose.connect(
@@ -48,6 +49,7 @@ app.use("/api/benefits", benefitRouter);
 app.use("/api/community", communityRouter);
 app.use("/api/attendance", attendanceRouter);
 app.use("/api/leave", leaveRouter);
+app.use("/api/tickets", ticketRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
