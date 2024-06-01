@@ -28,6 +28,7 @@ export default function EditEmployeeProfile() {
   const [skillsList, setSkillsList] = useState([]);
   const [awardsList, setAwardsList] = useState([]);
   const [profilePic, setProfilePic] = useState("");
+  const [profilePic, setProfilePic] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [editIndex, setEditIndex] = useState(null);
   const [editType, setEditType] = useState("");
@@ -78,40 +79,110 @@ export default function EditEmployeeProfile() {
   }, [roleData]);
   
 
-  const saveProfile = async (e) => {
-    e.preventDefault();
+
+  const uploadProfilePic = async () => {
     try {
-      // Upload file to server
-      // const formData = new FormData();
-      // formData.append("file", profilePic);
-
-      // const response = await axios.post(`http://localhost:5000/api/employees/${id}`, formData, {
-      //   headers: {
-      //     "Content-Type": "multipart/form-data"
-      //   }
-      // });
-      // console.log("File uploaded successfully", response.data);
+      const formData = new FormData();
+      formData.append("file", profilePic);
   
-      const joinedSinceISOString = employeeData.joinedSince
-      ? new Date(employeeData.joinedSince).toISOString()
-      : '';
-
-    const updatedEmployeeData = {
-      ...employeeData,
-      joinedSince: joinedSinceISOString,
-      edu: educationList.filter(edu => edu.confirmed),
-      skills: skillsList.filter(skill => skill.confirmed),
-      awards: awardsList.filter(award => award.confirmed),
-      // profilePicURL: response.data.profilePicURL // Use the new profile pic URL
-    };
+      const uploadResponse = await axios.post(
+        `http://localhost:5000/api/employees/${id}/profile-pic`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
   
-      const updateResponse = await axios.put(`http://localhost:5000/api/employees/${id}`, updatedEmployeeData);
+      if (uploadResponse.status === 200) {
+        console.log("Profile picture uploaded successfully");
+  
+        // Assuming `uploadResponse.data` contains the URL of the uploaded profile picture
+        const profilePicURL = uploadResponse.data.profilePicURL;
+  
+        // Update employeeData state with the returned profile picture URL
+        setEmployeeData((prevData) => ({
+          ...prevData,
+          profilePicURL: profilePicURL, // Make sure this matches the key in the response
+        }));
+        
+        return profilePicURL; // Return the URL
+      } else {
+        console.error("Profile picture upload failed");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      return null;
+    }
+  };
+
+  const updateProfile = async () => {
+    try {
+      // Check if there's a new profilePicURL to update
+      let updatedEmployeeData = { ...employeeData };
+      if (profilePic) {
+        // If a new profile picture was uploaded, upload it first and get the URL
+        const profilePicURL = await uploadProfilePic();
+        if (profilePicURL) {
+          // If the upload was successful, update the profilePicURL in the employee data
+          updatedEmployeeData = {
+            ...updatedEmployeeData,
+            profilePicURL: profilePicURL,
+          };
+        } else {
+          // If the upload failed, return and don't proceed with the update
+          console.error("Error uploading profile picture");
+          return false;
+        }
+      }
+  
+      // Update other profile information
+      updatedEmployeeData = {
+        ...updatedEmployeeData,
+        edu: educationList,
+        skills: skillsList,
+        awards: awardsList,
+      };
+  
+      const updateResponse = await axios.put(
+        `http://localhost:5000/api/employees/${id}`,
+        updatedEmployeeData
+      );
+  
       console.log("Profile updated successfully", updateResponse.data);
-      navigate(`/info/viewProfile/${id}`);
+      return true;
     } catch (error) {
       console.error("Error updating profile:", error);
+      return false;
     }
-  };  
+  };
+
+  
+const saveProfile = async (e) => {
+  e.preventDefault();
+  try {
+    const profilePicURL = await uploadProfilePic();
+    if (profilePicURL !== null) {
+      // Update the profilePicURL in the state
+      setEmployeeData((prevData) => ({
+        ...prevData,
+        profilePicURL: profilePicURL,
+      }));
+    }
+
+    const success = await updateProfile();
+    if (success) {
+      navigate(`/info/viewProfile/${id}`);
+    } else {
+      // Handle error
+    }
+  } catch (error) {
+    console.error("Error saving profile:", error);
+  }
+};
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -122,13 +193,7 @@ export default function EditEmployeeProfile() {
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setProfilePic(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    setProfilePic(file);
   };
 
   const handleAddEducation = () => {
@@ -217,8 +282,10 @@ export default function EditEmployeeProfile() {
             {/* Profile Picture */}
             <div className="flex items-center">
             <img className="h-48 w-36 mr-4 rounded-lg" src={profilePic || employeeData.profilePicURL || "/Profile_image.jpg"} alt="Profile Picture" />
+            <img className="h-48 w-36 mr-4 rounded-lg" src={profilePic || employeeData.profilePicURL || "/Profile_image.jpg"} alt="Profile Picture" />
               <label htmlFor="profilePic" className="text-black">
                 Change Photo
+                <input type="file" id="profilePic" onChange={handleFileChange}/>
                 <input type="file" id="profilePic" onChange={handleFileChange}/>
               </label>
             </div>
@@ -285,11 +352,14 @@ export default function EditEmployeeProfile() {
               id="jobTitle"
               name="jobTitle"
               value={employeeData.roleId._id}
+              value={employeeData.roleId._id}
               onChange={handleJobTitleChange}
               className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             >
               <option value="">Select Job Title</option>
               {jobTitles.map((role) => (
+                <option key={role._id} value={role._id}>
+                  {role.roleName}
                 <option key={role._id} value={role._id}>
                   {role.roleName}
                 </option>

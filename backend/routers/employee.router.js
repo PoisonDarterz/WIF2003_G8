@@ -21,34 +21,35 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(
 );
 const containerClient = blobServiceClient.getContainerClient("profilepic");
 
-router.post('/:id', upload.single("file"), async (req, res) => {
+router.post('/:id/profile-pic', upload.single("file"), async (req, res) => {
   try {
     const { file } = req;
     let fileUrl;
 
-    if (file) {
-      const blobName = Date.now() + "-" + file.originalname;
-      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-      await blockBlobClient.uploadData(file.buffer, {
-        blobHTTPHeaders: {
-          blobContentType: file.mimetype,
-        },
-      });
-      fileUrl = blockBlobClient.url;
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    // Find the employee and update the profile picture URL if a file was uploaded
-    const employee = await Employee.findByIdAndUpdate(
+    const blobName = Date.now() + "-" + file.originalname;
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    await blockBlobClient.uploadData(file.buffer, {
+      blobHTTPHeaders: {
+        blobContentType: file.mimetype,
+      },
+    });
+    fileUrl = blockBlobClient.url;
+
+    const updatedEmployee = await Employee.findOneAndUpdate(
       { id: req.params.id },
-      { profilePicURL: fileUrl },
+      { $set: { profilePicURL: fileUrl } }, // Update the profilePicURL
       { new: true }
     );
 
-    if (!employee) {
+    if (!updatedEmployee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-    res.json(employee);
+    res.json(updatedEmployee);
   } catch (err) {
     console.error("Error uploading file:", err);
     res.status(500).json({ message: err.message });
@@ -116,11 +117,11 @@ router.get('/:id', async (req, res) => {
 // Update employee profile
 router.put('/:id', async (req, res) => {
   try {
-    const { edu, skills, awards, ...employeeData } = req.body;
+    const { edu, skills, awards, profilePicURL, ...employeeData } = req.body; // Ensure profilePicURL is retrieved
 
     const updatedEmployee = await Employee.findOneAndUpdate(
       { id: req.params.id },
-      { $set: { edu, skills, awards }, ...employeeData },
+      { $set: { edu, skills, awards, profilePicURL }, ...employeeData }, // Update profilePicURL
       { new: true }
     ).populate([
       {
@@ -150,5 +151,4 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 module.exports = router;
