@@ -3,27 +3,23 @@ const mongoose = require("mongoose");
 
 const ReplySchema = new mongoose.Schema({
   employee: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee",
+    type: {id: String, name: String, profilePicURL: String},
+    ref: "Employee.id",
     required: true,
   },
   replyTime: { type: Date, default: Date.now },
   replyText: { type: String, required: true },
-  upvotes: { type: Number, default: 0 },
-  downvotes: { type: Number, default: 0 },
 });
 
 const CommentSchema = new mongoose.Schema({
   employee: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee",
+    type: {id: String, name: String, profilePicURL: String},
+    ref: "Employee.id",
     required: true,
   },
   commentTime: { type: Date, default: Date.now },
   commentText: { type: String, required: true },
   replies: [ReplySchema],
-  upvotes: { type: Number, default: 0 },
-  downvotes: { type: Number, default: 0 },
 });
 
 const CommunitySchema = new mongoose.Schema({
