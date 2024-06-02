@@ -17,7 +17,6 @@ const LeaveHistoryTable = () => {
           "http://localhost:5000/api/leave/applications",
           { withCredentials: true }
         );
-        console.log(response.data);
         setLeaveData(response.data);
         setFilteredData(response.data);
       } catch (error) {
