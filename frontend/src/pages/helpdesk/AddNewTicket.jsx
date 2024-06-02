@@ -3,10 +3,22 @@ import TopNavBlack from "../../components/TopNavBlack"
 import {useState} from 'react'
 import { FaFileImage, FaFilePdf, FaFileWord, FaFileExcel} from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
+import axios from "axios";
 
 function AddNewTicket(){
   const [files,setFiles]=useState([]);
   const [isSubmitted,setIsSubmitted]=useState(false);
+  const [formData,setFormData]=useState({
+    ticketID: "007",
+    dateTimeCreated: new Date(),
+    category: "",
+    subject: "",
+    detail: "",
+    attachment: "",
+    investigatorID: "",
+    investigationUpdate: "",
+    status: "pending",
+  })
   const navigate=useNavigate();
 
   const handleFileChange=(event)=>{
@@ -39,14 +51,17 @@ function AddNewTicket(){
   }
 
   const [notification, setNotification] = useState(null);
-  const handleSubmit=(event)=>{
+
+  const handleSubmit=async(event)=>{
     event.preventDefault()
     setNotification("Ticket submitted successfully!");
     setIsSubmitted(true);
-    // setTimeout(() => {
-    //   setNotification(null);
-    //   navigate("/helpdesk/");
-    // }, 3000);
+    try{
+     const response=await axios.post("http://localhost:5000/api/tickets/submitTicket",formData,{withCredentials:true});
+     console.log("New ticket submitted succesfully:",response.data)
+    }catch(error){
+      console.error("Error send request to submit ticket:",error);
+    }
   }
 
     return(
@@ -65,14 +80,15 @@ function AddNewTicket(){
                 className="border rounded-lg w-60 h-fit pl-2"
                 type="text"
                 id="ticketID"
-                value="T007"
+                value={formData.ticketID}
                 readOnly
               >
               </input>
             </div>  
             <div className="flex my-3">
               <label className="font-bold w-[12%] text-start">Category</label>
-              <select id="category" className="border rounded-lg w-60 pl-2">
+              <select id="category" className="border rounded-lg w-60 pl-2" 
+              value={formData.category} onChange={(e)=>{setFormData((prevData)=>({...prevData,category:e.target.value}))}}>
                 <option value="General">Select</option>
                 <option value="Financial misconduct">Financial misconduct</option>
                 <option value="Data security breaches">Data security breaches</option>
@@ -88,6 +104,8 @@ function AddNewTicket(){
                 type="text"
                 id="subject"
                 placeholder="Subject"
+                value={formData.subject}
+                onChange={(e)=>{setFormData((prevData)=>({...prevData,subject:e.target.value}))}}
                 readOnly={isSubmitted}
               >
               </input>
@@ -99,6 +117,8 @@ function AddNewTicket(){
                 id="detail"
                 placeholder="Provide as much detail as possible"
                 rows="4"
+                value={formData.detail}
+                onChange={(e)=>{setFormData((prevData)=>({...prevData,detail:e.target.value}))}}
                 required
                 readOnly={isSubmitted}
               >
