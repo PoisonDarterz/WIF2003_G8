@@ -24,73 +24,27 @@ const containerClientEdu = blobServiceClient.getContainerClient("edu");
 const containerClientSkills = blobServiceClient.getContainerClient("skills");
 const containerClientAwards = blobServiceClient.getContainerClient("awards");
 
-router.post('/:id/upload', upload.fields([
-  { name: 'profilePic', maxCount: 1 }, 
-  { name: 'eduDoc', maxCount: 1 }, 
-  { name: 'skillsDoc', maxCount: 1 },
-  { name: 'awardsDoc', maxCount: 1 }, 
-]), async (req, res) => {
+router.post('/:id/profile-pic', upload.single("file"), async (req, res) => {
   try {
-    const { profilePic, eduDoc, skillsDoc, awardsDoc } = req.files;
+    const { file } = req;
+    let fileUrl;
 
-    let profilePicURL;
-    if (profilePic && profilePic.length > 0) {
-      const profilePicBlobName = Date.now() + "-" + profilePic[0].originalname;
-      const profilePicBlockBlobClient = containerClient.getBlockBlobClient(profilePicBlobName);
-      await profilePicBlockBlobClient.uploadData(profilePic[0].buffer, {
-        blobHTTPHeaders: {
-          blobContentType: profilePic[0].mimetype,
-        },
-      });
-      profilePicURL = profilePicBlockBlobClient.url;
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    let eduDocURL;
-    if (eduDoc && eduDoc.length > 0) {
-      const eduDocBlobName = Date.now() + "-" + eduDoc[0].originalname;
-      const eduDocBlockBlobClient = containerClientEdu.getBlockBlobClient(eduDocBlobName);
-      await eduDocBlockBlobClient.uploadData(eduDoc[0].buffer, {
-        blobHTTPHeaders: {
-          blobContentType: eduDoc[0].mimetype,
-        },
-      });
-      eduDocURL = eduDocBlockBlobClient.url;
-    }
-
-    let skillsDocURL;
-    if (skillsDoc && skillsDoc.length > 0) {
-      const skillsDocBlobName = Date.now() + "-" + skillsDoc[0].originalname;
-      const skillsDocBlockBlobClient = containerClientSkills.getBlockBlobClient(skillsDocBlobName);
-      await skillsDocBlockBlobClient.uploadData(skillsDoc[0].buffer, {
-        blobHTTPHeaders: {
-          blobContentType: skillsDoc[0].mimetype,
-        },
-      });
-      skillsDocURL = skillsDocBlockBlobClient.url;
-    }
-
-    let awardsDocURL;
-    if (awardsDoc && awardsDoc.length > 0) {
-      const awardsDocBlobName = Date.now() + "-" + awardsDoc[0].originalname;
-      const awardsDocBlockBlobClient = containerClientAwards.getBlockBlobClient(awardsDocBlobName);
-      await awardsDocBlockBlobClient.uploadData(awardsDoc[0].buffer, {
-        blobHTTPHeaders: {
-          blobContentType: awardsDoc[0].mimetype,
-        },
-      });
-      awardsDocURL = awardsDocBlockBlobClient.url;
-    }
+    const blobName = Date.now() + "-" + file.originalname;
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    await blockBlobClient.uploadData(file.buffer, {
+      blobHTTPHeaders: {
+        blobContentType: file.mimetype,
+      },
+    });
+    fileUrl = blockBlobClient.url;
 
     const updatedEmployee = await Employee.findOneAndUpdate(
       { id: req.params.id },
-      {
-        $set: {
-          profilePicURL,
-          eduDocURL,
-          skillsDocURL,
-          awardsDocURL
-        },
-      },
+      { $set: { profilePicURL: fileUrl } }, // Update the profilePicURL
       { new: true }
     );
 
@@ -100,7 +54,43 @@ router.post('/:id/upload', upload.fields([
 
     res.json(updatedEmployee);
   } catch (err) {
-    console.error("Error uploading files:", err);
+    console.error("Error uploading file:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post('/:id/edu-doc/:eduId', upload.single("file"), async (req, res) => {
+  try {
+    const { file } = req;
+    const { id, eduId } = req.params;
+    let fileUrl;
+
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const blobName = Date.now() + "-" + file.originalname;
+    const blockBlobClient = containerClientEdu.getBlockBlobClient(blobName); // Use the educational documents container client
+    await blockBlobClient.uploadData(file.buffer, {
+      blobHTTPHeaders: {
+        blobContentType: file.mimetype,
+      },
+    });
+    fileUrl = blockBlobClient.url;
+
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { id, "edu._id": eduId },
+      { $set: { "edu.$.eduDocURL": fileUrl } }, 
+      { new: true }
+    );
+
+    if (!updatedEmployee) {
+      return res.status(404).json({ message: 'Employee or education document not found' });
+    }
+
+    res.json({ eduDocURL: fileUrl }); // Return the URL of the uploaded educational document
+  } catch (err) {
+    console.error("Error uploading educational document:", err);
     res.status(500).json({ message: err.message });
   }
 });
