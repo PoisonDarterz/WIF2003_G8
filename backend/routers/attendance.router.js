@@ -6,16 +6,20 @@ const {
   checkRole,
 } = require("../middlewares/auth.middleware");
 
-router.get("/", authenticateUser, async (req, res) => {
+router.get("/attendances", authenticateUser, async (req, res) => {
   try {
-    const records = await Attendance.find({ employeeId: req.user._id }).sort({
+    const records = await Attendance.find({
+      employeeId: req.user.employeeID,
+    }).sort({
       year: -1,
       month: -1,
       date: -1,
     });
+    console.log("Fetched records:", records); // Add this line
     res.json(records);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error fetching attendance records:", err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
@@ -24,6 +28,7 @@ router.post(
   authenticateUser,
   checkRole("Employee"),
   async (req, res) => {
+    const { employeeID, reason } = req.body;
     const clockInTime = new Date();
     const hour = clockInTime.getHours();
     let status;
@@ -46,15 +51,15 @@ router.post(
 
     try {
       const existingRecord = await Attendance.findOne({
-        employeeId: req.user._id,
+        employeeId: employeeID,
         year: clockInTime.getFullYear(),
         month: clockInTime.getMonth() + 1,
         date: clockInTime.getDate(),
       });
 
       if (existingRecord) {
-        if (req.body.reason) {
-          existingRecord.reason = req.body.reason;
+        if (reason) {
+          existingRecord.reason = reason;
           await existingRecord.save();
           res.status(200).json({
             record: existingRecord,
@@ -67,14 +72,14 @@ router.post(
         }
       } else {
         const attendanceRecord = new Attendance({
-          employeeId: req.user._id,
+          employeeId: employeeID,
           month: clockInTime.getMonth() + 1,
           date: clockInTime.getDate(),
           year: clockInTime.getFullYear(),
           clockIn: status === "Absent" ? "-" : clockInTime.toLocaleTimeString(),
           clockOut: "-",
           status: status,
-          reason: req.body.reason || "",
+          reason: reason || "",
         });
 
         const newRecord = await attendanceRecord.save();
@@ -92,12 +97,13 @@ router.post(
   authenticateUser,
   checkRole("Employee"),
   async (req, res) => {
+    const { employeeID } = req.body;
     const clockOutTime = new Date();
     const today = new Date();
 
     try {
       const todayRecord = await Attendance.findOne({
-        employeeId: req.user._id,
+        employeeId: employeeID,
         year: today.getFullYear(),
         month: today.getMonth() + 1,
         date: today.getDate(),
@@ -119,5 +125,25 @@ router.post(
     }
   }
 );
+
+// Endpoint to fetch all attendance records with pagination
+router.get("/all", authenticateUser, checkRole("Admin"), async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const records = await Attendance.find()
+      .sort({ year: -1, month: -1, date: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const totalRecords = await Attendance.countDocuments();
+    res.json({
+      records,
+      totalPages: Math.ceil(totalRecords / limit),
+      currentPage: parseInt(page),
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = router;

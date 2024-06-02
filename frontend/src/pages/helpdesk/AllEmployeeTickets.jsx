@@ -1,35 +1,46 @@
+import { useEffect,useState } from "react";
 import TopNavBlack from "../../components/TopNavBlack"
 import { useNavigate,useLocation } from 'react-router-dom';
+import axios from "axios";
 
 function AllEmployeeTickets(){
   const navigate=useNavigate();
-  
   const handleResolveTicket=(i)=>{
     const ticket=allTickets[i]
     navigate("/helpdesk/resolveTicket",{state:ticket})
   }
+  const [allTickets,setAllTickets]=useState([])
 
-  const allTickets=[
-    {
-      ticketID:"T006",
-      reportDate:"13 April 2024",
-      reportTime:"2:45pm",
-      category:"Financial Misconduct",
-      subject:"Unauthorized Expenses Claims",
-      assignedInvestigator:"-",
-      status:"pending",
-      employeeID:"E1001",
-      employeeName:"qihan",
-      detail:"I have observed several instances where expense claims from XXX have been submitted without proper authorization or for expenses that do not align with company policy. These unauthorized claims not only raise concerns about financial transparency but also create an unfair advantage for those submitting them. It's crucial to investigate and address these instances promptly to uphold the integrity of our expense reimbursement process and ensure fair treatment for all employees.",
-      attachment:null,
-      investigationUpdate:null,    
-    },    
-    {ticketID:"T005",employeeID:"E1002",reportDate:"28 Feb 2024",reportTime:"5:56pm",category:"Others",subject:"Safety Violations",assignedInvestigator:"Jonas","status":"in progress"},
-    {ticketID:"T004",employeeID:"E1003",reportDate:"1 Jan 2024",reportTime:"11:23am",category:"Data Security Breaches",subject:"Unauthorized Access to Confidential Data",assignedInvestigator:"Ching Ying",status:"in progress"},
-    {ticketID:"T003",employeeID:"E1004",reportDate:"27 Dec 2023",reportTime:"2:28pm",category:"Discrimination",subject:"Unfair Treatment due to National Origin",assignedInvestigator:"Ing Zhen",status:"resolved"},
-    {ticketID:"T002",employeeID:"E1001",reportDate:"4 August 2023",reportTime:"4:45pm",category:"Workplace harassment",subject:"Inappropriate Behavior by Colleague",assignedInvestigator:"James",status:"resolved"},
-    {ticketID:"T001",employeeID:"E1001",reportDate:"26 Mac 2023",reportTime:"10:49am",category:"Financial Misconduct",subject:"Misuse of Company Funds",assignedInvestigator:"Hui Min","status":"resolved"},
-  ]
+  // const allTickets=[
+  //   {
+  //     ticketID:"T006",
+  //     reportDate:"13 April 2024",
+  //     reportTime:"2:45pm",
+  //     category:"Financial Misconduct",
+  //     subject:"Unauthorized Expenses Claims",
+  //     assignedInvestigator:"-",
+  //     status:"pending",
+  //     employeeID:"E1001",
+  //     employeeName:"qihan",
+  //     detail:"I have observed several instances where expense claims from XXX have been submitted without proper authorization or for expenses that do not align with company policy. These unauthorized claims not only raise concerns about financial transparency but also create an unfair advantage for those submitting them. It's crucial to investigate and address these instances promptly to uphold the integrity of our expense reimbursement process and ensure fair treatment for all employees.",
+  //     attachment:null,
+  //     investigationUpdate:null,    
+  //   },    
+  //   {ticketID:"T005",employeeID:"E1002",reportDate:"28 Feb 2024",reportTime:"5:56pm",category:"Others",subject:"Safety Violations",assignedInvestigator:"Jonas","status":"in progress"},
+  //   {ticketID:"T004",employeeID:"E1003",reportDate:"1 Jan 2024",reportTime:"11:23am",category:"Data Security Breaches",subject:"Unauthorized Access to Confidential Data",assignedInvestigator:"Ching Ying",status:"in progress"},
+  //   {ticketID:"T003",employeeID:"E1004",reportDate:"27 Dec 2023",reportTime:"2:28pm",category:"Discrimination",subject:"Unfair Treatment due to National Origin",assignedInvestigator:"Ing Zhen",status:"resolved"},
+  //   {ticketID:"T002",employeeID:"E1001",reportDate:"4 August 2023",reportTime:"4:45pm",category:"Workplace harassment",subject:"Inappropriate Behavior by Colleague",assignedInvestigator:"James",status:"resolved"},
+  //   {ticketID:"T001",employeeID:"E1001",reportDate:"26 Mac 2023",reportTime:"10:49am",category:"Financial Misconduct",subject:"Misuse of Company Funds",assignedInvestigator:"Hui Min","status":"resolved"},
+  // ]
+
+  useEffect(()=>{
+    const fetchTickets=async()=>{
+      const response= await axios.get("http://localhost:5000/api/tickets/")
+      console.log("Ticket Response:",response.data);
+      setAllTickets(response.data);
+    }
+    fetchTickets();
+  },[]);
     return(
       <div className="p-8">
         <div className="mt-[-32px] ml-[-32px] mr-[-32px]">

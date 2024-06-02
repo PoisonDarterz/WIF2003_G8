@@ -34,7 +34,7 @@ function ProcessSalary() {
     // Create a new 'a' element, set its 'href' to the PDF URL, and click it to start the download
     const link = document.createElement('a');
     link.href = pdfUrl;
-    link.download = 'salary-slip.pdf';  // set the file name here
+    link.download = 'salary-slip.pdf';
     link.click();
   };
 

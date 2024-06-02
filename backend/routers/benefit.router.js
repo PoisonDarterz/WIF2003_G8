@@ -89,22 +89,22 @@ router.get('/my-benefits', authenticateUser, async (req, res) => {
         const employee = await Employee.findOne({ email: userId })
             .populate({
                 path: 'roleId',
-                select: 'roleName', // Select the role name only
+                select: 'roleName',
             })
             .populate({
                 path: 'roleId',
                 populate: {
                     path: 'benefits',
-                    select: 'type', // Select the type of benefit only
+                    select: 'type',
                     populate: {
                         path: 'benefits',
-                        select: 'benefit notes' // Select the benefit name and notes only
+                        select: 'benefit notes' 
                     }
                 }
             })
             .populate({
                 path: 'individualBenefits',
-                select: 'benefitName notes' // Select the benefit name and notes only
+                select: 'benefitName notes' 
             });
 
         // Extract the role name from the employee record

@@ -14,7 +14,9 @@ const SideNavBar = () => {
             key={index}
             to={item.to}
             className={`flex items-center ${
-              location.pathname === item.to ? "text-[#EB4335] font-bold" : "text-black"
+              location.pathname === item.to
+                ? "text-[#EB4335] font-bold"
+                : "text-black"
             } hover:text-[#2C74D8]`}
           >
             {item.icon}
