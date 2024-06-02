@@ -42,9 +42,9 @@ export default function EditEmployeeProfile() {
         
         setRoleData(roleResponse.data);
         setEmployeeData(employeeResponse.data);
-        const eduData = employeeData.edu.map(edu => ({ ...edu, confirmed: true }));
-        const skillsData = employeeData.skills.map(skill => ({ ...skill, confirmed: true }));
-        const awardsData = employeeData.awards.map(award => ({ ...award, confirmed: true }));
+        const eduData = employeeResponse.data.edu.map(edu => ({ ...edu, confirmed: true }));
+        const skillsData = employeeResponse.data.skills.map(skill => ({ ...skill, confirmed: true }));
+        const awardsData = employeeResponse.data.awards.map(award => ({ ...award, confirmed: true }));
 
         setEducationList(eduData);
         setSkillsList(skillsData);
@@ -62,7 +62,6 @@ export default function EditEmployeeProfile() {
   useEffect(() => {
     // Extract unique department names and job titles
     if (roleData) {
-      const uniqueDepartments = [];
       const uniqueJobTitles = [];
   
       roleData.forEach((role) => {
@@ -99,12 +98,6 @@ export default function EditEmployeeProfile() {
   
         // Assuming `uploadResponse.data` contains the URL of the uploaded profile picture
         const profilePicURL = uploadResponse.data.profilePicURL;
-  
-        // Update employeeData state with the returned profile picture URL
-        setEmployeeData((prevData) => ({
-          ...prevData,
-          profilePicURL: profilePicURL, // Make sure this matches the key in the response
-        }));
         
         return profilePicURL; // Return the URL
       } else {
@@ -117,68 +110,51 @@ export default function EditEmployeeProfile() {
     }
   };
 
-  const updateProfile = async () => {
+  const updateProfile = async (profilePicURL) => {
     try {
-      // Check if there's a new profilePicURL to update
-      let updatedEmployeeData = { ...employeeData };
-      if (profilePic) {
-        // If a new profile picture was uploaded, upload it first and get the URL
-        const profilePicURL = await uploadProfilePic();
-        if (profilePicURL) {
-          // If the upload was successful, update the profilePicURL in the employee data
-          updatedEmployeeData = {
-            ...updatedEmployeeData,
-            profilePicURL: profilePicURL,
-          };
-        } else {
-          // If the upload failed, return and don't proceed with the update
-          console.error("Error uploading profile picture");
-          return false;
-        }
-      }
-  
-      // Update other profile information
-      updatedEmployeeData = {
-        ...updatedEmployeeData,
-        edu: educationList,
-        skills: skillsList,
-        awards: awardsList,
-      };
-  
-      const updateResponse = await axios.put(
-        `http://localhost:5000/api/employees/${id}`,
-        updatedEmployeeData
-      );
-  
-      console.log("Profile updated successfully", updateResponse.data);
-      return true;
+        // Update other profile information
+        let updatedEmployeeData = {
+            ...employeeData,
+            profilePicURL: profilePicURL || employeeData.profilePicURL,
+            edu: educationList.filter(edu => edu.confirmed),
+            skills: skillsList.filter(skill => skill.confirmed),
+            awards: awardsList.filter(award => award.confirmed),
+        };
+
+        const updateResponse = await axios.put(
+            `http://localhost:5000/api/employees/${id}`,
+            updatedEmployeeData
+        );
+
+        console.log("Profile updated successfully", updateResponse.data);
+        return true;
     } catch (error) {
-      console.error("Error updating profile:", error);
-      return false;
+        console.error("Error updating profile:", error);
+        return false;
     }
-  };
+};
 
   
 const saveProfile = async (e) => {
   e.preventDefault();
   try {
-    const profilePicURL = await uploadProfilePic();
-    if (profilePicURL !== null) {
-      // Update the profilePicURL in the state
-      setEmployeeData((prevData) => ({
-        ...prevData,
-        profilePicURL: profilePicURL,
-      }));
-    }
+      let profilePicURL = null;
+      if (profilePic) {
+          profilePicURL = await uploadProfilePic();
+          if (profilePicURL === null) {
+              console.error("Error uploading profile picture");
+              return;
+          }
+      }
 
-    const success = await updateProfile();
-    if (success) {
-      navigate(`/info/viewProfile/${id}`);
-    } else {
-      // Handle error
-    }
+      const success = await updateProfile(profilePicURL);
+      if (success) {
+          navigate(`/info/viewProfile/${id}`);
+      } else {
+          // Handle error
+      }
   } catch (error) {
-    console.error("Error saving profile:", error);
+      console.error("Error saving profile:", error);
   }
 };
 

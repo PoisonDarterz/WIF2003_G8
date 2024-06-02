@@ -21,6 +21,9 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(
   process.env.CONNECTION_STRING
 );
 const containerClient = blobServiceClient.getContainerClient("profilepic");
+const containerClientEdu = blobServiceClient.getContainerClient("edu");
+const containerClientSkills = blobServiceClient.getContainerClient("skills");
+const containerClientAwards = blobServiceClient.getContainerClient("awards");
 
 router.post('/:id/profile-pic', upload.single("file"), async (req, res) => {
   try {
