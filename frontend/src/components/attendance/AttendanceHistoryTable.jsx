@@ -19,14 +19,12 @@ const AttendanceHistoryTable = () => {
           "http://localhost:5000/api/attendance/attendances",
           { withCredentials: true }
         );
-        console.log("Fetched data:", response.data);
         const sortedData = response.data.sort((a, b) => {
           const dateA = new Date(a.year, a.month - 1, a.date);
           const dateB = new Date(b.year, b.month - 1, b.date);
           return dateB - dateA;
         });
         setAttendanceData(sortedData);
-        console.log("Sorted data: " + sortedData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

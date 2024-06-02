@@ -31,12 +31,7 @@ export default function ViewProfile() {
       try {
         const response = await axios.get(`http://localhost:5000/api/employees/${id}`);
         
-        const employee = response.data;
-        if (!employee.emailContact) {
-          employee.emailContact = employee.email.email;
-        }
-
-        setEmployeeData(employee);
+        setEmployeeData(response.data);
       } catch (error) {
         console.error("Error fetching employee data:", error);
       }

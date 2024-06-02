@@ -9,7 +9,7 @@ const AttendanceTableAdmin = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [selectedDate, setSelectedDate] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
-  
+
   const [selectedAttendance, setSelectedAttendance] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -22,7 +22,6 @@ const AttendanceTableAdmin = () => {
           "http://localhost:5000/api/attendance/all",
           { withCredentials: true }
         );
-        console.log("Fetched data:", response.data);
         setAttendanceData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -67,19 +66,15 @@ const AttendanceTableAdmin = () => {
     }
   };
 
-  const formatDate = (dateString, isMonth) => {
-    const date = new Date(dateString);
+  const formatDate = (day, month, year, isMonth) => {
+    const date = new Date(year, month - 1, day);
     if (isMonth) {
       return date.toLocaleDateString("en-US", {
         month: "long",
         year: "numeric",
       });
     } else {
-      return date.toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      });
+      return `${day}/${month}/${year}`;
     }
   };
 
@@ -136,10 +131,10 @@ const AttendanceTableAdmin = () => {
                 <td className="py-3 px-6 text-center">{data.employeeId}</td>
                 <td className="py-3 px-6 text-center">{data.employeeName}</td>
                 <td className="py-3 px-6 text-center">
-                  {formatDate(`${data.year}-${data.month}-${data.date}`, true)}
+                  {formatDate(data.date, data.month, data.year, true)}
                 </td>
                 <td className="py-3 px-6 text-center">
-                  {formatDate(`${data.year}-${data.month}-${data.date}`, false)}
+                  {formatDate(data.date, data.month, data.year, false)}
                 </td>
                 <td className="py-3 px-6 text-center">{data.clockIn}</td>
                 <td className="py-3 px-6 text-center">{data.clockOut}</td>
@@ -200,4 +195,3 @@ const AttendanceTableAdmin = () => {
 };
 
 export default AttendanceTableAdmin;
-

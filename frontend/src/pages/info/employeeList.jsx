@@ -14,14 +14,8 @@ function ViewEmployeeList() {
     const fetchEmployees = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/employees");
-        const employees = response.data.map(employee => {
-          if (!employee.emailContact) {
-            employee.emailContact = employee.email.email;
-          }
-          return employee;
-        });
 
-        setEmployeeData(employees);
+        setEmployeeData(response.data);
       } catch (error) {
         console.error("Error fetching employees:", error);
       }

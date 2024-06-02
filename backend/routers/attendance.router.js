@@ -16,7 +16,6 @@ router.get("/attendances", authenticateUser, async (req, res) => {
       month: -1,
       date: -1,
     });
-    console.log("Fetched records:", records); // Add this line
     res.json(records);
   } catch (err) {
     console.error("Error fetching attendance records:", err);
