@@ -20,28 +20,77 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(
   process.env.CONNECTION_STRING
 );
 const containerClient = blobServiceClient.getContainerClient("profilepic");
+const containerClientEdu = blobServiceClient.getContainerClient("edu");
+const containerClientSkills = blobServiceClient.getContainerClient("skills");
+const containerClientAwards = blobServiceClient.getContainerClient("awards");
 
-router.post('/:id/profile-pic', upload.single("file"), async (req, res) => {
+router.post('/:id/upload', upload.fields([
+  { name: 'profilePic', maxCount: 1 }, 
+  { name: 'eduDoc', maxCount: 1 }, 
+  { name: 'skillsDoc', maxCount: 1 },
+  { name: 'awardsDoc', maxCount: 1 }, 
+]), async (req, res) => {
   try {
-    const { file } = req;
-    let fileUrl;
+    const { profilePic, eduDoc, skillsDoc, awardsDoc } = req.files;
 
-    if (!file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+    let profilePicURL;
+    if (profilePic && profilePic.length > 0) {
+      const profilePicBlobName = Date.now() + "-" + profilePic[0].originalname;
+      const profilePicBlockBlobClient = containerClient.getBlockBlobClient(profilePicBlobName);
+      await profilePicBlockBlobClient.uploadData(profilePic[0].buffer, {
+        blobHTTPHeaders: {
+          blobContentType: profilePic[0].mimetype,
+        },
+      });
+      profilePicURL = profilePicBlockBlobClient.url;
     }
 
-    const blobName = Date.now() + "-" + file.originalname;
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    await blockBlobClient.uploadData(file.buffer, {
-      blobHTTPHeaders: {
-        blobContentType: file.mimetype,
-      },
-    });
-    fileUrl = blockBlobClient.url;
+    let eduDocURL;
+    if (eduDoc && eduDoc.length > 0) {
+      const eduDocBlobName = Date.now() + "-" + eduDoc[0].originalname;
+      const eduDocBlockBlobClient = containerClientEdu.getBlockBlobClient(eduDocBlobName);
+      await eduDocBlockBlobClient.uploadData(eduDoc[0].buffer, {
+        blobHTTPHeaders: {
+          blobContentType: eduDoc[0].mimetype,
+        },
+      });
+      eduDocURL = eduDocBlockBlobClient.url;
+    }
+
+    let skillsDocURL;
+    if (skillsDoc && skillsDoc.length > 0) {
+      const skillsDocBlobName = Date.now() + "-" + skillsDoc[0].originalname;
+      const skillsDocBlockBlobClient = containerClientSkills.getBlockBlobClient(skillsDocBlobName);
+      await skillsDocBlockBlobClient.uploadData(skillsDoc[0].buffer, {
+        blobHTTPHeaders: {
+          blobContentType: skillsDoc[0].mimetype,
+        },
+      });
+      skillsDocURL = skillsDocBlockBlobClient.url;
+    }
+
+    let awardsDocURL;
+    if (awardsDoc && awardsDoc.length > 0) {
+      const awardsDocBlobName = Date.now() + "-" + awardsDoc[0].originalname;
+      const awardsDocBlockBlobClient = containerClientAwards.getBlockBlobClient(awardsDocBlobName);
+      await awardsDocBlockBlobClient.uploadData(awardsDoc[0].buffer, {
+        blobHTTPHeaders: {
+          blobContentType: awardsDoc[0].mimetype,
+        },
+      });
+      awardsDocURL = awardsDocBlockBlobClient.url;
+    }
 
     const updatedEmployee = await Employee.findOneAndUpdate(
       { id: req.params.id },
-      { $set: { profilePicURL: fileUrl } }, // Update the profilePicURL
+      {
+        $set: {
+          profilePicURL,
+          eduDocURL,
+          skillsDocURL,
+          awardsDocURL
+        },
+      },
       { new: true }
     );
 
@@ -51,7 +100,7 @@ router.post('/:id/profile-pic', upload.single("file"), async (req, res) => {
 
     res.json(updatedEmployee);
   } catch (err) {
-    console.error("Error uploading file:", err);
+    console.error("Error uploading files:", err);
     res.status(500).json({ message: err.message });
   }
 });

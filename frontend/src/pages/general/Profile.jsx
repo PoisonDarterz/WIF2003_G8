@@ -19,7 +19,7 @@ const Profile = () => {
                 });
 
                 const formattedData = {
-                    id: `#${response.data.id}`,
+                    id: `${response.data.id}`,
                     name: response.data.name,
                     profilePicURL: response.data.profilePicURL
                 };
@@ -66,11 +66,11 @@ const Profile = () => {
                         </div>
                         <div className="border-b border-black pb-5"></div>
                         <div className="flex justify-center"> 
-                            <Link to="/info/viewProfile" className="mt-5 text-indigo-600 font-semibold hover:underline">View Profile</Link>
+                            <Link to={`/info/viewProfile/${user.id}`} className="mt-5 text-indigo-600 font-semibold hover:underline">View Profile</Link>
                         </div>
                         <div className="border-b border-black pb-5"></div>
                         <div className="flex justify-center"> 
-                            <Link to="/info/editMyProfile" className="mt-5 text-indigo-600 font-semibold hover:underline">Edit Profile</Link>
+                            <Link to={`/info/editMyProfile/${user.id}`} className="mt-5 text-indigo-600 font-semibold hover:underline">Edit Profile</Link>
                         </div>
                         <div className="border-b border-black pb-5"></div>
                         <div className="flex justify-center"> 

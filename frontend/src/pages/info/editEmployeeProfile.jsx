@@ -21,13 +21,16 @@ export default function EditEmployeeProfile() {
     awards: [],
     emailContact: "",
   });  
-  const [allEmployeeData, setAllEmployeeData] = useState(null);
-  const [departments, setDepartments] = useState([]);
+  const [roleData, setRoleData] = useState(null);
+  const [department, setDepartment] = useState([]);
   const [jobTitles, setJobTitles] = useState([]);
   const [educationList, setEducationList] = useState([]);
   const [skillsList, setSkillsList] = useState([]);
   const [awardsList, setAwardsList] = useState([]);
   const [profilePic, setProfilePic] = useState("");
+  const [eduDoc, setEduDoc] = useState("");
+  const [skillsDoc, setSkillsDoc] = useState("");
+  const [awardsDoc, setAwardsDoc] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [editIndex, setEditIndex] = useState(null);
   const [editType, setEditType] = useState("");
@@ -37,19 +40,14 @@ export default function EditEmployeeProfile() {
       try {
         setIsLoading(true);  
         // Fetch employee data
-        const allEmployeeResponse = await axios.get(`http://localhost:5000/api/employees`);
+        const roleResponse = await axios.get(`http://localhost:5000/api/roles`);
         const employeeResponse = await axios.get(`http://localhost:5000/api/employees/${id}`);
         
-        const employee = employeeResponse.data;
-        if (!employee.emailContact) {
-          employee.emailContact = employee.email.email;
-        }
-
-        setEmployeeData(employee);
-        setAllEmployeeData(allEmployeeResponse.data);
-        const eduData = employee.edu.map(edu => ({ ...edu, confirmed: true }));
-        const skillsData = employee.skills.map(skill => ({ ...skill, confirmed: true }));
-        const awardsData = employee.awards.map(award => ({ ...award, confirmed: true }));
+        setRoleData(roleResponse.data);
+        setEmployeeData(employeeResponse.data);
+        const eduData = employeeResponse.data.edu.map(edu => ({ ...edu, confirmed: true }));
+        const skillsData = employeeResponse.data.skills.map(skill => ({ ...skill, confirmed: true }));
+        const awardsData = employeeResponse.data.awards.map(award => ({ ...award, confirmed: true }));
 
         setEducationList(eduData);
         setSkillsList(skillsData);
@@ -66,37 +64,28 @@ export default function EditEmployeeProfile() {
   
   useEffect(() => {
     // Extract unique department names and job titles
-    if (allEmployeeData) {
-      const uniqueDepartments = [];
+    if (roleData) {
       const uniqueJobTitles = [];
   
-      allEmployeeData.forEach((employee) => {
-        // Check if the department is already in the array
-        const departmentExists = uniqueDepartments.find(department => department._id === employee.roleId.departmentId._id);
-        if (!departmentExists) {
-          uniqueDepartments.push(employee.roleId.departmentId);
-        }
-  
+      roleData.forEach((role) => {
         // Check if the job title is already in the array
-        const jobTitleExists = uniqueJobTitles.find(role => role._id === employee.roleId._id);
+        const jobTitleExists = uniqueJobTitles.find(job => job._id === role._id);
         if (!jobTitleExists) {
-          uniqueJobTitles.push(employee.roleId);
+          uniqueJobTitles.push(role);
         }
       });
   
-      setDepartments(uniqueDepartments);
       setJobTitles(uniqueJobTitles);
     }
-  }, [allEmployeeData]);
-
-
-  const uploadProfilePic = async () => {
+  }, [roleData]);
+  
+  const uploadDocument = async (documentType, documentFile) => {
     try {
       const formData = new FormData();
-      formData.append("file", profilePic);
+      formData.append("file", documentFile);
   
       const uploadResponse = await axios.post(
-        `http://localhost:5000/api/employees/${id}/profile-pic`,
+        `http://localhost:5000/api/employees/${id}/upload`,
         formData,
         {
           headers: {
@@ -106,83 +95,88 @@ export default function EditEmployeeProfile() {
       );
   
       if (uploadResponse.status === 200) {
-        console.log("Profile picture uploaded successfully");
+        console.log(`${documentType} document uploaded successfully`);
   
-        // Assuming `uploadResponse.data` contains the URL of the uploaded profile picture
-        const profilePicURL = uploadResponse.data.profilePicURL;
+        const documentURL = uploadResponse.data[`${documentType}URL`];
   
-        // Update employeeData state with the returned profile picture URL
-        setEmployeeData((prevData) => ({
-          ...prevData,
-          profilePicURL: profilePicURL, // Make sure this matches the key in the response
-        }));
-        
-        return profilePicURL; // Return the URL
+        return documentURL; 
       } else {
-        console.error("Profile picture upload failed");
+        console.error(`${documentType} document upload failed`);
         return null;
       }
     } catch (error) {
-      console.error("Error uploading profile picture:", error);
+      console.error(`Error uploading ${documentType} document:`, error);
       return null;
     }
   };
+  
 
-  const updateProfile = async () => {
+  const updateProfile = async (profilePicURL) => {
     try {
-      // Check if there's a new profilePicURL to update
-      let updatedEmployeeData = { ...employeeData };
-      if (profilePic) {
-        // If a new profile picture was uploaded, upload it first and get the URL
-        const profilePicURL = await uploadProfilePic();
-        if (profilePicURL) {
-          // If the upload was successful, update the profilePicURL in the employee data
-          updatedEmployeeData = {
-            ...updatedEmployeeData,
-            profilePicURL: profilePicURL,
-          };
-        } else {
-          // If the upload failed, return and don't proceed with the update
-          console.error("Error uploading profile picture");
-          return false;
-        }
-      }
-  
-      // Update other profile information
-      updatedEmployeeData = {
-        ...updatedEmployeeData,
-        edu: educationList,
-        skills: skillsList,
-        awards: awardsList,
-      };
-  
-      const updateResponse = await axios.put(
-        `http://localhost:5000/api/employees/${id}`,
-        updatedEmployeeData
-      );
-  
-      console.log("Profile updated successfully", updateResponse.data);
-      return true;
+        // Update other profile information
+        let updatedEmployeeData = {
+            ...employeeData,
+            profilePicURL: profilePicURL || employeeData.profilePicURL,
+            edu: educationList.filter(edu => edu.confirmed),
+            skills: skillsList.filter(skill => skill.confirmed),
+            awards: awardsList.filter(award => award.confirmed),
+        };
+
+        const updateResponse = await axios.put(
+            `http://localhost:5000/api/employees/${id}`,
+            updatedEmployeeData
+        );
+
+        console.log("Profile updated successfully", updateResponse.data);
+        return true;
     } catch (error) {
-      console.error("Error updating profile:", error);
-      return false;
+        console.error("Error updating profile:", error);
+        return false;
     }
-  };
+};
 
   
 const saveProfile = async (e) => {
   e.preventDefault();
   try {
-    const profilePicURL = await uploadProfilePic();
-    if (profilePicURL !== null) {
-      // Update the profilePicURL in the state
-      setEmployeeData((prevData) => ({
-        ...prevData,
-        profilePicURL: profilePicURL,
-      }));
+    let profilePicURL = null;
+    let eduDocURL = null;
+    let skillsDocURL = null;
+    let awardsDocURL = null;
+
+    if (profilePic) {
+      profilePicURL = await uploadDocument('profile', profilePic);
+      if (profilePicURL === null) {
+        console.error("Error uploading profile picture");
+        return;
+      }
     }
 
-    const success = await updateProfile();
+    if (eduDoc) {
+      eduDocURL = await uploadDocument('edu', eduDoc);
+      if (eduDocURL === null) {
+        console.error("Error uploading educational document");
+        return;
+      }
+    }
+
+    if (skillsDoc) {
+      skillsDocURL = await uploadDocument('skills', skillsDoc);
+      if (skillsDocURL === null) {
+        console.error("Error uploading skills document");
+        return;
+      }
+    }
+
+    if (awardsDoc) {
+      awardsDocURL = await uploadDocument('awards', awardsDoc);
+      if (awardsDocURL === null) {
+        console.error("Error uploading awards document");
+        return;
+      }
+    }
+
+    const success = await updateProfile(profilePicURL, eduDocURL, skillsDocURL, awardsDocURL);
     if (success) {
       navigate(`/info/viewProfile/${id}`);
     } else {
@@ -193,7 +187,6 @@ const saveProfile = async (e) => {
   }
 };
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (value !== null) { 
@@ -201,10 +194,31 @@ const saveProfile = async (e) => {
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e, fileType) => {
     const file = e.target.files[0];
-    setProfilePic(file);
+    if (!file) {
+      console.error("No file selected.");
+      return;
+    }
+    switch (fileType) {
+      case 'profilePic':
+        setProfilePic(file);
+        break;
+      case 'eduDoc':
+        setEduDoc(file);
+        break;
+      case 'skillsDoc':
+        setSkillsDoc(file);
+        break;
+      case 'awardsDoc':
+        setAwardsDoc(file);
+        break;
+      default:
+        console.error("Invalid file type.");
+        break;
+    }
   };
+  
 
   const handleAddEducation = () => {
     setEducationList([...educationList, { eduTitle: '', eduDesc: '', eduDocURL: '', confirmed: false }]);
@@ -260,33 +274,17 @@ const saveProfile = async (e) => {
     listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
   };
 
-  const handleDepartmentChange = (e) => {
-    const selectedDepartmentId = e.target.value;
-    const selectedDepartment = departments.find(department => department._id === selectedDepartmentId);
-
-    if (selectedDepartment) {
+  const handleJobTitleChange = (e) => {
+    const selectedJobTitleId = e.target.value;
+    const selectedJobTitle = jobTitles.find(jobTitle => jobTitle._id === selectedJobTitleId);
+    if (selectedJobTitle) {
         setEmployeeData(prevState => ({
             ...prevState,
-            roleId: {
-                ...prevState.roleId,
-                departmentId: selectedDepartment
-            }
+            roleId: selectedJobTitle            
         }));
-        }
-    };
-
-    const handleJobTitleChange = (e) => {
-        const selectedJobTitleId = e.target.value;
-        const selectedJobTitle = jobTitles.find(jobTitle => jobTitle._id === selectedJobTitleId);
-
-        if (selectedJobTitle) {
-            setEmployeeData(prevState => ({
-                ...prevState,
-                roleId: selectedJobTitle
-            }));
-        }
-    };
-
+        setDepartment(selectedJobTitle.departmentId.departmentName);
+    }
+  };
 
   if (isLoading) { 
     return <div>Loading...</div>;
@@ -310,7 +308,7 @@ const saveProfile = async (e) => {
             <img className="h-48 w-36 mr-4 rounded-lg" src={profilePic || employeeData.profilePicURL || "/Profile_image.jpg"} alt="Profile Picture" />
               <label htmlFor="profilePic" className="text-black">
                 Change Photo
-                <input type="file" id="profilePic" onChange={handleFileChange}/>
+                <input type="file" id="profilePic" onChange={(e) => handleFileChange(e, 'profilePic')}/>
               </label>
             </div>
             {/* Input for employee ID */}
@@ -340,16 +338,16 @@ const saveProfile = async (e) => {
             />
 
             {/* Input for email */}
-            <label htmlFor="email" className="mt-5 block text-md font-medium leading-6 text-gray-900">
+            <label htmlFor="emailContact" className="mt-5 block text-md font-medium leading-6 text-gray-900">
                 Email Address
             </label>
             <input
-                id="email"
-                name="email"
+                id="emailContact"
+                name="emailContact"
                 type="email"
                 value={employeeData.emailContact}
                 onChange={handleInputChange}
-                autoComplete="email"
+                autoComplete="emailContact"
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
 
@@ -366,26 +364,6 @@ const saveProfile = async (e) => {
                 onChange={handleInputChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
-        {/* Department dropdown */}
-        <div>
-            <label htmlFor="department" className="mt-5 block text-md font-medium leading-6 text-gray-900">
-              Department
-            </label>
-            <select
-              id="department"
-              name="department"
-              value={employeeData.roleId.departmentId._id}
-              onChange={handleDepartmentChange}
-              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            >
-              <option value="">Select Department</option>
-              {departments.map((dept) => (
-                <option key={dept._id} value={dept._id}>
-                  {dept.departmentName}
-                </option>
-              ))}
-            </select>
-          </div>
 
           {/* Job title dropdown */}
           <div>
@@ -408,15 +386,28 @@ const saveProfile = async (e) => {
             </select>
           </div>
 
+          {/* Department dropdown */}
+          <div>
+              <label htmlFor="departmentName" className="mt-5 block text-md font-medium leading-6 text-gray-900">
+                Department
+              </label>
+              <div
+                id="departmentName"
+                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+              >
+                {employeeData.roleId.departmentId.departmentName || department}
+              </div>
+            </div>
+
           {/* Input for join date */}
-            <label htmlFor="joinDate" className="mt-5 block text-md font-medium leading-6 text-gray-900">
+            <label htmlFor="joinedSince" className="mt-5 block text-md font-medium leading-6 text-gray-900">
                 Joined Since
             </label>
             <input
-                id="joinDate"
-                name="joinDate"
+                id="joinedSince"
+                name="joinedSince"
                 type="date"
-                value={employeeData.joinedSince.split("T")[0]}
+                value={employeeData.joinedSince ? employeeData.joinedSince.split("T")[0] : ''}
                 onChange={handleInputChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
@@ -460,11 +451,8 @@ const saveProfile = async (e) => {
                         placeholder="Description"
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
-                      <input
-                        type="file"
-                        id={`eduEvidence${index}`}
-                        name={`eduEvidence${index}`}
-                      />
+                      <input type="file" onChange={(e) => handleFileChange(e, 'eduDoc')} />
+
                       <div className="flex justify-center gap-10 items-center">
                         <button type="button" onClick={() => handleConfirmItem(index, educationList)} className="text-indigo-600">Confirm</button>
                         {/* <button type="button" onClick={handleCancelEditSection} className="text-red-500">Cancel</button> */}
@@ -518,11 +506,8 @@ const saveProfile = async (e) => {
                         placeholder="Description"
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
-                      <input
-                        type="file"
-                        id={`skillsEvidence${index}`}
-                        name={`skillsEvidence${index}`}
-                      />
+                      <input type="file" onChange={(e) => handleFileChange(e, 'skillsDoc')} />
+
                       <div className="flex justify-center gap-10 items-center">
                         <button type="button" onClick={() => handleConfirmItem(index, skillsList)} className="text-indigo-600">Confirm</button>
                         {/* <button type="button" onClick={handleCancelEditSection} className="text-red-500">Cancel</button> */}
@@ -575,11 +560,8 @@ const saveProfile = async (e) => {
                         placeholder="Description"
                         className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
-                      <input
-                        type="file"
-                        id={`awardsDocURL${index}`}
-                        name={`awardsDocURL${index}`}
-                      />
+                      <input type="file" onChange={(e) => handleFileChange(e, 'awardsDoc')} />
+
                       <div className="flex justify-center gap-10 items-center">
                         <button type="button" onClick={() => handleConfirmItem(index, awardsList)} className="text-indigo-600">Confirm</button>
                         {/* <button type="button" onClick={handleCancelEditSection} className="text-red-500">Cancel</button> */}
