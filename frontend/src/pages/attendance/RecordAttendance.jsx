@@ -25,9 +25,10 @@ const RecordAttendance = () => {
 
   const handleClockIn = async () => {
     try {
+      const employeeID = localStorage.getItem("employeeID");
       const response = await axios.post(
         "http://localhost:5000/api/attendance/clockin",
-        { reason: reason },
+        { reason: reason, employeeID: employeeID },
         { withCredentials: true }
       );
 
@@ -55,11 +56,11 @@ const RecordAttendance = () => {
 
   const handleClockOut = async () => {
     try {
+      const employeeID = localStorage.getItem("employeeID");
       const response = await axios.post(
         "http://localhost:5000/api/attendance/clockout",
-        {
-          withCredentials: true,
-        }
+        { employeeID: employeeID },
+        { withCredentials: true }
       );
       console.log("Clock-out successful:", response.data);
     } catch (error) {
@@ -76,9 +77,10 @@ const RecordAttendance = () => {
     setShowDialog(false);
     setReasonError(false);
     try {
+      const employeeID = localStorage.getItem("employeeID");
       const response = await axios.post(
         "http://localhost:5000/api/attendance/clockin",
-        { reason: reason },
+        { reason: reason, employeeID: employeeID },
         { withCredentials: true }
       );
       console.log("Reason submitted successfully:", response.data);

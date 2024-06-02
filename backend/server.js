@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "../.env" }); // Add this line at the top
+require("dotenv").config({ path: "../.env" }); 
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -14,6 +14,7 @@ const communityRouter = require("./routers/community.router");
 const attendanceRouter = require("./routers/attendance.router");
 const leaveRouter = require("./routers/leave.router");
 const roleRouter = require("./routers/role.router");
+const ticketRouter = require("./routers/ticket.router");
 
 
 // Connect to MongoDB Atlas database
@@ -51,6 +52,7 @@ app.use("/api/community", communityRouter);
 app.use("/api/attendance", attendanceRouter);
 app.use("/api/leave", leaveRouter);
 app.use("/api/roles", roleRouter);
+app.use("/api/tickets", ticketRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -1,43 +1,46 @@
 import TopNavBlack from "../../components/TopNavBlack"
 import { useNavigate} from 'react-router-dom';
+import {useState,useEffect} from 'react'
+import axios from "axios";
 
 function MyTickets(){
-  const tickets=[
-    {
-      ticketID:"T006",
-      reportDate:"13 April 2024",
-      reportTime:"2:45pm",
-      category:"Financial Misconduct",
-      subject:"Unauthorized Expenses Claims",
-      assignedInvestigator:"-",
-      status:"pending",
-      employeeID:"E1001",
-      employeeName:"qihan",
-      detail:"I have observed several instances where expense claims from XXX have been submitted without proper authorization or for expenses that do not align with company policy. These unauthorized claims not only raise concerns about financial transparency but also create an unfair advantage for those submitting them. It's crucial to investigate and address these instances promptly to uphold the integrity of our expense reimbursement process and ensure fair treatment for all employees.",
-      attachment:null,
-      investigationUpdate:"After conducting a thorough investigation, we have not found any evidence to support the allegations of financial misconduct. Our team carefully reviewed the financial records and conducted interviews as part of the investigation process. We take all reports seriously and appreciate your diligence in bringing this matter to our attention.While the investigation did not uncover any instances of financial misconduct, we remain committed to upholding the highest standards of integrity and transparency in our financial practices. Should you have any further concerns or questions, please do not hesitate to reach out to us.",    
-    },
+  const [tickets,setTickets]=useState([])
+  // const tickets=[
+  //   {
+  //     ticketID:"T006",
+  //     reportDate:"13 April 2024",
+  //     reportTime:"2:45pm",
+  //     category:"Financial Misconduct",
+  //     subject:"Unauthorized Expenses Claims",
+  //     assignedInvestigator:"-",
+  //     status:"pending",
+  //     employeeID:"E1001",
+  //     employeeName:"qihan",
+  //     detail:"I have observed several instances where expense claims from XXX have been submitted without proper authorization or for expenses that do not align with company policy. These unauthorized claims not only raise concerns about financial transparency but also create an unfair advantage for those submitting them. It's crucial to investigate and address these instances promptly to uphold the integrity of our expense reimbursement process and ensure fair treatment for all employees.",
+  //     attachment:null,
+  //     investigationUpdate:"After conducting a thorough investigation, we have not found any evidence to support the allegations of financial misconduct. Our team carefully reviewed the financial records and conducted interviews as part of the investigation process. We take all reports seriously and appreciate your diligence in bringing this matter to our attention.While the investigation did not uncover any instances of financial misconduct, we remain committed to upholding the highest standards of integrity and transparency in our financial practices. Should you have any further concerns or questions, please do not hesitate to reach out to us.",    
+  //   },
 
-    {
-      ticketID:"T002",
-      reportDate:"4 August 2023",
-      reportTime:"4:45pm",
-      category:"Workplace harassment",
-      subject:"Inappropriate Behavior by Colleague",
-      assignedInvestigator:"James",
-      status:"resolved",
+  //   {
+  //     ticketID:"T002",
+  //     reportDate:"4 August 2023",
+  //     reportTime:"4:45pm",
+  //     category:"Workplace harassment",
+  //     subject:"Inappropriate Behavior by Colleague",
+  //     assignedInvestigator:"James",
+  //     status:"resolved",
 
-    },
-    {
-      ticketID:"T001",
-      reportDate:"26 Mac 2023",
-      reportTime:"10:49am",
-      category:"Financial Misconduct",
-      subject:"Misuse of Company Funds",
-      assignedInvestigator:"Hui Min",
-      status:"resolved"
-    },
-  ]
+  //   },
+  //   {
+  //     ticketID:"T001",
+  //     reportDate:"26 Mac 2023",
+  //     reportTime:"10:49am",
+  //     category:"Financial Misconduct",
+  //     subject:"Misuse of Company Funds",
+  //     assignedInvestigator:"Hui Min",
+  //     status:"resolved"
+  //   },
+  // ]
   const navigate=useNavigate();
 
   const handleViewTicket=(i)=>{
@@ -48,6 +51,17 @@ function MyTickets(){
   const handleAddTicket=()=>{
     navigate("/helpdesk/addNewTicket")
   }
+
+  useEffect(()=>{
+    const fetchTickets=async()=>{
+      const response = await axios.get("http://localhost:5000/api/tickets/myTickets", {
+        withCredentials: true,
+      });
+      console.log("MyTicket Response:",response.data);
+      setTickets(response.data);
+    }
+    fetchTickets();
+  },[])
 
     return(
         <div className="p-8">
