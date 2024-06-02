@@ -5,6 +5,7 @@ const {
   authenticateUser,
   checkRole,
 } = require("../middlewares/auth.middleware");
+const Employee = require('../models/employee.model');
 
 router.get("/attendances", authenticateUser, async (req, res) => {
   try {
@@ -129,20 +130,43 @@ router.post(
 // Endpoint to fetch all attendance records with pagination
 router.get("/all", authenticateUser, checkRole("Admin"), async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const records = await Attendance.find()
-      .sort({ year: -1, month: -1, date: -1 })
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit));
+    // Find all attendance records
+    const attendanceList = await Attendance.find().sort({
+      year: -1,
+      month: -1,
+      date: -1,
+    });;
 
-    const totalRecords = await Attendance.countDocuments();
-    res.json({
-      records,
-      totalPages: Math.ceil(totalRecords / limit),
-      currentPage: parseInt(page),
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    // Create an array to store formatted attendance data
+    const formattedAttendanceList = [];
+
+    // Iterate through each attendance record
+    for (const attendance of attendanceList) {
+      // Find the corresponding employee based on employeeId
+      const employee = await Employee.findOne({ id: attendance.employeeId });
+
+      // If employee exists, format the data and push to formattedAttendanceList
+      if (employee) {
+        const formattedAttendance = {
+          employeeName: employee.name, // Include employee name
+          employeeId: attendance.employeeId,
+          month:attendance.month,
+          date: attendance.date,
+          year:attendance.year,
+          clockIn: attendance.clockIn,
+          clockOut: attendance.clockOut,
+          status: attendance.status,
+          reason: attendance.reason,
+        };
+        formattedAttendanceList.push(formattedAttendance);
+      }
+    }
+
+    // Send the formatted attendance list as response
+    res.json(formattedAttendanceList);
+  } catch (error) {
+    console.error('Error fetching attendance:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

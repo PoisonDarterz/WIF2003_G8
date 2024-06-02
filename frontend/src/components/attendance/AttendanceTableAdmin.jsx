@@ -9,39 +9,47 @@ const AttendanceTableAdmin = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [selectedDate, setSelectedDate] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
-  const [totalPages, setTotalPages] = useState(0);
+  
   const [selectedAttendance, setSelectedAttendance] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchAttendanceData = async () => {
+    const fetchData = async () => {
       try {
         const response = await axios.get(
           "http://localhost:5000/api/attendance/all",
-          {
-            params: { page: currentPage, limit: entriesPerPage },
-            withCredentials: true,
-          }
+          { withCredentials: true }
         );
-        const { records, totalPages } = response.data;
-        setAttendanceData(records);
-        setTotalPages(totalPages);
+        console.log("Fetched data:", response.data);
+        setAttendanceData(response.data);
       } catch (error) {
-        console.error("Error fetching attendance data:", error);
+        console.error("Error fetching data:", error);
+        setError("Error fetching data. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchAttendanceData();
-  }, [currentPage, entriesPerPage]);
+    fetchData();
+  }, []);
 
-  const filteredData = attendanceData.filter((data) => {
-    if (selectedDate) {
-      const selectedMonth = selectedDate.getMonth() + 1;
-      const selectedYear = selectedDate.getFullYear();
-      return data.month === selectedMonth && data.year === selectedYear;
-    }
-    return true;
-  });
+  const filteredData = selectedDate
+    ? attendanceData.filter((data) => {
+        const selectedMonth = selectedDate.getMonth() + 1;
+        const selectedYear = selectedDate.getFullYear();
+        return data.month === selectedMonth && data.year === selectedYear;
+      })
+    : attendanceData;
+
+  const indexOfLastEntry = currentPage * entriesPerPage;
+  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
+  const currentEntries = filteredData.slice(
+    indexOfFirstEntry,
+    indexOfLastEntry
+  );
+  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -59,11 +67,20 @@ const AttendanceTableAdmin = () => {
     }
   };
 
-  const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+  const formatDate = (dateString, isMonth) => {
+    const date = new Date(dateString);
+    if (isMonth) {
+      return date.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+    } else {
+      return date.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    }
   };
 
   const handleViewClick = (attendance) => {
@@ -90,49 +107,56 @@ const AttendanceTableAdmin = () => {
           />
         </div>
       </div>
-      <table className="w-full table-auto">
-        <thead>
-          <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-            <th className="py-3 px-6 text-center">Employee ID</th>
-            <th className="py-3 px-6 text-center">Employee Name</th>
-            <th className="py-3 px-6 text-center">Month Issued</th>
-            <th className="py-3 px-6 text-center">Date Issued</th>
-            <th className="py-3 px-6 text-center">Status</th>
-            <th className="py-3 px-6 text-center">View Attendance</th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-600 text-sm font-light">
-          {filteredData.map((data, index) => (
-            <tr
-              key={index}
-              className={`border-b border-gray-200 hover:bg-gray-100 ${
-                index % 2 === 0 ? "bg-white" : "bg-[#EAF3FF]"
-              }`}
-            >
-              <td className="py-3 px-6 text-center">{data.employeeId}</td>
-              <td className="py-3 px-6 text-center">{data.employeeName}</td>
-              <td className="py-3 px-6 text-center">
-                {new Date(data.year, data.month - 1).toLocaleString("default", {
-                  month: "long",
-                  year: "numeric",
-                })}
-              </td>
-              <td className="py-3 px-6 text-center">
-                {formatDate(new Date(data.year, data.month - 1, data.date))}
-              </td>
-              <td className="py-3 px-6 text-center">{data.status}</td>
-              <td className="py-3 px-6 text-center">
-                <button
-                  className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-                  onClick={() => handleViewClick(data)}
-                >
-                  View
-                </button>
-              </td>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        <table className="w-full table-auto">
+          <thead>
+            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+              <th className="py-3 px-6 text-center">Employee ID</th>
+              <th className="py-3 px-6 text-center">Employee Name</th>
+              <th className="py-3 px-6 text-center">Month Issued</th>
+              <th className="py-3 px-6 text-center">Date Issued</th>
+              <th className="py-3 px-6 text-center">Clock-in Time</th>
+              <th className="py-3 px-6 text-center">Clock-out Time</th>
+              <th className="py-3 px-6 text-center">Status</th>
+              <th className="py-3 px-6 text-center">View Attendance</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="text-gray-600 text-sm font-light">
+            {currentEntries.map((data, index) => (
+              <tr
+                key={index}
+                className={`border-b border-gray-200 hover:bg-gray-100 ${
+                  index % 2 === 0 ? "bg-white" : "bg-[#EAF3FF]"
+                }`}
+              >
+                <td className="py-3 px-6 text-center">{data.employeeId}</td>
+                <td className="py-3 px-6 text-center">{data.employeeName}</td>
+                <td className="py-3 px-6 text-center">
+                  {formatDate(`${data.year}-${data.month}-${data.date}`, true)}
+                </td>
+                <td className="py-3 px-6 text-center">
+                  {formatDate(`${data.year}-${data.month}-${data.date}`, false)}
+                </td>
+                <td className="py-3 px-6 text-center">{data.clockIn}</td>
+                <td className="py-3 px-6 text-center">{data.clockOut}</td>
+                <td className="py-3 px-6 text-center">{data.status}</td>
+                <td className="py-3 px-6 text-center">
+                  <button
+                    className="bg-[#2C74D8] hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                    onClick={() => handleViewClick(data)}
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       <div className="flex justify-center items-center mt-6">
         <button
           className={`px-4 py-2 text-sm text-white bg-gray-500 rounded ${
@@ -176,3 +200,4 @@ const AttendanceTableAdmin = () => {
 };
 
 export default AttendanceTableAdmin;
+

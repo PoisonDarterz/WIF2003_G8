@@ -6,7 +6,6 @@ const authenticateUser = async (req, res, next) => {
   try {
     // Extract token from cookies
     const token = req.cookies.token;
-    console.log("Token received:", token);
 
     if (!token) {
       return res.status(401).json({ message: "Unauthorized: Missing token" });
