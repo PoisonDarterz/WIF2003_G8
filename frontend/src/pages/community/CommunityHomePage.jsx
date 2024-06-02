@@ -5,6 +5,7 @@ import CommunityCard from '../../components/community/CommunityCard';
 import CommunityPost from '../../components/community/CommunityPost';
 import CommunitySidebar from '../../components/community/CommunitySideBar';
 import CreatePost from '../../components/community/CreatePost';
+import axios from 'axios';
 
 const CommunityHomePage = () => {
     const [posts, setPosts] = useState([
