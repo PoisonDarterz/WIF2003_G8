@@ -74,7 +74,6 @@ function SalaryBox({ openModal, setSalaryDetails }) {
         {key !== 'monthYear' && (
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-md font-semibold capitalize">{key}</h3>
-            {key !== 'basic' && (
               <button
                 style={{ backgroundColor: '#2C74D8', color: '#FFFFFF' }}
                 className="rounded px-4"
@@ -82,7 +81,6 @@ function SalaryBox({ openModal, setSalaryDetails }) {
               >
                 + Add a record
               </button>
-            )}
           </div>
         )}
         {key === 'monthYear' && (
@@ -104,7 +102,6 @@ function SalaryBox({ openModal, setSalaryDetails }) {
                 >
                   Edit
                 </button>
-                {key !== 'basic' && (
                   <button
                     style={{ backgroundColor: '#EB4335', color: '#FFFFFF' }}
                     className="rounded px-4"
@@ -112,7 +109,6 @@ function SalaryBox({ openModal, setSalaryDetails }) {
                   >
                     Remove
                   </button>
-                )}
               </div>
             </div>
           </div>
