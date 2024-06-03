@@ -3,11 +3,11 @@ const router = express.Router();
 const Community = require("../models/community.model");
 const Employee = require("../models/employee.model");
 const mongoose = require("mongoose");
+
 // GET all community posts
 router.get("/posts", async (req, res) => {
   try {
     const communityPosts = await Community.find()
-
     res.json(communityPosts);
   } catch (err) {
     console.error("Error getting community posts:", err);

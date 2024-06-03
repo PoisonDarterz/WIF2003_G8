@@ -46,6 +46,8 @@ import ReviewTicket from "./pages/helpdesk/ReviewTicket";
 import AllEmployeeTickets from "./pages/helpdesk/AllEmployeeTickets";
 import ResolveTicket from "./pages/helpdesk/ResolveTicket";
 import SubmitFeedback from "./pages/helpdesk/SubmitFeedback";
+import MentalHealthArticle from "./pages/community/MentalHealthArticle";
+import TeamBuildingAnnouncement from "./pages/community/TeamBuildingAnnouncement";
 
 function App() {
   return (
@@ -81,7 +83,14 @@ function App() {
           <Route path="/community" element={<CommunityHomePage />} />
           <Route
             path="/community/OfficeInsightsArticle"
-            element={<OfficeInsightsArticle />}
+            element={<OfficeInsightsArticle />} />
+          <Route
+            path="/community/MentalHealthArticle"
+            element={<MentalHealthArticle />}
+          />
+          <Route
+            path="/community/TeamBuildingAnnouncement"
+            element={<TeamBuildingAnnouncement/>}
           />
 
           {/* Helpdesk/Feedback module routes */}

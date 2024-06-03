@@ -43,8 +43,18 @@ const CommunityHomePage = () => {
                             imageUrl='/officeImage.jpg'
                             route="/community/OfficeInsightsArticle"  // <-- Correct route path
                         />
-                        <CommunityCard title="Mental Health" description="5th May 2024" imageUrl='/mentalhealthworkshop.png'/>
-                        <CommunityCard title="Team Building" description="16th May 2024" imageUrl='/teambuildingcard.jpg'/>
+                        <CommunityCard 
+                            title="Mental Health" 
+                            description="5th May 2024" 
+                            imageUrl='/mentalhealthworkshop.png'
+                            route="/community/MentalHealthArticle"
+                        />
+                        <CommunityCard 
+                            title="Team Building" 
+                            description="16th May 2024" 
+                            imageUrl='/teambuildingcard.jpg'
+                            route="/community/TeamBuildingAnnouncement"
+                        />
 
                         {/* Add more cards as needed */}
                     </div>
