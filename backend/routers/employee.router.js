@@ -1,19 +1,17 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const { BlobServiceClient } = require("@azure/storage-blob");
 const storage = multer.memoryStorage();
-const upload = multer({ 
+const upload = multer({
   storage: storage,
-  limits: { fileSize: 1000000 }  // Set file size limit to 1MB
+  limits: { fileSize: 1000000 }, // Set file size limit to 1MB
 });
 
-
-const Employee = require('../models/employee.model');
-const User = require('../models/user.model');
-const Department = require('../models/department.model');
-const Role = require('../models/role.model');
-
+const Employee = require("../models/employee.model");
+const User = require("../models/user.model");
+const Department = require("../models/department.model");
+const Role = require("../models/role.model");
 
 require("dotenv").config();
 
@@ -25,13 +23,13 @@ const containerClientEdu = blobServiceClient.getContainerClient("edu");
 const containerClientSkills = blobServiceClient.getContainerClient("skills");
 const containerClientAwards = blobServiceClient.getContainerClient("awards");
 
-router.post('/:id/profile-pic', upload.single("file"), async (req, res) => {
+router.post("/:id/profile-pic", upload.single("file"), async (req, res) => {
   try {
     const { file } = req;
     let fileUrl;
 
     if (!file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
     const blobName = Date.now() + "-" + file.originalname;
@@ -50,7 +48,7 @@ router.post('/:id/profile-pic', upload.single("file"), async (req, res) => {
     );
 
     if (!updatedEmployee) {
-      return res.status(404).json({ message: 'Employee not found' });
+      return res.status(404).json({ message: "Employee not found" });
     }
 
     res.json(updatedEmployee);
@@ -60,14 +58,14 @@ router.post('/:id/profile-pic', upload.single("file"), async (req, res) => {
   }
 });
 
-router.post('/:id/edu-doc/:eduId', upload.single("file"), async (req, res) => {
+router.post("/:id/edu-doc/:eduId", upload.single("file"), async (req, res) => {
   try {
     const { file } = req;
     const { id, eduId } = req.params;
     let fileUrl;
 
     if (!file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
     const blobName = Date.now() + "-" + file.originalname;
@@ -81,15 +79,17 @@ router.post('/:id/edu-doc/:eduId', upload.single("file"), async (req, res) => {
 
     const updatedEmployee = await Employee.findOneAndUpdate(
       { id, "edu._id": eduId },
-      { $set: { "edu.$.eduDocURL": fileUrl } }, 
+      { $set: { "edu.$.eduDocURL": fileUrl } },
       { new: true }
     );
 
     if (!updatedEmployee) {
-      return res.status(404).json({ message: 'Employee or education document not found' });
+      return res
+        .status(404)
+        .json({ message: "Employee or education document not found" });
     }
 
-    res.json({ eduDocURL: fileUrl }); 
+    res.json({ eduDocURL: fileUrl });
   } catch (err) {
     console.error("Error uploading educational document:", err);
     res.status(500).json({ message: err.message });
@@ -97,139 +97,153 @@ router.post('/:id/edu-doc/:eduId', upload.single("file"), async (req, res) => {
 });
 
 // Upload skill document
-router.post('/:id/skill-doc/:skillsId', upload.single("file"), async (req, res) => {
-  try {
-    const { file } = req;
-    const { id, skillsId } = req.params;
-    let fileUrl;
+router.post(
+  "/:id/skill-doc/:skillsId",
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      const { file } = req;
+      const { id, skillsId } = req.params;
+      let fileUrl;
 
-    if (!file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      if (!file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const blobName = Date.now() + "-" + file.originalname;
+      const blockBlobClient =
+        containerClientSkills.getBlockBlobClient(blobName);
+      await blockBlobClient.uploadData(file.buffer, {
+        blobHTTPHeaders: {
+          blobContentType: file.mimetype,
+        },
+      });
+      fileUrl = blockBlobClient.url;
+
+      const updatedEmployee = await Employee.findOneAndUpdate(
+        { id, "skills._id": skillsId },
+        { $set: { "skills.$.skillsDocURL": fileUrl } },
+        { new: true }
+      );
+
+      if (!updatedEmployee) {
+        return res
+          .status(404)
+          .json({ message: "Employee or skills document not found" });
+      }
+
+      res.json({ skillsDocURL: fileUrl });
+    } catch (err) {
+      console.error("Error uploading skills document:", err);
+      res.status(500).json({ message: err.message });
     }
-
-    const blobName = Date.now() + "-" + file.originalname;
-    const blockBlobClient = containerClientSkills.getBlockBlobClient(blobName);
-    await blockBlobClient.uploadData(file.buffer, {
-      blobHTTPHeaders: {
-        blobContentType: file.mimetype,
-      },
-    });
-    fileUrl = blockBlobClient.url;
-
-    const updatedEmployee = await Employee.findOneAndUpdate(
-      { id, "skills._id": skillsId },
-      { $set: { "skills.$.skillsDocURL": fileUrl } }, 
-      { new: true }
-    );
-
-    if (!updatedEmployee) {
-      return res.status(404).json({ message: 'Employee or skills document not found' });
-    }
-
-    res.json({ skillsDocURL: fileUrl }); 
-  } catch (err) {
-    console.error("Error uploading skills document:", err);
-    res.status(500).json({ message: err.message });
   }
-});
+);
 
 // Upload award document
-router.post('/:id/award-doc/:awardsId', upload.single("file"), async (req, res) => {
-  try {
-    const { file } = req;
-    const { id, awardsId } = req.params;
-    let fileUrl;
+router.post(
+  "/:id/award-doc/:awardsId",
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      const { file } = req;
+      const { id, awardsId } = req.params;
+      let fileUrl;
 
-    if (!file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      if (!file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const blobName = Date.now() + "-" + file.originalname;
+      const blockBlobClient =
+        containerClientAwards.getBlockBlobClient(blobName);
+      await blockBlobClient.uploadData(file.buffer, {
+        blobHTTPHeaders: {
+          blobContentType: file.mimetype,
+        },
+      });
+      fileUrl = blockBlobClient.url;
+
+      const updatedEmployee = await Employee.findOneAndUpdate(
+        { id, "awards._id": awardsId },
+        { $set: { "awards.$.awardsDocURL": fileUrl } },
+        { new: true }
+      );
+
+      if (!updatedEmployee) {
+        return res
+          .status(404)
+          .json({ message: "Employee or award document not found" });
+      }
+
+      res.json({ awardsDocURL: fileUrl });
+    } catch (err) {
+      console.error("Error uploading award document:", err);
+      res.status(500).json({ message: err.message });
     }
-
-    const blobName = Date.now() + "-" + file.originalname;
-    const blockBlobClient = containerClientAwards.getBlockBlobClient(blobName);
-    await blockBlobClient.uploadData(file.buffer, {
-      blobHTTPHeaders: {
-        blobContentType: file.mimetype,
-      },
-    });
-    fileUrl = blockBlobClient.url;
-
-    const updatedEmployee = await Employee.findOneAndUpdate(
-      { id, "awards._id": awardsId },
-      { $set: { "awards.$.awardsDocURL": fileUrl } }, 
-      { new: true }
-    );
-
-    if (!updatedEmployee) {
-      return res.status(404).json({ message: 'Employee or award document not found' });
-    }
-
-    res.json({ awardsDocURL: fileUrl });
-  } catch (err) {
-    console.error("Error uploading award document:", err);
-    res.status(500).json({ message: err.message });
   }
-});
+);
 
 // Get all employees
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-      const employees = await Employee.find().populate([
-        {
-          path: 'email',
-          model: 'User' 
+    const employees = await Employee.find().populate([
+      {
+        path: "email",
+        model: "User",
+      },
+      {
+        path: "roleId",
+        model: "Role",
+        populate: {
+          path: "departmentId",
+          model: "Department",
         },
-        {
-          path: 'roleId',
-          model: 'Role', 
-          populate: {
-            path: 'departmentId',
-            model: 'Department'
-          }
-        }
-      ]); 
-  
-      res.json(employees);
+      },
+    ]);
+
+    res.json(employees);
   } catch (err) {
-      console.log("Error fetching employees:", err); 
-      res.status(500).json({ message: err.message });
+    console.log("Error fetching employees:", err);
+    res.status(500).json({ message: err.message });
   }
 });
 
 // Get employee by custom ID
-router.get('/:id', async (req, res) => {
-    try {
-      const employeeId = req.params.id;  
-      const employee = await Employee.findOne({id: employeeId}).populate([
-        {
-          path: 'email',
-          model: 'User'
+router.get("/:id", async (req, res) => {
+  try {
+    const employeeId = req.params.id;
+    const employee = await Employee.findOne({ id: employeeId }).populate([
+      {
+        path: "email",
+        model: "User",
+      },
+      {
+        path: "roleId",
+        model: "Role",
+        populate: {
+          path: "departmentId",
+          model: "Department",
         },
-        {
-          path: 'roleId',
-          model: 'Role', 
-          populate: {
-            path: 'departmentId',
-            model: 'Department'
-          }
-        },
-        { path: 'edu' },
-        { path: 'skills' },
-        { path: 'awards' }
-      ]); 
-      if (!employee) {
-        return res.status(404).json({ message: 'Employee not found' });
-      }
-
-      res.json(employee); 
-      console.log(`Fetched employee with ID: ${employeeId}`);
-    } catch (err) {
-      console.error("Error fetching employee:", err);
-      res.status(500).json({ message: err.message });
+      },
+      { path: "edu" },
+      { path: "skills" },
+      { path: "awards" },
+    ]);
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
     }
-  });
+
+    res.json(employee);
+    console.log(`Fetched employee with ID: ${employeeId}`);
+  } catch (err) {
+    console.error("Error fetching employee:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // Update employee profile
-router.put('/:id', async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const { edu, skills, awards, profilePicURL, ...employeeData } = req.body; // Ensure profilePicURL is retrieved
 
@@ -239,24 +253,24 @@ router.put('/:id', async (req, res) => {
       { new: true }
     ).populate([
       {
-        path: 'email',
-        model: 'User'
+        path: "email",
+        model: "User",
       },
       {
-        path: 'roleId',
-        model: 'Role',
+        path: "roleId",
+        model: "Role",
         populate: {
-          path: 'departmentId',
-          model: 'Department'
-        }
+          path: "departmentId",
+          model: "Department",
+        },
       },
-      { path: 'edu' },
-      { path: 'skills' },
-      { path: 'awards' }
+      { path: "edu" },
+      { path: "skills" },
+      { path: "awards" },
     ]);
 
     if (!updatedEmployee) {
-      return res.status(404).json({ message: 'Employee not found' });
+      return res.status(404).json({ message: "Employee not found" });
     }
 
     res.json(updatedEmployee);
@@ -265,4 +279,18 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+router.post("/adminsName", async (req, res) => {
+  try {
+    const adminsID = req.body;
+    const adminsName = await Employee.find({
+      id: { $in: adminsID },
+    }).select(["name", "id"]);
+    res.json(adminsName);
+  } catch (error) {
+    console.error("Error fetching admin name:", error);
+    res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;

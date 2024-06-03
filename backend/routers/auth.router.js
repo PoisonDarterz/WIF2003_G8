@@ -73,18 +73,18 @@ router.post("/register", async (req, res) => {
       isVerified: false,
     });
 
-        // Save user to database
-        await user.save();
+    // Save user to database
+    await user.save();
 
-        // Auto create employee data
-        const employee = new Employee({
-            id: employeeID,
-            name: "Update Name",
-            email: user._id,
-            emailContact: email,
-            roleId: "665aa21a2da0bfb2731bdf71"
-        });
-        await employee.save();
+    // Auto create employee data
+    const employee = new Employee({
+      id: employeeID,
+      name: "Update Name",
+      email: user._id,
+      emailContact: email,
+      roleId: "665aa21a2da0bfb2731bdf71",
+    });
+    await employee.save();
 
     // Send verification email
     const mailOptions = {
@@ -330,6 +330,17 @@ router.get("/user-role", authenticateUser, async (req, res) => {
   } catch (error) {
     console.error("Error fetching user role:", error);
     res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// Route to get all adminID
+router.get("/allAdminID", authenticateUser, async (req, res) => {
+  try {
+    const allAdmin = await User.find({ role: "Admin" }).select("employeeID");
+
+    res.json(allAdmin);
+  } catch (error) {
+    console.error("Error fetching all admin ID:", error);
   }
 });
 

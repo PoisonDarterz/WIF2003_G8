@@ -46,8 +46,8 @@ router.post(
         subject: req.body.subject === "" ? "General" : req.body.subject,
         detail: req.body.detail,
         attachment: req.body.attachment,
-        investigatorID: "-",
-        investigationUpdate: "-",
+        investigatorID: "",
+        investigationUpdate: "",
         status: "pending",
       });
       await newTicket
@@ -58,6 +58,25 @@ router.post(
         );
     } catch (error) {
       console.error("Error submitting ticket: ", error);
+    }
+  }
+);
+
+router.put(
+  "/:ticketID",
+  authenticateUser,
+  // checkRole("Admin"),
+  async (req, res) => {
+    const { ticketID } = req.params;
+    const hold = req.body;
+
+    try {
+      const updatedTicket = await Ticket.findByIdAndUpdate(ticketID, hold, {
+        new: true,
+      });
+      res.json(updatedTicket);
+    } catch (error) {
+      console.error("Error updating ticket on database:", error);
     }
   }
 );

@@ -6,7 +6,8 @@ import axios from 'axios'
 function ResolveTicket(){
   const navigate=useNavigate()
   const location=useLocation()
-  const ticket=location.state
+  const hold=location.state
+  const [ticket,setTicket]=useState(hold)
 
   const isoString=ticket.dateTimeCreated;
   const dateTime=new Date(isoString);
@@ -21,8 +22,31 @@ function ResolveTicket(){
   const formattedMinutes = minutes.toString().padStart(2, '0');
 
   const [employeeName,setEmployeeName]=useState("");
+  const [admins,setAdmins]=useState([])
+  const [assignedInvestigatorID,setAssignedInvestigatorID]=useState(ticket.investigatorID)
 
-  const handleSave=()=>{
+  const handleSave=async()=>{
+    //Update to database
+    if(assignedInvestigatorID!==""){
+      ticket.status="in progress"
+      ticket.investigatorID=assignedInvestigatorID
+    }
+    else{
+      ticket.status="pending"
+      ticket.investigatorID=""
+    }
+
+    try{
+      const response=await axios.put(`http://localhost:5000/api/tickets/${ticket._id}`,ticket, {
+        withCredentials: true,
+      })
+      console.log("Updated ticket:",response.data)
+    }catch(error){
+      console.error("Error updating ticket: ",error)
+    }
+
+    console.log("ticket:",ticket)
+
     navigate("/helpdesk/allEmployeeTickets")
   }
 
@@ -38,8 +62,37 @@ function ResolveTicket(){
       console.log("Employee by ID:",response.data);
       setEmployeeName(response.data.name);
     }
+
+    const fetchAllAdminWithID=async()=>{
+
+      try{
+        const response = await axios.get(`http://localhost:5000/api/auth/allAdminID`, {
+          withCredentials: true,
+        });
+        var adminsID=response.data.map((admin)=>(admin.employeeID))
+
+      }catch(error){
+        console.error("Error fetching admin ID:",error)
+      }
+
+      try{
+        const response= await axios.post(`http://localhost:5000/api/employees/adminsName`,adminsID);
+        setAdmins(response.data)
+
+      }catch(error){
+        console.log("Error fetching admin name:",error)
+      }
+
+      console.log("admins:",admins)
+
+    }
+
     fetchEmployeeByID();
+    fetchAllAdminWithID();
   },[])
+
+  const admin=admins.find((admin)=>admin.id===ticket.investigatorID)
+  console.log("admin:",admin)
 
     return(
         <div className="p-8">
@@ -81,13 +134,12 @@ function ResolveTicket(){
           </div>
           <div className="flex w-[90%] my-2">
             <div className="font-bold w-[15%] text-left">Assigned Investigator</div>
-            <select id="category" className="w-[75%] border rounded-lg text-left pl-5" >
-                <option value="non">Select</option>
-                <option value="Jonas">Jonas</option>
-                <option value="Ing Zhen">Ing Zhen</option>
-                <option value="James">James</option>
-                <option value="Hui Min">Hui Min</option>
-                <option value="Ching Ying">Ching Ying</option>
+            <select id="category" className="w-[75%] border rounded-lg text-left pl-5" value={assignedInvestigatorID} onChange={(e)=>{setAssignedInvestigatorID(e.target.value)}}>
+                <option value="">Select</option>
+                {admins.map((admin)=>(
+                  <option value={admin.id}>{admin.name}</option>
+                ))}                
+
             </select>
           </div>
           <div className="flex w-[90%] my-2">
@@ -109,6 +161,8 @@ function ResolveTicket(){
                 id="detail"
                 placeholder="Update the investigation process"
                 rows="4"
+                value={ticket.investigationUpdate}
+                onChange={(e)=>{setTicket((prevTicket)=>({...prevTicket,investigationUpdate:e.target.value}))}}
             />
           </div>
           <div className="flex w-[90%] my-2">
@@ -119,9 +173,9 @@ function ResolveTicket(){
                   type="radio"
                   id="resolved"
                   name="status"
-                  value="resolved"
-                  // checked={selectedStatus === 'in progress'}
-                  // onChange={handleStatusChange}
+                  value={ticket.status}
+                  checked={ticket.status === 'resolved'}
+                  onChange={(e)=>{setTicket((prevTicket)=>({...prevTicket,status:"resolved"}));console.log("ticket after resolved clicked:",ticket)}}
                 />
                 Yes
               </label>
@@ -131,9 +185,9 @@ function ResolveTicket(){
                   type="radio"
                   id="in progress"
                   name="status"
-                  value="in progress"
-                  // checked={selectedStatus === 'resolved'}
-                  // onChange={handleStatusChange}
+                  value={ticket.status}
+                  checked={ticket.status ==='pending'||ticket.status ==='in progress'}
+                  onChange={(e)=>{setTicket((prevTicket)=>({...prevTicket,status:ticket.investigatorID===""?"pending":"in progress"}))}}
                 />
                 No
               </label>
