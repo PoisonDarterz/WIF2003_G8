@@ -39,6 +39,7 @@ function AllEmployeeTickets(){
       console.log("Ticket Response:",response.data);
       setAllTickets(response.data);
     }
+
     fetchTickets();
   },[]);
     return(
