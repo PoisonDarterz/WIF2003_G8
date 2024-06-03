@@ -5,7 +5,7 @@ const {
   authenticateUser,
   checkRole,
 } = require("../middlewares/auth.middleware");
-const Employee = require('../models/employee.model');
+const Employee = require("../models/employee.model");
 
 router.get("/attendances", authenticateUser, async (req, res) => {
   try {
@@ -109,16 +109,17 @@ router.post(
         date: today.getDate(),
       });
 
-      if (
-        !todayRecord ||
-        todayRecord.clockOut !== "-" ||
-        todayRecord.status === "Absent"
-      ) {
+      if (!todayRecord || todayRecord.status === "Absent") {
         res.status(400).json({ message: "Please clock in first!" });
+      } else if (todayRecord.clockOut !== "-") {
+        res.status(400).json({ message: "You can't clock out twice a day!" });
       } else {
         todayRecord.clockOut = clockOutTime.toLocaleTimeString();
         const updatedRecord = await todayRecord.save();
-        res.status(200).json(updatedRecord);
+        res.status(200).json({
+          message: `Clock out successful at ${todayRecord.clockOut}!`,
+          record: updatedRecord,
+        });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -134,7 +135,7 @@ router.get("/all", authenticateUser, checkRole("Admin"), async (req, res) => {
       year: -1,
       month: -1,
       date: -1,
-    });;
+    });
 
     // Create an array to store formatted attendance data
     const formattedAttendanceList = [];
@@ -149,9 +150,9 @@ router.get("/all", authenticateUser, checkRole("Admin"), async (req, res) => {
         const formattedAttendance = {
           employeeName: employee.name, // Include employee name
           employeeId: attendance.employeeId,
-          month:attendance.month,
+          month: attendance.month,
           date: attendance.date,
-          year:attendance.year,
+          year: attendance.year,
           clockIn: attendance.clockIn,
           clockOut: attendance.clockOut,
           status: attendance.status,
@@ -164,8 +165,8 @@ router.get("/all", authenticateUser, checkRole("Admin"), async (req, res) => {
     // Send the formatted attendance list as response
     res.json(formattedAttendanceList);
   } catch (error) {
-    console.error('Error fetching attendance:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error fetching attendance:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
