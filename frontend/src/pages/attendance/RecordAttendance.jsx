@@ -11,7 +11,7 @@ import TextField from "@mui/material/TextField";
 
 const RecordAttendance = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [canClockOut, setCanClockOut] = useState(false);
+  const [canClockOut, setCanClockOut] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [reason, setReason] = useState("");
   const [reasonError, setReasonError] = useState(false);
@@ -62,10 +62,14 @@ const RecordAttendance = () => {
         { employeeID: employeeID },
         { withCredentials: true }
       );
-      console.log("Clock-out successful:", response.data);
+      const { message } = response.data;
+      alert(message);
+      setCanClockOut(false);
     } catch (error) {
       console.error("Error clocking out:", error);
-      alert(error.response.data.message);
+      const errorMessage =
+        error.response?.data?.message || "An error occurred during clock-out.";
+      alert(errorMessage);
     }
   };
 
