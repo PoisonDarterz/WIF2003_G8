@@ -14,6 +14,24 @@ const LeaveApplicationForm = () => {
   const [file, setFile] = useState(null);
   const fileInputRef = useRef(null);
 
+  const departments = [
+    "HR Manager",
+    "Software Engineer",
+    "Digital Marketing Specialist",
+    "Marketing Manager",
+    "IT Manager",
+    "Financial Analyst",
+    "Customer Service Manager",
+    "Finance Manager",
+    "Network Administrator",
+    "Customer Support Representative",
+    "Operations Manager",
+    "R&D Manager",
+    "Supply Chain Manager",
+    "Research Scientist",
+    "None",
+  ];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -83,6 +101,7 @@ const LeaveApplicationForm = () => {
               id="employeeName"
               value={employeeName}
               onChange={(e) => setEmployeeName(e.target.value)}
+              placeholder="Enter your name"
               className="w-64 px-3 py-2 border border-gray-300 rounded"
             />
           </div>
@@ -96,6 +115,7 @@ const LeaveApplicationForm = () => {
               id="employeeID"
               value={employeeID}
               onChange={(e) => setEmployeeID(e.target.value)}
+              placeholder="Enter your ID (e.g EMP100)"
               className="w-64 px-3 py-2 border border-gray-300 rounded"
             />
           </div>
@@ -104,13 +124,21 @@ const LeaveApplicationForm = () => {
             <label htmlFor="department" className="block font-bold mb-2">
               Department
             </label>
-            <input
-              type="text"
+            <select
               id="department"
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               className="w-64 px-3 py-2 border border-gray-300 rounded"
-            />
+            >
+              <option value="" disabled>
+                Select your department
+              </option>
+              {departments.map((dept, index) => (
+                <option key={index} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mb-4">

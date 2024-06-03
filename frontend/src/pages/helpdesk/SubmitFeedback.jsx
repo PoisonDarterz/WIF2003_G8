@@ -4,6 +4,7 @@ import Rating from 'react-rating';
 import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStar, FaRegStar } from 'react-icons/fa';
+import axios from 'axios'
 
 function SubmitFeedback(){
   const [rating,setRating]=useState(0);
@@ -23,7 +24,7 @@ function SubmitFeedback(){
     setFeedback(event.target.value);
   }
 
-  const handleSubmit=()=>{
+  const handleSubmit=async()=>{
     navigate('/helpdesk/feedback');
   }
 
