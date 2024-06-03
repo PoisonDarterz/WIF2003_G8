@@ -14,6 +14,7 @@ const User = require('../models/user.model');
 const Department = require('../models/department.model');
 const Role = require('../models/role.model');
 
+
 require("dotenv").config();
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(
@@ -70,7 +71,7 @@ router.post('/:id/edu-doc/:eduId', upload.single("file"), async (req, res) => {
     }
 
     const blobName = Date.now() + "-" + file.originalname;
-    const blockBlobClient = containerClientEdu.getBlockBlobClient(blobName); // Use the educational documents container client
+    const blockBlobClient = containerClientEdu.getBlockBlobClient(blobName);
     await blockBlobClient.uploadData(file.buffer, {
       blobHTTPHeaders: {
         blobContentType: file.mimetype,
@@ -88,9 +89,83 @@ router.post('/:id/edu-doc/:eduId', upload.single("file"), async (req, res) => {
       return res.status(404).json({ message: 'Employee or education document not found' });
     }
 
-    res.json({ eduDocURL: fileUrl }); // Return the URL of the uploaded educational document
+    res.json({ eduDocURL: fileUrl }); 
   } catch (err) {
     console.error("Error uploading educational document:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Upload skill document
+router.post('/:id/skill-doc/:skillsId', upload.single("file"), async (req, res) => {
+  try {
+    const { file } = req;
+    const { id, skillsId } = req.params;
+    let fileUrl;
+
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const blobName = Date.now() + "-" + file.originalname;
+    const blockBlobClient = containerClientSkills.getBlockBlobClient(blobName);
+    await blockBlobClient.uploadData(file.buffer, {
+      blobHTTPHeaders: {
+        blobContentType: file.mimetype,
+      },
+    });
+    fileUrl = blockBlobClient.url;
+
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { id, "skills._id": skillsId },
+      { $set: { "skills.$.skillsDocURL": fileUrl } }, 
+      { new: true }
+    );
+
+    if (!updatedEmployee) {
+      return res.status(404).json({ message: 'Employee or skills document not found' });
+    }
+
+    res.json({ skillsDocURL: fileUrl }); 
+  } catch (err) {
+    console.error("Error uploading skills document:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Upload award document
+router.post('/:id/award-doc/:awardsId', upload.single("file"), async (req, res) => {
+  try {
+    const { file } = req;
+    const { id, awardsId } = req.params;
+    let fileUrl;
+
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const blobName = Date.now() + "-" + file.originalname;
+    const blockBlobClient = containerClientAwards.getBlockBlobClient(blobName);
+    await blockBlobClient.uploadData(file.buffer, {
+      blobHTTPHeaders: {
+        blobContentType: file.mimetype,
+      },
+    });
+    fileUrl = blockBlobClient.url;
+
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { id, "awards._id": awardsId },
+      { $set: { "awards.$.awardsDocURL": fileUrl } }, 
+      { new: true }
+    );
+
+    if (!updatedEmployee) {
+      return res.status(404).json({ message: 'Employee or award document not found' });
+    }
+
+    res.json({ awardsDocURL: fileUrl });
+  } catch (err) {
+    console.error("Error uploading award document:", err);
     res.status(500).json({ message: err.message });
   }
 });
