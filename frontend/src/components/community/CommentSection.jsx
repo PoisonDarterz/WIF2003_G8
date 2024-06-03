@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { FaReply } from 'react-icons/fa'; // Importing FontAwesome icons
 import moment from 'moment';
 
-const CommentSection = ({ comments }) => {
+const CommentSection = ({ postId, comments }) => {
     const [newComments, setNewComments] = useState(Array(comments.length).fill(''));
     const [replyingTo, setReplyingTo] = useState(Array(comments.length).fill(-1));
+    const [newCommentText, setNewCommentText] = useState('');
 
     const handleCommentChange = (e, index) => {
         const updatedComments = [...newComments];
@@ -12,11 +13,53 @@ const CommentSection = ({ comments }) => {
         setNewComments(updatedComments);
     };
 
-    const handleSubmitComment = (index) => {
-        console.log('New comment:', newComments[index]);
-        const updatedComments = [...newComments];
-        updatedComments[index] = ''; // Clear the comment after submitting
-        setNewComments(updatedComments);
+    const handleSubmitComment = async (index) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/community/${postId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ commentText: newComments[index], employeeId: 'currentEmployeeId' })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const updatedPost = await response.json();
+            setNewComments(Array(updatedPost.comments.length).fill(''));
+            // Optionally update the post comments in parent state if passed down as a prop
+        } catch (error) {
+            console.error('Error submitting comment:', error);
+        }
+    };
+
+    const handleNewCommentChange = (e) => {
+        setNewCommentText(e.target.value);
+    };
+
+    const handleNewCommentSubmit = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/community/posts/${postId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ commentText: newCommentText, employeeId: 'currentEmployeeId' })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const updatedPost = await response.json();
+            setNewComments(Array(updatedPost.comments.length).fill(''));
+            setNewCommentText('');
+            // Optionally update the post comments in parent state if passed down as a prop
+        } catch (error) {
+            console.error('Error submitting comment:', error);
+        }
     };
 
     const toggleReply = (index) => {
@@ -89,12 +132,12 @@ const CommentSection = ({ comments }) => {
                 <textarea
                     className="w-full p-2 rounded-md border"
                     placeholder="Write a comment..."
-                    value={newComments[comments.length]}
-                    onChange={(e) => handleCommentChange(e, comments.length)}
+                    value={newCommentText}
+                    onChange={handleNewCommentChange}
                 ></textarea>
                 <button
                     className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                    onClick={() => handleSubmitComment(comments.length)}
+                    onClick={handleNewCommentSubmit}
                 >
                     Submit
                 </button>
