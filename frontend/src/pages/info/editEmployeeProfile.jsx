@@ -34,6 +34,7 @@ export default function EditEmployeeProfile() {
   const [isLoading, setIsLoading] = useState(true);
   const [editIndex, setEditIndex] = useState(null);
   const [editType, setEditType] = useState("");
+  const [profilePicPreview, setProfilePicPreview] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -277,6 +278,11 @@ export default function EditEmployeeProfile() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setProfilePic(file);
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setProfilePicPreview(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    }
   };
   
 
@@ -411,7 +417,7 @@ export default function EditEmployeeProfile() {
           <div className="sm:col-span-1 text-left p-5">
             {/* Profile Picture */}
             <div className="flex items-center">
-            <img className="h-48 w-36 mr-4 rounded-lg" src={profilePic || employeeData.profilePicURL || "/Profile_image.jpg"} alt="Profile Picture" />
+            <img className="h-48 w-36 mr-4 rounded-lg" src={profilePicPreview  || employeeData.profilePicURL || "/Profile_image.jpg"} alt="Profile Picture" />
               <label htmlFor="profilePic" className="text-black">
                 Change Photo
                 <input type="file" id="profilePic" onChange={handleFileChange}/>
