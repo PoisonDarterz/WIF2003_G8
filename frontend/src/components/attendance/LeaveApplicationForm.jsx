@@ -122,7 +122,7 @@ const LeaveApplicationForm = () => {
 
           <div className="mb-4">
             <label htmlFor="department" className="block font-bold mb-2">
-              Department
+              Job Title
             </label>
             <select
               id="department"
@@ -131,7 +131,7 @@ const LeaveApplicationForm = () => {
               className="w-64 px-3 py-2 border border-gray-300 rounded"
             >
               <option value="" disabled>
-                Select your department
+                Select your Job Title
               </option>
               {departments.map((dept, index) => (
                 <option key={index} value={dept}>
