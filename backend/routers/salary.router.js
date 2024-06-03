@@ -19,7 +19,6 @@ const containerClient = blobServiceClient.getContainerClient("salaryslips");
 router.post(
   "/generate-salary",
   authenticateUser,
-  checkRole("Admin"),
   async (req, res) => {
     try {
       console.log("Received request to generate salary");

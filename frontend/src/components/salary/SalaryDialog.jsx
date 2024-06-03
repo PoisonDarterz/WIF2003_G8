@@ -20,6 +20,9 @@ function SalaryDialog({ isOpen, onRequestClose, handleAddRecord, handleEditRecor
     } else {
       handleAddRecord(title, amount, notes);
     }
+    setTitle('');
+    setAmount('');
+    setNotes('');
     onRequestClose();
   };
 

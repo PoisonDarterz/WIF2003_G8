@@ -55,11 +55,17 @@ function ProcessSalary() {
       }));
   
       // Send the data to the server
-      const response = await axios.post("http://localhost:5000/api/salary/generate-salary", data);
+      const response = await axios.post("http://localhost:5000/api/salary/generate-salary", data, { withCredentials: true });
   
-      alert('Salary documents generated and saved successfully');
+      if (response.status === 200) {
+        alert('Salary documents generated and saved successfully');
+        window.location.reload();
+      } else {
+        alert('Failed to generate salary documents');
+      }
     } catch (error) {
       console.error('Failed to generate salary documents:', error);
+      alert('An error occurred while generating salary documents');
     }
   };
   
