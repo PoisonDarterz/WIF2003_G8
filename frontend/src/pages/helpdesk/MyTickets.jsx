@@ -43,8 +43,7 @@ function MyTickets(){
   // ]
   const navigate=useNavigate();
 
-  const handleViewTicket=(i)=>{
-    const ticket=tickets[i]
+  const handleViewTicket=(ticket)=>{
     navigate("/helpdesk/reviewTicket",{state:ticket})
   }
 
@@ -94,17 +93,29 @@ function MyTickets(){
             </tr>
           </thead>
           <tbody className="text-sm font-normal text-gray-700">
-            {tickets.map((data, i) => (
-              <tr onClick={()=>{handleViewTicket(i)}} className={`hover:bg-slate-300 ${i % 2 === 0 ? 'bg-[#fefefe] '  : 'bg-[#eaf3ff] '} px-4 py-2`}>
-                <td className="w-[5%] px-4 py-4">{data.ticketID}</td>
-                <td className="w-[10%] px-4 py-4">{data.reportDate}</td>
-                <td className="w-[10%] px-4 py-4">{data.reportTime}</td>
-                <td className="w-[20%] px-4 py-4">{data.category}</td>
-                <td className="w-[20%] px-4 py-4">{data.subject}</td>
-                <td className="w-[20%] px-4 py-4">{data.assignedInvestigator}</td>
-                <td className="w-[7%] px-4 py-4">{data.status}</td>
+            {tickets.map((ticket, i) => {
+              const isoString=ticket.dateTimeCreated;
+              const dateTime=new Date(isoString);
+              const year = dateTime.getUTCFullYear();
+              const month = dateTime.getUTCMonth() + 1;
+              const day = dateTime.getUTCDate();
+              const formattedMonth = month.toString().padStart(2, '0');
+              const formattedDay = day.toString().padStart(2, '0');
+              const hours = dateTime.getUTCHours();
+              const minutes = dateTime.getUTCMinutes();
+              const formattedHours = hours.toString().padStart(2, '0');
+              const formattedMinutes = minutes.toString().padStart(2, '0');
+              return(
+              <tr onClick={()=>{handleViewTicket(ticket)}} className={`hover:bg-slate-300 ${i % 2 === 0 ? 'bg-[#fefefe] '  : 'bg-[#eaf3ff] '} px-4 py-2`}>
+                <td className="w-[5%] px-4 py-4">{"T"+ticket.ticketID}</td>
+                <td className="w-[10%] px-4 py-4">{formattedDay+"/"+formattedMonth+"/"+year}</td>
+                <td className="w-[10%] px-4 py-4">{formattedHours+":"+formattedMinutes}</td>
+                <td className="w-[20%] px-4 py-4">{ticket.category}</td>
+                <td className="w-[20%] px-4 py-4">{ticket.subject}</td>
+                <td className="w-[20%] px-4 py-4">{ticket.investigatorID}</td>
+                <td className="w-[7%] px-4 py-4">{ticket.status}</td>
               </tr>
-            ))}
+            )})}
           </tbody>
         </table>
         </div>

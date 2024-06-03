@@ -42,13 +42,13 @@ router.post(
         ticketID: req.body.ticketID,
         employeeID: req.user.employeeID,
         dateTimeCreated: req.body.dateTimeCreated,
-        category: req.body.category,
-        subject: req.body.subject,
+        category: req.body.category === "" ? "General" : req.body.category,
+        subject: req.body.subject === "" ? "General" : req.body.subject,
         detail: req.body.detail,
         attachment: req.body.attachment,
-        investigatorID: req.body.investigatorID,
-        investigationUpdate: req.body.investigationUpdate,
-        status: req.body.status,
+        investigatorID: "-",
+        investigationUpdate: "-",
+        status: "pending",
       });
       await newTicket
         .save()

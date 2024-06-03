@@ -15,9 +15,6 @@ function AddNewTicket(){
     subject: "",
     detail: "",
     attachment: "",
-    investigatorID: "",
-    investigationUpdate: "",
-    status: "pending",
   })
   const navigate=useNavigate();
 
@@ -59,6 +56,14 @@ function AddNewTicket(){
     try{
      const response=await axios.post("http://localhost:5000/api/tickets/submitTicket",formData,{withCredentials:true});
      console.log("New ticket submitted succesfully:",response.data)
+     setFormData({
+      ticketID: "007",
+      dateTimeCreated: new Date(),
+      category: "",
+      subject: "",
+      detail: "",
+      attachment: "",
+    })
     }catch(error){
       console.error("Error send request to submit ticket:",error);
     }
