@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaThumbsUp, FaComment } from 'react-icons/fa'; // Importing FontAwesome icons
-import CommentSection from './CommentSection'; // Import your CommentSection component
+import { FaThumbsUp, FaComment } from 'react-icons/fa';
+import CommentSection from './CommentSection';
 import moment from 'moment';
 
 const CommunityPost = ({ postId }) => {
@@ -9,7 +9,7 @@ const CommunityPost = ({ postId }) => {
     const [isCommentsShown, setIsCommentsShown] = useState(false);
 
     useEffect(() => {
-        fetch(`http://localhost:5000/api/community/posts/${postId}`) // replace with your backend URL
+        fetch(`http://localhost:5000/api/community/posts/${postId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -18,7 +18,7 @@ const CommunityPost = ({ postId }) => {
             })
             .then(data => setPost(data))
             .catch(error => console.error('Error fetching post data:', error));
-    }, [postId]);
+    }, [post]);
 
     const toggleLike = () => setIsLiked(!isLiked);
     const toggleComments = () => setIsCommentsShown(!isCommentsShown);
@@ -56,9 +56,10 @@ const CommunityPost = ({ postId }) => {
                     <FaComment className="mr-2" /> {post.comments.length} Comments
                 </button>
             </div>
-            {isCommentsShown && <CommentSection comments={post.comments} />}
+            {isCommentsShown && <CommentSection postId={postId} comments={post.comments} />}
         </div>
     );
 };
 
 export default CommunityPost;
+
