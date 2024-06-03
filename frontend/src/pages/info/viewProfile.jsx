@@ -3,12 +3,20 @@ import TopNavBlack from "../../components/TopNavBlack";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 
+const getCurrentUser = () => {
+  const role = localStorage.getItem('role');
+  const employeeID = localStorage.getItem('employeeID');
+  return { role, employeeID };
+};
+
 export default function ViewProfile() {
   const {id} = useParams();
   const [showImage, setShowImage] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [employeeData, setEmployeeData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [canEditProfile, setCanEditProfile] = useState(false);
+  const { role, employeeID } = getCurrentUser();
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -32,6 +40,11 @@ export default function ViewProfile() {
         const response = await axios.get(`http://localhost:5000/api/employees/${id}`);
         
         setEmployeeData(response.data);
+
+        setCanEditProfile(
+          role === 'Admin' || employeeID === response.data.id
+        );
+
       } catch (error) {
         console.error("Error fetching employee data:", error);
       }
@@ -39,7 +52,7 @@ export default function ViewProfile() {
     };
 
     fetchEmployee();
-  }, [id]); 
+  }, [id, role, employeeID]); 
   
   if (isLoading) { // Render loading message if data is still being fetched
     return <div>Loading...</div>;
@@ -184,15 +197,16 @@ export default function ViewProfile() {
             <div className="border-b border-gray-900/10 pb-12"></div>
 
             <div className="mt-6 flex items-center justify-end gap-x-6">
-              <Link to={`/info/editEmployeeProfile/${employeeData.id}`}>
-
-                <button
-                  type="button"
-                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                  Edit Profile
-                </button>
-              </Link>
+              {canEditProfile && (
+                <Link to={`/info/editEmployeeProfile/${employeeData.id}`}>
+                  <button
+                    type="button"
+                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    Edit Profile
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
