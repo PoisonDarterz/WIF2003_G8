@@ -112,7 +112,11 @@ export default function ViewProfile() {
                     <td className="w-[30%] px-4 py-4">{edu.eduTitle}</td>
                     <td className="w-[50%] px-4 py-4">{edu.eduDesc}</td>
                     <td className="w-[20%] px-4 py-4">
-                      <a href={edu.eduDocURL} target="_blank" rel="noopener noreferrer">View Document</a>
+                      {edu.eduDocURL ? (
+                        <a href={edu.eduDocURL} target="_blank" rel="noopener noreferrer" className="text-blue-500">View Document</a>
+                      ) : (
+                        "No Document"
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -137,7 +141,11 @@ export default function ViewProfile() {
                     <td className="w-[30%] px-4 py-4">{skills.skillsTitle}</td>
                     <td className="w-[50%] px-4 py-4">{skills.skillsDesc}</td>
                     <td className="w-[20%] px-4 py-4">
-                      <a href={skills.skillsDocURL} target="_blank" rel="noopener noreferrer">View Document</a>
+                      {skills.skillsDocURL ? (
+                        <a href={skills.skillsDocURL} target="_blank" rel="noopener noreferrer" className="text-blue-500">View Document</a>
+                      ) : (
+                        "No Document"
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -162,7 +170,11 @@ export default function ViewProfile() {
                     <td className="w-[30%] px-4 py-4">{awards.awardsTitle}</td>
                     <td className="w-[50%] px-4 py-4">{awards.awardsDesc}</td>
                     <td className="w-[20%] px-4 py-4">
-                      <a href={awards.awardsDocURL} target="_blank" rel="noopener noreferrer">View Document</a>
+                      {awards.awardsDocURL ? (
+                        <a href={awards.awardsDocURL} target="_blank" rel="noopener noreferrer" className="text-blue-500">View Document</a>
+                      ) : (
+                        "No Document"
+                      )}
                     </td>
                   </tr>
                 ))}
