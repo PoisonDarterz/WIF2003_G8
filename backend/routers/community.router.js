@@ -15,6 +15,36 @@ router.get("/posts", async (req, res) => {
   }
 });
 
+// GET a specific community post by ID
+router.get("/posts/:postId", async (req, res) => {
+    const { postId } = req.params;
+    try {
+        const communityPost = await Community.findOne({ postId: new mongoose.Types.ObjectId(postId) });
+        if (!communityPost) {
+            return res.status(404).json({ message: "Community post not found" });
+        }
+        res.json(communityPost);
+    } catch (err) {
+        console.error("Error getting community post:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+// GET all comments for a specific community post
+router.get("/posts/:postId/comments", async (req, res) => {
+    const { postId } = req.params;
+    try {
+        const communityPost = await Community.findOne({ postId: new mongoose.Types.ObjectId(postId) });
+        if (!communityPost) {
+            return res.status(404).json({ message: "Community post not found" });
+        }
+        res.json(communityPost.comments);
+    } catch (err) {
+        console.error("Error getting comments:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
 // POST a new community post
 router.post("/posts", async (req, res) => {
     try {

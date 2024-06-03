@@ -1,5 +1,5 @@
-// src/components/community/CreatePost.jsx
 import React, { useState } from 'react';
+import axios from 'axios'; // Import axios for making HTTP requests
 
 const CreatePost = ({ addPost }) => {
     const [showCreatePost, setShowCreatePost] = useState(false);
@@ -10,31 +10,29 @@ const CreatePost = ({ addPost }) => {
         setShowCreatePost(true);
     };
 
-    const handlePostSubmit = () => {
-        const newPost = {
-            username: "John Doe", // Replace with dynamic data if available
-            userProfileSrc: "/Profile_image.jpg", // Replace with dynamic data if available
-            postTime: "Just now",
-            postCaption: newPostContent,
-            postImageSrc: newPostImage,
-            likes: 0,
-            comments: 0
-        };
+    const handlePostSubmit = async () => {
+    const postData = new FormData();
+    postData.append('postCaption', newPostContent);
+    if (newPostImage) {
+        postData.append('postImage', newPostImage);
+    }
+
+    try {
+        const response = await axios.post('http://localhost:5000/api/community/posts', postData);
+        const newPost = response.data;
         addPost(newPost);
         setShowCreatePost(false);
         setNewPostContent('');
         setNewPostImage(null);
-    };
+    } catch (error) {
+        console.error('Error creating post:', error);
+    }
+};
+
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setNewPostImage(reader.result);
-        };
-        if (file) {
-            reader.readAsDataURL(file);
-        }
+        setNewPostImage(file);
     };
 
     return (
@@ -87,4 +85,5 @@ const CreatePost = ({ addPost }) => {
 };
 
 export default CreatePost;
+
 

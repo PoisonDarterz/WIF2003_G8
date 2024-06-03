@@ -1,31 +1,22 @@
 import React, { useState } from 'react';
-import { FaReply } from 'react-icons/fa';
+import { FaReply } from 'react-icons/fa'; // Importing FontAwesome icons
+import moment from 'moment';
 
 const CommentSection = ({ comments }) => {
-    const [newComment, setNewComment] = useState('');
+    const [newComments, setNewComments] = useState(Array(comments.length).fill(''));
     const [replyingTo, setReplyingTo] = useState(Array(comments.length).fill(-1));
-    const [replies, setReplies] = useState(comments.map(() => ''));
 
-    const handleCommentChange = (e) => {
-        setNewComment(e.target.value);
+    const handleCommentChange = (e, index) => {
+        const updatedComments = [...newComments];
+        updatedComments[index] = e.target.value;
+        setNewComments(updatedComments);
     };
 
-    const handleReplyChange = (e, index) => {
-        const newReplies = [...replies];
-        newReplies[index] = e.target.value;
-        setReplies(newReplies);
-    };
-
-    const handleSubmitComment = () => {
-        console.log('New comment:', newComment);
-        setNewComment('');
-    };
-
-    const handleSubmitReply = (index) => {
-        console.log('Reply to comment', index, ':', replies[index]);
-        const newReplies = [...replies];
-        newReplies[index] = '';
-        setReplies(newReplies);
+    const handleSubmitComment = (index) => {
+        console.log('New comment:', newComments[index]);
+        const updatedComments = [...newComments];
+        updatedComments[index] = ''; // Clear the comment after submitting
+        setNewComments(updatedComments);
     };
 
     const toggleReply = (index) => {
@@ -39,11 +30,11 @@ const CommentSection = ({ comments }) => {
             {comments.map((comment, index) => (
                 <div key={index} className="mb-4 border-b pb-4">
                     <div className="flex items-start mb-2">
-                        <img src={comment.userProfileSrc} alt="User" className="w-10 h-10 rounded-full mr-4 object-cover" />
+                        <img src={comment.employee.profilePicURL} alt="User" className="w-10 h-10 rounded-full mr-4 object-cover" />
                         <div className="flex-grow">
                             <div className="flex items-center mb-2">
-                                <h4 className="text-lg font-semibold text-gray-800">{comment.username}</h4>
-                                <p className="text-sm text-gray-500 ml-2">{comment.commentTime}</p>
+                                <h4 className="text-lg font-semibold text-gray-800">{comment.employee.name}</h4>
+                                <p className="text-sm text-gray-500 ml-2">{moment(comment.commentTime).format('MMMM Do YYYY, h:mm a')}</p>
                             </div>
                             <p className="text-gray-700 text-left">{comment.commentText}</p>
 
@@ -61,12 +52,12 @@ const CommentSection = ({ comments }) => {
                                     <textarea
                                         className="w-full p-2 rounded-md border"
                                         placeholder="Write a reply..."
-                                        value={replies[index]}
-                                        onChange={(e) => handleReplyChange(e, index)}
+                                        value={newComments[index]}
+                                        onChange={(e) => handleCommentChange(e, index)}
                                     ></textarea>
                                     <button
                                         className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                                        onClick={() => handleSubmitReply(index)}
+                                        onClick={() => handleSubmitComment(index)}
                                     >
                                         Submit
                                     </button>
@@ -79,11 +70,11 @@ const CommentSection = ({ comments }) => {
                         <div className="ml-16 mt-4">
                             {comment.replies.map((reply, idx) => (
                                 <div key={idx} className="flex items-start mb-2">
-                                    <img src={reply.userProfileSrc} alt="User" className="w-8 h-8 rounded-full mr-2 object-cover" />
+                                    <img src={reply.employee.profilePicURL} alt="User" className="w-8 h-8 rounded-full mr-2 object-cover" />
                                     <div className="flex-grow">
                                         <div className="flex items-center mb-2">
-                                            <h4 className="text-sm font-semibold text-gray-800">{reply.username}</h4>
-                                            <p className="text-xs text-gray-500 ml-2">{reply.replyTime}</p>
+                                            <h4 className="text-sm font-semibold text-gray-800">{reply.employee.name}</h4>
+                                            <p className="text-xs text-gray-500 ml-2">{moment(reply.replyTime).format('MMMM Do YYYY, h:mm a')}</p>
                                         </div>
                                         <p className="text-sm text-gray-700">{reply.replyText}</p>
                                     </div>
@@ -98,12 +89,12 @@ const CommentSection = ({ comments }) => {
                 <textarea
                     className="w-full p-2 rounded-md border"
                     placeholder="Write a comment..."
-                    value={newComment}
-                    onChange={handleCommentChange}
+                    value={newComments[comments.length]}
+                    onChange={(e) => handleCommentChange(e, comments.length)}
                 ></textarea>
                 <button
                     className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                    onClick={handleSubmitComment}
+                    onClick={() => handleSubmitComment(comments.length)}
                 >
                     Submit
                 </button>
@@ -113,3 +104,4 @@ const CommentSection = ({ comments }) => {
 };
 
 export default CommentSection;
+
