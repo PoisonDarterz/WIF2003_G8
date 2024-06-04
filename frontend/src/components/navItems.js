@@ -28,6 +28,28 @@ const employeeNavItems = [
   },
 ];
 
+const adminHelpdeskNavItems = [
+  {
+    title: "Resolve Ticket",
+    link: "/helpdesk/allEmployeeTickets",
+  },
+  {
+    title: "Review Feedback",
+    link: "/helpdesk/reviewFeedback",
+  },
+];
+
+const employeeHelpdeskNavItems = [
+  {
+    title: "Review Ticket",
+    link: "/helpdesk",
+  },
+  {
+    title: "Feedback",
+    link: "/helpdesk/feedback",
+  },
+];
+
 export const navItems = (role) => [
   {
     title: "HOME",
@@ -42,7 +64,7 @@ export const navItems = (role) => [
   {
     title: "SALARY",
     link: "/salary/view",
-    submenu: role === 'Admin' ? adminNavItems : employeeNavItems,
+    submenu: role === "Admin" ? adminNavItems : employeeNavItems,
   },
   {
     title: "INFORMATION",
@@ -57,19 +79,7 @@ export const navItems = (role) => [
   {
     title: "HELPDESK",
     link: "/helpdesk",
-    submenu: [
-      {
-        title: "Review Ticket",
-        link: "/helpdesk",
-      },
-      {
-        title: "Resolve Ticket",
-        link: "/helpdesk/allEmployeeTickets",
-      },
-      {
-        title: "Feedback",
-        link: "/helpdesk/feedback",
-      },
-    ],
+    submenu:
+      role === "Admin" ? adminHelpdeskNavItems : employeeHelpdeskNavItems,
   },
 ];

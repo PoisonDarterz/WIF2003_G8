@@ -24,18 +24,19 @@ function ResolveTicket(){
   const [employeeName,setEmployeeName]=useState("");
   const [admins,setAdmins]=useState([])
   const [assignedInvestigatorID,setAssignedInvestigatorID]=useState(ticket.investigatorID)
+  const [status,setStatus]=useState(ticket.status);
 
   const handleSave=async()=>{
     //Update to database
-    if(assignedInvestigatorID!==""){
-      ticket.status="in progress"
-      ticket.investigatorID=assignedInvestigatorID
-    }
-    else{
+    assignedInvestigatorID===""?ticket.investigatorID="":ticket.investigatorID=assignedInvestigatorID;
+    status==="resolved"?ticket.status="resolved":assignedInvestigatorID===""?ticket.status="pending":ticket.status="in progress";
+    if(assignedInvestigatorID===""){
       ticket.status="pending"
-      ticket.investigatorID=""
     }
 
+    console.log("when save:")
+    console.log("assignedInvestigatorID:",assignedInvestigatorID)
+    console.log("status:",status)
     try{
       const response=await axios.put(`http://localhost:5000/api/tickets/${ticket._id}`,ticket, {
         withCredentials: true,
@@ -76,7 +77,7 @@ function ResolveTicket(){
       }
 
       try{
-        const response= await axios.post(`http://localhost:5000/api/employees/adminsName`,adminsID);
+        const response= await axios.post(`http://localhost:5000/api/employees/employee-Id&Name`,adminsID);
         setAdmins(response.data)
 
       }catch(error){
@@ -174,8 +175,8 @@ function ResolveTicket(){
                   id="resolved"
                   name="status"
                   value={ticket.status}
-                  checked={ticket.status === 'resolved'}
-                  onChange={(e)=>{setTicket((prevTicket)=>({...prevTicket,status:"resolved"}));console.log("ticket after resolved clicked:",ticket)}}
+                  checked={status === 'resolved'}
+                  onChange={(e)=>{setStatus("resolved")}}
                 />
                 Yes
               </label>
@@ -186,8 +187,8 @@ function ResolveTicket(){
                   id="in progress"
                   name="status"
                   value={ticket.status}
-                  checked={ticket.status ==='pending'||ticket.status ==='in progress'}
-                  onChange={(e)=>{setTicket((prevTicket)=>({...prevTicket,status:ticket.investigatorID===""?"pending":"in progress"}))}}
+                  checked={status ==='not resolved'||status==="pending"||status==="in progress"}
+                  onChange={(e)=>{setStatus("not resolved")}}
                 />
                 No
               </label>
