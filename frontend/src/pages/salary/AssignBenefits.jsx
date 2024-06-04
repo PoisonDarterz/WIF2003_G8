@@ -47,6 +47,7 @@ function AssignBenefits() {
       if (response.status === 200) {
         setRoleBenefits(roleBenefits);
         setIndividualBenefits(individualBenefits);
+        alert('Benefit information saved successfully');
         setUnsavedChanges(false);
       } else {
         console.error('Failed to save benefits:', response);

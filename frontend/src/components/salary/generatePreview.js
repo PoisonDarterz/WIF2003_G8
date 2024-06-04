@@ -4,20 +4,28 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export function generatePreview(employee, salaryDetails, returnDefinition = false) {
-  const grossPay = salaryDetails.basic[0].amount + salaryDetails.allowances.reduce((a, b) => a + b.amount, 0) + salaryDetails.bonuses.reduce((a, b) => a + b.amount, 0);
-  const totalDeductions = salaryDetails.deductions.reduce((a, b) => a + b.amount, 0) + salaryDetails["EPF \/ Socso"].reduce((a, b) => a + b.amount, 0);
+  if (!salaryDetails.basic[0]?.amount || !salaryDetails["EPF \/ Socso"]?.find(item => item.name === 'EPF')?.amount || !salaryDetails["EPF \/ Socso"]?.find(item => item.name === 'SOCSO')?.amount) {
+    alert('Please fill in Basic Pay, EPF, and SOCSO');
+    return;
+  }
+  
+  const grossPay = salaryDetails.basic[0]?.amount || 0
+    + (salaryDetails.allowances?.reduce((a, b) => a + b.amount, 0) || 0)
+    + (salaryDetails.bonuses?.reduce((a, b) => a + b.amount, 0) || 0);
+  const totalDeductions = (salaryDetails.deductions?.reduce((a, b) => a + b.amount, 0) || 0)
+    + (salaryDetails["EPF \/ Socso"]?.reduce((a, b) => a + b.amount, 0) || 0);
   const netPay = grossPay - totalDeductions;
 
   const earnings = [
-    `Basic Pay: ${salaryDetails.basic[0].amount}`,
-    ...salaryDetails.allowances.map(allowance => `${allowance.name}: ${allowance.amount}`),
-    ...salaryDetails.bonuses.map(bonus => `${bonus.name}: ${bonus.amount}`),
+    `Basic Pay: ${salaryDetails.basic[0]?.amount || 0}`,
+    ...(salaryDetails.allowances?.map(allowance => `${allowance.name}: ${allowance.amount}`) || []),
+    ...(salaryDetails.bonuses?.map(bonus => `${bonus.name}: ${bonus.amount}`) || []),
   ];
 
   const deductions = [
-    ...salaryDetails.deductions.map(deduction => `${deduction.name}: ${deduction.amount}`),
-    `Employee EPF: ${salaryDetails["EPF \/ Socso"].find(item => item.name === 'EPF').amount}`,
-    `Employee SOCSO: ${salaryDetails["EPF \/ Socso"].find(item => item.name === 'SOCSO').amount}`,
+    ...(salaryDetails.deductions?.map(deduction => `${deduction.name}: ${deduction.amount}`) || []),
+    `Employee EPF: ${salaryDetails["EPF \/ Socso"]?.find(item => item.name === 'EPF')?.amount || 0}`,
+    `Employee SOCSO: ${salaryDetails["EPF \/ Socso"]?.find(item => item.name === 'SOCSO')?.amount || 0}`,
   ];
 
   // Ensure both arrays have the same length
