@@ -10,6 +10,7 @@ function AllEmployeeTickets(){
     navigate("/helpdesk/resolveTicket",{state:ticket})
   }
   const [allTickets,setAllTickets]=useState([])
+  const [investigators,setInvestigators]=useState([])
 
   // const allTickets=[
   //   {
@@ -38,9 +39,19 @@ function AllEmployeeTickets(){
       const response= await axios.get("http://localhost:5000/api/tickets/")
       console.log("Ticket Response:",response.data);
       setAllTickets(response.data);
-    }
+      const allInvestigatorIDs=response.data.map((ticket)=>(ticket.investigatorID))
 
+      try{
+        const response= await axios.post(`http://localhost:5000/api/employees/employee-Id&Name`,allInvestigatorIDs);
+        console.log("Investigator with name:",response.data)
+        setInvestigators(response.data)
+      }catch(error){
+        console.log("Error fetching investigator with name:",error)
+      }
+    }
     fetchTickets();
+
+    console.log("All Investigator:",investigators)
   },[]);
     return(
       <div className="p-8">
@@ -78,6 +89,7 @@ function AllEmployeeTickets(){
              const minutes = dateTime.getUTCMinutes();
              const formattedHours = hours.toString().padStart(2, '0');
              const formattedMinutes = minutes.toString().padStart(2, '0');
+             const investigator=investigators.find((investigator)=>investigator.id===ticket.investigatorID)
               return(
               <tr onClick={()=>handleResolveTicket(i)} className={`hover:bg-slate-300 ${i % 2 === 0 ? 'bg-[#fefefe]' : 'bg-[#eaf3ff]'} px-4 py-2`}>
                 <td className="w-[7%] px-4 py-4">{"T"+ticket.ticketID}</td>
@@ -86,20 +98,20 @@ function AllEmployeeTickets(){
                 <td className="w-[10%] px-4 py-4">{formattedHours+":"+formattedMinutes}</td>
                 <td className="w-[18%] px-4 py-4">{ticket.category}</td>
                 <td className="w-[18%] px-4 py-4">{ticket.subject}</td>
-                <td className="w-[%] px-4 py-4">{ticket.investigatorID}</td>
+                <td className="w-[%] px-4 py-4">{investigator?investigator.name:"-"}</td>
                 <td className="w-[14%] px-4 py-4">{ticket.status}</td>
               </tr>
             )})}
           </tbody>
         </table>
         </div>
-        <div className="flex justify-center items-center mt-6">
+        {/* <div className="flex justify-center items-center mt-6">
           <button className="px-4 py-2 text-sm text-white bg-gray-500 rounded">Previous</button>
           <button className="px-4 py-2 ml-2 text-sm text-white bg-[#2C74D8] rounded">1</button>
           <button className="px-4 py-2 ml-2 text-sm text-black bg-gray-300 rounded">2</button>
           <button className="px-4 py-2 ml-2 text-sm text-black bg-gray-300 rounded">3</button>
           <button className="px-4 py-2 ml-2 text-sm text-white bg-gray-500 rounded">Next</button>
-        </div>
+        </div> */}
       </div>
       
     )
