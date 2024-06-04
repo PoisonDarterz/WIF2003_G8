@@ -280,7 +280,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.post("/adminsName", async (req, res) => {
+router.post("/employee-Id&Name", async (req, res) => {
   try {
     const adminsID = req.body;
     const adminsName = await Employee.find({
