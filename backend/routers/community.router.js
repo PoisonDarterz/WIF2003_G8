@@ -118,6 +118,36 @@ router.post("/:postId/comments", async (req, res) => {
     }
 });
 
+//POST a new like or decrease a like for a specific community post
+router.post("/posts/:postId/like", async (req, res) => {
+    const { postId } = req.params;
+    try {
+        // Find the community post
+        const communityPost = await Community.findOne({
+            postId: new mongoose.Types.ObjectId(postId),
+        });
+        if (!communityPost) {
+            return res
+                .status(404)
+                .json({ message: "Community post not found" });
+        }
+
+        // Increment the likes count or decrement the likes count
+        if(req.body.like === "like") {
+            communityPost.likes += 1;
+        } else if(req.body.like === "dislike") {
+            communityPost.likes -= 1;
+        }
+
+        await communityPost.save();
+
+        res.status(201).json(communityPost);
+    } catch (err) {
+        console.error("Error liking post:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
 // POST a new reply for a specific comment of a community post
 router.post("/posts/:postId/comments/:commentId/replies", async (req, res) => {
     const { postId, commentId } = req.params;

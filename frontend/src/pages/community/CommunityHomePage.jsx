@@ -28,13 +28,9 @@ const CommunityHomePage = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-screen">    
             <TopNavBlack />
-
-            <div className="flex mt-8 px-4">
-                <CommunitySidebar />
-
-                <div className="w-2/4 basis-3/5">
+                <div className=" justify-center" style={{ display: 'flex', flexDirection: 'column' }}>
                     <div className="justify-center flex overflow-x-auto space-x-4 min-w-[calc(25% - 1rem)] h-[fit-content]">
                         <CommunityCard 
                             title="Office Insights" 
@@ -75,8 +71,6 @@ const CommunityHomePage = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-
             <CreatePost addPost={addPost} />
         </div>
     );

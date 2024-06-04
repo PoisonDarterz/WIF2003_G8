@@ -5,6 +5,8 @@ import axios from "axios";
 
 function MyTickets(){
   const [tickets,setTickets]=useState([])
+  const [investigators,setInvestigators]=useState([])
+
   // const tickets=[
   //   {
   //     ticketID:"T006",
@@ -58,6 +60,16 @@ function MyTickets(){
       });
       console.log("MyTicket Response:",response.data);
       setTickets(response.data);
+
+      const allInvestigatorIDs=response.data.map((ticket)=>(ticket.investigatorID))
+
+      try{
+        const response= await axios.post(`http://localhost:5000/api/employees/employee-Id&Name`,allInvestigatorIDs);
+        console.log("Investigator with name:",response.data)
+        setInvestigators(response.data)
+      }catch(error){
+        console.log("Error fetching investigator with name:",error)
+      }
     }
     fetchTickets();
   },[])
@@ -105,6 +117,7 @@ function MyTickets(){
               const minutes = dateTime.getUTCMinutes();
               const formattedHours = hours.toString().padStart(2, '0');
               const formattedMinutes = minutes.toString().padStart(2, '0');
+              const investigator=investigators.find((investigator)=>investigator.id===ticket.investigatorID)
               return(
               <tr onClick={()=>{handleViewTicket(ticket)}} className={`hover:bg-slate-300 ${i % 2 === 0 ? 'bg-[#fefefe] '  : 'bg-[#eaf3ff] '} px-4 py-2`}>
                 <td className="w-[5%] px-4 py-4">{"T"+ticket.ticketID}</td>
@@ -112,20 +125,20 @@ function MyTickets(){
                 <td className="w-[10%] px-4 py-4">{formattedHours+":"+formattedMinutes}</td>
                 <td className="w-[20%] px-4 py-4">{ticket.category}</td>
                 <td className="w-[20%] px-4 py-4">{ticket.subject}</td>
-                <td className="w-[20%] px-4 py-4">{ticket.investigatorID}</td>
+                <td className="w-[20%] px-4 py-4">{investigator?investigator.name:"-"}</td>
                 <td className="w-[7%] px-4 py-4">{ticket.status}</td>
               </tr>
             )})}
           </tbody>
         </table>
         </div>
-        <div className="flex justify-center items-center mt-6">
+        {/* <div className="flex justify-center items-center mt-6">
           <button className="px-4 py-2 text-sm text-white bg-gray-500 rounded">Previous</button>
           <button className="px-4 py-2 ml-2 text-sm text-white bg-[#2C74D8] rounded">1</button>
           <button className="px-4 py-2 ml-2 text-sm text-black bg-gray-300 rounded">2</button>
           <button className="px-4 py-2 ml-2 text-sm text-black bg-gray-300 rounded">3</button>
           <button className="px-4 py-2 ml-2 text-sm text-white bg-gray-500 rounded">Next</button>
-        </div>
+        </div> */}
         </div>
     )
 }

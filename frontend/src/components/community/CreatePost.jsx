@@ -10,25 +10,30 @@ const CreatePost = ({ addPost }) => {
         setShowCreatePost(true);
     };
 
+    
+
     const handlePostSubmit = async () => {
-    const postData = new FormData();
-    postData.append('postCaption', newPostContent);
-    if (newPostImage) {
-        postData.append('postImage', newPostImage);
-    }
+        const postData = new FormData();
+        postData.append('postCaption', newPostContent);
+        if (newPostImage) {
+            postData.append('postImage', newPostImage);
+        }
 
-    try {
-        const response = await axios.post('http://localhost:5000/api/community/posts', postData);
-        const newPost = response.data;
-        addPost(newPost);
-        setShowCreatePost(false);
-        setNewPostContent('');
-        setNewPostImage(null);
-    } catch (error) {
-        console.error('Error creating post:', error);
-    }
-};
-
+        try {
+            const response = await axios.post('http://localhost:5000/api/community/posts', postData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            const newPost = response.data;
+            addPost(newPost);
+            setShowCreatePost(false);
+            setNewPostContent('');
+            setNewPostImage(null);
+        } catch (error) {
+            console.error('Error creating post:', error);
+        }
+    };
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
@@ -85,5 +90,3 @@ const CreatePost = ({ addPost }) => {
 };
 
 export default CreatePost;
-
-
