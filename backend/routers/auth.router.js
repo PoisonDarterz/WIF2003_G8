@@ -105,7 +105,6 @@ router.post("/register", async (req, res) => {
           .status(500)
           .json({ message: "Failed to send verification email." });
       } else {
-        console.log("Verification email is sent to your email account");
         return res.status(201).json({
           message:
             "User created successfully. Please verify your email to complete registration.",
@@ -240,7 +239,6 @@ router.post("/forgot-password", async (req, res) => {
           .status(500)
           .json({ message: "Failed to send reset password email." });
       } else {
-        console.log("Reset password email is sent to your email account");
         return res
           .status(200)
           .json({ message: "Reset password email sent successfully." });
