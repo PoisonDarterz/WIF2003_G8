@@ -11,11 +11,6 @@ const ReviewLeaveTable = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [startDate, setStartDate] = useState(null);
 
-  const parseDate = (dateStr) => {
-    const [day, month, year] = dateStr.split("/");
-    return new Date(year, month - 1, day);
-  };
-
   useEffect(() => {
     const fetchLeaveData = async () => {
       try {
@@ -59,57 +54,19 @@ const ReviewLeaveTable = () => {
     setCurrentPage(currentPage + 1);
   };
 
-  const handleAccept = async (id) => {
+  const updateLeaveStatus = async (id, status) => {
     try {
       await axios.put(
         `http://localhost:5000/api/leave/application/${id}/status`,
-        { status: "Accepted" },
+        { status },
         { withCredentials: true }
       );
       setLeaveData((prevData) =>
-        prevData.map((item) =>
-          item._id === id ? { ...item, status: "Accepted" } : item
-        )
+        prevData.map((item) => (item._id === id ? { ...item, status } : item))
       );
-      alert("Leave application accepted.");
+      alert(`Leave application ${status.toLowerCase()}.`);
     } catch (error) {
-      console.error("Error updating leave status:", error);
-    }
-  };
-
-  const handleReject = async (id) => {
-    try {
-      await axios.put(
-        `http://localhost:5000/api/leave/application/${id}/status`,
-        { status: "Rejected" },
-        { withCredentials: true }
-      );
-      setLeaveData((prevData) =>
-        prevData.map((item) =>
-          item._id === id ? { ...item, status: "Rejected" } : item
-        )
-      );
-      alert("Leave application rejected.");
-    } catch (error) {
-      console.error("Error updating leave status:", error);
-    }
-  };
-
-  const handlePending = async (id) => {
-    try {
-      await axios.put(
-        `http://localhost:5000/api/leave/application/${id}/status`,
-        { status: "Pending" },
-        { withCredentials: true }
-      );
-      setLeaveData((prevData) =>
-        prevData.map((item) =>
-          item._id === id ? { ...item, status: "Pending" } : item
-        )
-      );
-      alert("Leave application marked as pending.");
-    } catch (error) {
-      console.error("Error updating leave status:", error);
+      console.error(`Error updating leave status to ${status}:`, error);
     }
   };
 
@@ -195,15 +152,15 @@ const ReviewLeaveTable = () => {
               <td className="py-3 px-6 text-center flex justify-center items-center space-x-2">
                 <FaCheckCircle
                   style={{ color: "green", cursor: "pointer" }}
-                  onClick={() => handleAccept(application._id)}
+                  onClick={() => updateLeaveStatus(application._id, "Accepted")}
                 />
                 <FaTimesCircle
                   style={{ color: "red", cursor: "pointer" }}
-                  onClick={() => handleReject(application._id)}
+                  onClick={() => updateLeaveStatus(application._id, "Rejected")}
                 />
                 <FaPauseCircle
                   style={{ color: "#ed8332", cursor: "pointer" }}
-                  onClick={() => handlePending(application._id)}
+                  onClick={() => updateLeaveStatus(application._id, "Pending")}
                 />
               </td>
             </tr>

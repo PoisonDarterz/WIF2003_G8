@@ -3,11 +3,13 @@ const router = express.Router();
 const multer = require("multer");
 const { BlobServiceClient } = require("@azure/storage-blob");
 const LeaveApplication = require("../models/leave.model");
+const Attendance = require("../models/attendance.model");
 const {
   authenticateUser,
   checkRole,
 } = require("../middlewares/auth.middleware");
 require("dotenv").config();
+const Employee = require("../models/employee.model");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
