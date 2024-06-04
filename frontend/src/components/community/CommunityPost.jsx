@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaThumbsUp, FaComment } from 'react-icons/fa';
 import CommentSection from './CommentSection';
 import moment from 'moment';
+import axios from 'axios';
 
 const CommunityPost = ({ postId }) => {
     const [post, setPost] = useState(null);
@@ -20,13 +21,23 @@ const CommunityPost = ({ postId }) => {
             .catch(error => console.error('Error fetching post data:', error));
     }, [post]);
 
-    const toggleLike = () => setIsLiked(!isLiked);
+    const toggleLike = async () => {
+        try {
+            const likeStatus = isLiked ? 'dislike' : 'like'; // Determine the new like status
+            const response = await axios.post(`http://localhost:5000/api/community/posts/${postId}/like`, { like: likeStatus });
+            const updatedLikes = response.data.likes; // Assume your backend returns the updated post data
+
+            setIsLiked(!isLiked);
+            setPost(prevPost => ({ ...prevPost, likes: updatedLikes }));
+        } catch (error) {
+            console.error('Error updating like status:', error);
+        }
+    };
     const toggleComments = () => setIsCommentsShown(!isCommentsShown);
 
     if (!post) {
-        return <p>Loading...</p>;
+        return <div>Loading...</div>;
     }
-
     return (
         <div className="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1">
             <div className="flex items-center mb-4">
