@@ -1,6 +1,7 @@
 import TopNavBlack from "../../components/TopNavBlack"
 import { useNavigate,useLocation } from 'react-router-dom';
 import {useState,useEffect} from "react";
+import { FaFileImage, FaFilePdf, FaFileWord, FaFileExcel} from "react-icons/fa";
 import axios from 'axios'
 
 function ResolveTicket(){
@@ -10,7 +11,10 @@ function ResolveTicket(){
   const [ticket,setTicket]=useState(hold)
 
   const isoString=ticket.dateTimeCreated;
-  const dateTime=new Date(isoString);
+  const utcDate = new Date(isoString); // Convert ISO string to Date object in UTC
+  const dateTime = new Date(utcDate.getTime() + 8 * 60 * 60 * 1000);
+  // const isoString=ticket.dateTimeCreated;
+  // const dateTime=new Date(isoString);
   const year = dateTime.getUTCFullYear();
   const month = dateTime.getUTCMonth() + 1;
   const day = dateTime.getUTCDate();
@@ -54,6 +58,28 @@ function ResolveTicket(){
   const handleCancelSave=()=>{
     navigate("/helpdesk/allEmployeeTickets")
   }
+
+  const getFileIcon = (fileUrl) => {
+    const fileExtension = fileUrl.split('.').pop().toLowerCase();
+    switch (fileExtension) {
+      case "jpeg":
+      case "jpg":
+      case "png":
+        return <a href={fileUrl} target="_blank"><FaFileImage className="w-10 h-10" /></a>;
+      case "pdf":
+        return <a href={fileUrl} target="_blank"><FaFilePdf className="w-10 h-10" /></a>;
+      case "doc":
+      case "docx":
+        return <a href={fileUrl} target="_blank" ><FaFileWord className="w-10 h-10" /></a>;
+      case "xls":
+      case "xlsx":
+        return <a href={fileUrl} target="_blank"><FaFileExcel className="w-10 h-10" /></a>;
+      default:
+        return <a href={fileUrl} target="_blank"><FaFileImage className="w-10 h-10" /></a>; // Default icon for unknown file types
+    }
+  };
+
+  const fileName=ticket.attachment.substring(ticket.attachment.lastIndexOf('/') + 1);
 
   useEffect(()=>{
     const fetchEmployeeByID=async()=>{
@@ -153,7 +179,14 @@ function ResolveTicket(){
           </div>
           <div className="flex w-[90%] my-2">
             <div className="font-bold w-[15%] text-left">Attachment</div>
-            {ticket.attachment!==""?<div className="w-[75%] border rounded-lg text-left pl-5"></div>:<div className="w-[75%] border rounded-lg text-left pl-5">No attachement</div>}
+            {ticket.attachment!==""?
+            <div className="w-[75%] border rounded-lg text-left pl-5 py-2">
+              {getFileIcon(ticket.attachment)}
+              <div className="flex">
+                <p className="flex w-24 overflow-hidden whitespace-nowrap overflow-ellipsis" title={fileName}>{fileName}</p>
+              </div>
+            </div>
+            :<div className="w-[75%] border rounded-lg text-left pl-5">No attachment</div>}
           </div>
           <div className="flex w-[90%] my-2">
             <div className="font-bold w-[15%] text-left">Investigation Update</div>

@@ -30,12 +30,20 @@ const employeeNavItems = [
 
 const adminHelpdeskNavItems = [
   {
-    title: "Resolve Ticket",
+    title: "Review Ticket",
+    link: "/helpdesk",
+  },
+  {
+    title: "Share Feedback",
+    link: "/helpdesk/feedback",
+  },
+  {
+    title: "Resolve Tickets",
     link: "/helpdesk/allEmployeeTickets",
   },
   {
-    title: "Review Feedback",
-    link: "/helpdesk/reviewFeedback",
+    title: "Review Feedbacks",
+    link: "/helpdesk/reviewFeedbacks",
   },
 ];
 
@@ -45,7 +53,7 @@ const employeeHelpdeskNavItems = [
     link: "/helpdesk",
   },
   {
-    title: "Feedback",
+    title: "Share Feedback",
     link: "/helpdesk/feedback",
   },
 ];

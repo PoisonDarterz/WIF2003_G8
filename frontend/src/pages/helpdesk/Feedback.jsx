@@ -1,7 +1,11 @@
 import TopNavBlack from "../../components/TopNavBlack"
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
+import {useState,useEffect} from 'react'
 
 function Feedback(){
+
+  const [fields,setFields]=useState([])
   const allCategory=[
     {"category":"General","img":"/General.png","description":"Let us know how we can enhance health and hygiene standards to ensure a clean and healthy work environment"},
     {"category":"Facilites","img":"/Facilities.png","description":"Let us know how we can enhance health and hygiene standards to ensure a clean and healthy work environment"},
@@ -13,6 +17,17 @@ function Feedback(){
     {"category":"Development","img":"/Development.png","description":"Let us know how we can enhance health and hygiene standards to ensure a clean and healthy work environment"},
   ]
 
+  useEffect(()=>{
+    const fetchFields=async()=>{
+      const response = await axios.get("http://localhost:5000/api/feedbacks/fields", {
+        withCredentials: true,
+      });
+      console.log("Fields Response:",response.data);
+      setFields(response.data);
+
+    }
+    fetchFields();
+  },[])
   return(
       <div className="p-8">
         <div className="mt-[-32px] ml-[-32px] mr-[-32px]">
@@ -23,9 +38,9 @@ function Feedback(){
           <p className="text-lg">Your feedback shapes our actions and decisions.</p>
         </div>
         <div className="flex justify-center items-center">
-          <div className="flex flex-wrap h-full w-[70%]">
-            {allCategory.map((category,index)=>(
-              <IndividualCategory categoryName={category.category} img={category.img} description={category.description}/>
+          <div className="flex flex-wrap h-full w-[75%]">
+            {fields.map((field,index)=>(
+              <IndividualCategory categoryName={field.category} img={field.imageUrl} description={field.description}/>
             )
             )}
           </div>

@@ -28,6 +28,13 @@ import OfficeInsightsArticle from "./pages/community/OfficeInsightsArticle";
 // Helpdesk module routes
 import Tickets from "./pages/helpdesk/MyTickets";
 import Feedback from "./pages/helpdesk/Feedback";
+import ReviewFeedback from "./pages/helpdesk/ReviewFeedback";
+import AddNewTicket from "./pages/helpdesk/AddNewTicket";
+import ReviewTicket from "./pages/helpdesk/ReviewTicket";
+import AllEmployeeTickets from "./pages/helpdesk/AllEmployeeTickets";
+import AllEmployeeFeedbacks from "./pages/helpdesk/AllEmployeeFeedbacks";
+import ResolveTicket from "./pages/helpdesk/ResolveTicket";
+import SubmitFeedback from "./pages/helpdesk/SubmitFeedback";
 
 // Info module routes
 import ViewEmployeeList from "./pages/info/employeeList";
@@ -41,11 +48,6 @@ import AdminSalary from "./pages/salary/AdminSalary";
 import Benefits from "./pages/salary/Benefits";
 import ProcessSalary from "./pages/salary/ProcessSalary";
 import AssignBenefits from "./pages/salary/AssignBenefits";
-import AddNewTicket from "./pages/helpdesk/AddNewTicket";
-import ReviewTicket from "./pages/helpdesk/ReviewTicket";
-import AllEmployeeTickets from "./pages/helpdesk/AllEmployeeTickets";
-import ResolveTicket from "./pages/helpdesk/ResolveTicket";
-import SubmitFeedback from "./pages/helpdesk/SubmitFeedback";
 import MentalHealthArticle from "./pages/community/MentalHealthArticle";
 import TeamBuildingAnnouncement from "./pages/community/TeamBuildingAnnouncement";
 
@@ -104,6 +106,8 @@ function App() {
           <Route path="/helpdesk/resolveTicket" element={<ResolveTicket />} />
           <Route path="/helpdesk/feedback" element={<Feedback />} />
           <Route path="/helpdesk/submitFeedback" element={<SubmitFeedback />} />
+          <Route path="/helpdesk/reviewFeedbacks/:feedbackID" element={<ReviewFeedback />} />
+          <Route path="/helpdesk/reviewFeedbacks" element={<AllEmployeeFeedbacks />} />
 
           {/* Info module routes */}
           <Route path="/info/employeeList" element={<ViewEmployeeList />} />

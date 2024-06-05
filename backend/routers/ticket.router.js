@@ -1,5 +1,19 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+
+const { BlobServiceClient } = require("@azure/storage-blob");
+// Azure Blob Storage setup
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  process.env.CONNECTION_STRING
+);
+const containerAttachments =
+  blobServiceClient.getContainerClient("attachments");
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10000000 }, // Set file size limit to 10MB
+});
 
 const Ticket = require("../models/ticket.model");
 const {
@@ -7,25 +21,20 @@ const {
   checkRole,
 } = require("../middlewares/auth.middleware");
 
-router.get(
-  "/myTickets",
-  authenticateUser,
-  checkRole("Employee"),
-  async (req, res) => {
-    try {
-      const myTickets = await Ticket.find({
-        employeeID: req.user.employeeID,
-      });
-      res.json(myTickets);
-    } catch (error) {
-      console.error("Error fetching tickets:", error);
-    }
+router.get("/myTickets", authenticateUser, async (req, res) => {
+  try {
+    const myTickets = await Ticket.find({
+      employeeID: req.user.employeeID,
+    }).sort({ dateTimeCreated: -1 });
+    res.json(myTickets);
+  } catch (error) {
+    console.error("Error fetching tickets:", error);
   }
-);
+});
 
 router.get("/", async (req, res) => {
   try {
-    const allTickets = await Ticket.find();
+    const allTickets = await Ticket.find().sort({ dateTimeCreated: -1 });
     res.json(allTickets);
   } catch (error) {
     console.error("Error fetching tickets:", error);
@@ -35,9 +44,16 @@ router.get("/", async (req, res) => {
 router.post(
   "/submitTicket",
   authenticateUser,
-  checkRole("Employee"),
+  upload.array("attachments", 10),
   async (req, res) => {
     try {
+      console.log("req.files:", req.files);
+      console.log("req.body:", req.body);
+
+      const fileUrl =
+        req.files.length !== 0 ? await uploadToAzureBlob(req.files[0]) : "";
+      console.log("fileUrl:", fileUrl);
+
       const newTicketID = await generateID();
       const newTicket = new Ticket({
         ticketID: newTicketID,
@@ -46,7 +62,7 @@ router.post(
         category: req.body.category === "" ? "General" : req.body.category,
         subject: req.body.subject === "" ? "General" : req.body.subject,
         detail: req.body.detail,
-        attachment: req.body.attachment,
+        attachment: fileUrl,
         investigatorID: "",
         investigationUpdate: "",
         status: "pending",
@@ -60,10 +76,25 @@ router.post(
   }
 );
 
+const uploadToAzureBlob = async (file) => {
+  const blobName = `${Date.now()}-${file.originalname}`;
+  const blockBlobClient = containerAttachments.getBlockBlobClient(blobName);
+
+  // await blockBlobClient.upload(file.buffer, file.size);
+
+  await blockBlobClient.uploadData(file.buffer, {
+    blobHTTPHeaders: {
+      blobContentType: file.mimetype,
+    },
+  });
+
+  return blockBlobClient.url;
+};
+
 router.put(
   "/:ticketID",
   authenticateUser,
-  // checkRole("Admin"),
+  checkRole("Admin"),
   async (req, res) => {
     const { ticketID } = req.params;
     const hold = req.body;

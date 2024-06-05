@@ -20,25 +20,26 @@ function AddNewTicket(){
   const handleFileChange=(event)=>{
     const uploadedFile=event.target.files[0];
     setFiles([...files,uploadedFile]);
+    console.log("files:",files)
   }
 
   const handleRemoveFile=(i)=>{
     setFiles((files) => files.filter((_, index) => index !== i));
   }
 
-  const getFileIcon = (fileType) => {
-    switch (fileType) {
+  const getFileIcon = (file) => {
+    switch (file.type) {
       case "image/jpeg":
       case "image/png":
-        return <FaFileImage className="w-10 h-10" />;
+        return <a href={URL.createObjectURL(file)} target="_blank"><FaFileImage className="w-10 h-10" /></a>;
       case "application/pdf":
-        return <FaFilePdf className="w-10 h-10" />;
+        return <a href={URL.createObjectURL(file)} target="_blank"><FaFilePdf className="w-10 h-10" /></a>;
       case "application/msword":
-        return <FaFileWord className="w-10 h-10" />;
+        return <a href={URL.createObjectURL(file)} target="_blank" ><FaFileWord className="w-10 h-10" /></a>;
       case "application/vnd.ms-excel":
-        return <FaFileExcel className="w-10 h-10" />;
+        return <a href={URL.createObjectURL(file)} target="_blank"><FaFileExcel className="w-10 h-10" /></a>;
       default:
-        return <FaFileImage className="w-10 h-10" />; // Default icon for unknown file types
+        return <a href={URL.createObjectURL(file)} target="_blank"><FaFileImage className="w-10 h-10" /></a>; // Default icon for unknown file types
     }
   };
 
@@ -52,8 +53,26 @@ function AddNewTicket(){
     event.preventDefault()
     setNotification("Ticket submitted successfully!");
     setIsSubmitted(true);
+    const data =new FormData();
+    data.append('dateTimeCreated', formData.dateTimeCreated);
+    data.append('category', formData.category);
+    data.append('subject', formData.subject);
+    data.append('detail', formData.detail);
+
+    console.log("files:",files)
+    // Append multiple files to the formData
+    files.forEach((file, index) => {
+      data.append('attachments', file);
+    });
+
+    console.log("data.attachments:",data.attachments)
     try{
-     const response=await axios.post("http://localhost:5000/api/tickets/submitTicket",formData,{withCredentials:true});
+     const response=await axios.post("http://localhost:5000/api/tickets/submitTicket",data,{
+      headers:{
+      'Content-Type':'multipart/form-data'
+     },
+       withCredentials:true
+      });
      console.log("New ticket submitted succesfully:",response.data)
      setFormData({
       dateTimeCreated: new Date(),
@@ -121,11 +140,10 @@ function AddNewTicket(){
               <div className="flex w-[70%] resize-none border rounded-lg p-3">
                 {files.map((file,index)=>(
                   <div className="pr-5">
-                    {getFileIcon(file.type)}
+                    {getFileIcon(file)}
                     <div className="flex">
                       <p className="flex w-24 overflow-hidden whitespace-nowrap overflow-ellipsis" title={file.name}>{file.name}</p>
                       <button><MdCancel onClick={()=>handleRemoveFile(index)}/></button>
-
                     </div>
                   </div>
                   
@@ -136,13 +154,14 @@ function AddNewTicket(){
                   id="attachment"
                   onChange={handleFileChange}
                 />
+                {files.length===0&&
                 <div className="flex flex-col">
                   <button type="button"
                     onClick={()=>document.getElementById('attachment').click()}>
                     <img src="/AddFile.png" alt="upload file" className="w-10 h-10"/>
                   </button>
                   <p>Upload file</p>
-                </div>
+                </div>}
               </div>
             </div>
                 
