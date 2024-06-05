@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Import axios for making HTTP requests
+import axios from 'axios';
 
 const CreatePost = ({ addPost }) => {
     const [showCreatePost, setShowCreatePost] = useState(false);
@@ -10,17 +10,17 @@ const CreatePost = ({ addPost }) => {
         setShowCreatePost(true);
     };
 
-    
-
     const handlePostSubmit = async () => {
         const postData = new FormData();
         postData.append('postCaption', newPostContent);
         if (newPostImage) {
             postData.append('postImage', newPostImage);
         }
+        postData.append('employeeId', '123'); // Use the correct employeeId
 
         try {
             const response = await axios.post('http://localhost:5000/api/community/posts', postData, {
+                
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -42,7 +42,6 @@ const CreatePost = ({ addPost }) => {
 
     return (
         <div>
-            {/* Modal for creating a new post */}
             {showCreatePost && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -77,8 +76,6 @@ const CreatePost = ({ addPost }) => {
                     </div>
                 </div>
             )}
-
-            {/* Button to trigger the create post modal */}
             <button 
                 className="fixed bottom-5 right-5 bg-blue-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl"
                 onClick={handleCreatePostClick}
@@ -90,3 +87,6 @@ const CreatePost = ({ addPost }) => {
 };
 
 export default CreatePost;
+
+
+

@@ -1,17 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { FaReply } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaReply } from 'react-icons/fa'; // Importing FontAwesome icons
 import moment from 'moment';
 
 const CommentSection = ({ postId, comments }) => {
     const [newComments, setNewComments] = useState(Array(comments.length).fill(''));
     const [replyingTo, setReplyingTo] = useState(Array(comments.length).fill(-1));
     const [newCommentText, setNewCommentText] = useState('');
-    const [newReplies, setNewReplies] = useState(Array(comments.length).fill(''));
-    const [updatedComments, setUpdatedComments] = useState(comments);
-
-    useEffect(() => {
-        setUpdatedComments(comments);
-    }, [comments]);
+    const [newReplies, setNewReplies] = useState(Array(comments.length).fill('')); // Adding replies state
 
     const handleCommentChange = (e, index) => {
         const updatedComments = [...newComments];
@@ -19,7 +14,7 @@ const CommentSection = ({ postId, comments }) => {
         setNewComments(updatedComments);
     };
 
-    const handleReplyChange = (e, index) => {
+    const handleReplyChange = (e, index) => { // Adding reply change handler
         const updatedReplies = [...newReplies];
         updatedReplies[index] = e.target.value;
         setNewReplies(updatedReplies);
@@ -41,7 +36,7 @@ const CommentSection = ({ postId, comments }) => {
 
             const updatedPost = await response.json();
             setNewComments(Array(updatedPost.comments.length).fill(''));
-            setUpdatedComments(updatedPost.comments);
+            // Optionally update the post comments in parent state if passed down as a prop
         } catch (error) {
             console.error('Error submitting comment:', error);
         }
@@ -68,7 +63,7 @@ const CommentSection = ({ postId, comments }) => {
             const updatedPost = await response.json();
             setNewComments(Array(updatedPost.comments.length).fill(''));
             setNewCommentText('');
-            setUpdatedComments(updatedPost.comments);
+            // Optionally update the post comments in parent state if passed down as a prop
         } catch (error) {
             console.error('Error submitting comment:', error);
         }
@@ -90,7 +85,7 @@ const CommentSection = ({ postId, comments }) => {
 
             const updatedPost = await response.json();
             setNewReplies(Array(updatedPost.comments.length).fill(''));
-            setUpdatedComments(updatedPost.comments);
+            // Optionally update the post comments in parent state if passed down as a prop
         } catch (error) {
             console.error('Error submitting reply:', error);
         }
@@ -104,7 +99,7 @@ const CommentSection = ({ postId, comments }) => {
 
     return (
         <div className="mt-4 p-4 bg-gray-100 rounded-md">
-            {updatedComments.map((comment, index) => (
+            {comments.map((comment, index) => (
                 <div key={comment._id} className="mb-4 border-b pb-4">
                     <div className="flex items-start mb-2">
                         <img src={comment.employee.profilePicURL} alt="User" className="w-10 h-10 rounded-full mr-4 object-cover" />
@@ -129,12 +124,12 @@ const CommentSection = ({ postId, comments }) => {
                                     <textarea
                                         className="w-full p-2 rounded-md border"
                                         placeholder="Write a reply..."
-                                        value={newReplies[index]}
-                                        onChange={(e) => handleReplyChange(e, index)}
+                                        value={newReplies[index]} // Fixing the value to newReplies
+                                        onChange={(e) => handleReplyChange(e, index)} // Using handleReplyChange
                                     ></textarea>
                                     <button
                                         className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                                        onClick={() => handleSubmitReply(comment._id, index)}
+                                        onClick={() => handleSubmitReply(comment._id, index)} // Passing comment ID and index
                                     >
                                         Submit
                                     </button>
