@@ -59,7 +59,7 @@ export default function ViewProfile() {
     fetchEmployee();
   }, [id, role, employeeID]); 
   
-  if (isLoading) { // Render loading message if data is still being fetched
+  if (isLoading) { 
     return <div>Loading...</div>;
   }
 
