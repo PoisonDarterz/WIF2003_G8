@@ -64,12 +64,10 @@ export default function EditEmployeeProfile() {
   }, [id]);
   
   useEffect(() => {
-    // Extract unique department names and job titles
     if (roleData) {
       const uniqueJobTitles = [];
   
       roleData.forEach((role) => {
-        // Check if the job title is already in the array
         const jobTitleExists = uniqueJobTitles.find(job => job._id === role._id);
         if (!jobTitleExists) {
           uniqueJobTitles.push(role);
@@ -126,10 +124,9 @@ export default function EditEmployeeProfile() {
       if (uploadResponse.status === 200) {
         console.log("Profile picture uploaded successfully");
   
-        // Assuming `uploadResponse.data` contains the URL of the uploaded profile picture
         const profilePicURL = uploadResponse.data.profilePicURL;
 
-        return profilePicURL; // Return the URL
+        return profilePicURL; 
       } else {
         console.error("Profile picture upload failed");
         return null;
@@ -364,18 +361,11 @@ export default function EditEmployeeProfile() {
                 <input type="file" id="profilePic" onChange={handleFileChange}/>
               </label>
             </div>
-            {/* Input for employee ID */}
+            
             <label htmlFor="employeeId" className="mt-5 block text-md font-medium leading-6 text-gray-900">
                 Employee ID
             </label>
-            <input
-                id="employeeId"
-                name="employeeId"
-                type="text"
-                value={employeeData.id}
-                onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
+            <p>{employeeData.id}</p>
 
             {/* Input for name */}
             <label htmlFor="name" className="mt-5 block text-md font-medium leading-6 text-gray-900">

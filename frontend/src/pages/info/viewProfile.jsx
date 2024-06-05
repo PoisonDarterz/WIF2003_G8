@@ -73,9 +73,9 @@ export default function ViewProfile() {
           <h1 className="text-2xl font-bold">Profile of {employeeData.name}</h1>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-10 gap-x-4">
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-12 gap-x-4">
           {/* Left Column */}
-          <div className="bg-[#eaf3ff] p-5 sm:col-span-2 text-left rounded-lg">
+          <div className="bg-[#eaf3ff] p-5 sm:col-span-3 text-left rounded-lg">
             <div>
               <img
                 className="h-48 w-36 rounded-lg cursor-pointer"
@@ -107,7 +107,7 @@ export default function ViewProfile() {
           </div>
 
           {/* Right Column */}
-          <div className="bg-[#eaf3ff] p-5 sm:col-span-8 text-left ml-5 rounded-lg">
+          <div className="bg-[#eaf3ff] p-5 sm:col-span-9 text-left ml-5 rounded-lg">
             <h2 className="font-bold">Bio</h2>
             <p>
               {employeeData.bio}
