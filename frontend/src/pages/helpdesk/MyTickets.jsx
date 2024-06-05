@@ -45,7 +45,8 @@ function MyTickets(){
   // ]
   const navigate=useNavigate();
 
-  const handleViewTicket=(ticket)=>{
+  const handleViewTicket=(ticket,investigator)=>{
+    ticket.investigator=investigator
     navigate("/helpdesk/reviewTicket",{state:ticket})
   }
 
@@ -119,7 +120,7 @@ function MyTickets(){
               const formattedMinutes = minutes.toString().padStart(2, '0');
               const investigator=investigators.find((investigator)=>investigator.id===ticket.investigatorID)
               return(
-              <tr onClick={()=>{handleViewTicket(ticket)}} className={`hover:bg-slate-300 ${i % 2 === 0 ? 'bg-[#fefefe] '  : 'bg-[#eaf3ff] '} px-4 py-2`}>
+              <tr onClick={()=>{handleViewTicket(ticket,investigator)}} className={`hover:bg-slate-300 ${i % 2 === 0 ? 'bg-[#fefefe] '  : 'bg-[#eaf3ff] '} px-4 py-2`}>
                 <td className="w-[5%] px-4 py-4">{"T"+ticket.ticketID}</td>
                 <td className="w-[10%] px-4 py-4">{formattedDay+"/"+formattedMonth+"/"+year}</td>
                 <td className="w-[10%] px-4 py-4">{formattedHours+":"+formattedMinutes}</td>
