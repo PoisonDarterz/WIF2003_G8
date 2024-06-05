@@ -8,17 +8,17 @@ import axios from 'axios'
 
 function SubmitFeedback(){
   const navigate = useNavigate();
-  const [feedback,setFeedback]=useState({
-    feedbackID: "001",
-    category: "asd",
-    rating: 0,
-    feedbackComment: "",
-  })
 
   const location = useLocation();
   const data = location.state;
   const category = data && data.category;
   const description = data && data.description;
+
+  const [feedback,setFeedback]=useState({
+    category: category,
+    rating: 0,
+    feedbackComment: "",
+  })
   
   const handleCancelFeedback=()=>{
     navigate('/helpdesk/feedback');
@@ -26,16 +26,15 @@ function SubmitFeedback(){
 
   const handleSubmit=async(event)=>{
     event.preventDefault()
-    navigate('/helpdesk/feedback');
     try{
      const response=await axios.post("http://localhost:5000/api/feedbacks/submitFeedback",feedback,{withCredentials:true});
-     console.log("New feedback submitted succesfully:",response.data)
+    //  console.log("New feedback submitted succesfully:",response.data)
      setFeedback({
-      feedbackID: "001",
       category: "",
       rating: "",
       feedbackComment: "",
     })
+    navigate('/helpdesk/feedback');
     }catch(error){
       console.error("Error send request to submit feedback:",error);
     }

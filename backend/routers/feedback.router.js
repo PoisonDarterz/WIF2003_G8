@@ -23,23 +23,34 @@ router.post(
   async (req, res) => {
     console.log("req.body:", req.body);
     try {
+      const newFeedbackID = await generateID();
       const newFeedback = new Feedback({
-        feedbackID: req.body.feedbackID,
+        feedbackID: newFeedbackID,
         category: req.body.category,
         employeeID: req.user.employeeID,
         rating: req.body.rating,
         feedbackComment: req.body.feedbackComment,
       });
-      await newFeedback
-        .save()
-        .then(() => console.log("Feedback submitted successfully to mongodb"))
-        .catch((error) =>
-          console.error("Error create new feedback at mongodb: ", error)
-        );
+
+      const hold = await newFeedback.save();
+      console.log("Feedback submitted successfully to mongodb");
+      res.status(201).json(hold); // Send the created feedback as a response
     } catch (error) {
       console.error("Error submitting feedback: ", error);
     }
   }
 );
+
+const generateID = async () => {
+  const lastFeedback = await Feedback.findOne().sort({ feedbackID: -1 }).exec();
+  let newID = "001";
+
+  if (lastFeedback) {
+    const lastFeedbackID = parseInt(lastFeedback.feedbackID, 10);
+    newID = (lastFeedbackID + 1).toString().padStart(3, "0");
+  }
+
+  return newID;
+};
 
 module.exports = router;

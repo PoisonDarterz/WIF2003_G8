@@ -55,7 +55,7 @@ function ReviewTicket({}){
           </div>
           <div className="flex w-[90%] my-2">
             <div className="font-bold w-[15%] text-left">Assigned Investigator</div>
-            <div className="w-[75%] border rounded-lg text-left pl-5">{ticket.investigatorID}</div>
+            <div className="w-[75%] border rounded-lg text-left pl-5">{ticket.investigator?ticket.investigator.name:"-"}</div>
           </div>
           <div className="flex w-[90%] my-2">
             <div className="font-bold w-[15%] text-left">Subject</div>
@@ -71,7 +71,7 @@ function ReviewTicket({}){
           </div>
           <div className="flex w-[90%] my-2">
             <div className="font-bold w-[15%] text-left">Investigation Update</div>
-            <div className="w-[75%] border rounded-lg text-left p-2 pl-5">{ticket.investigationUpdate}</div>
+            <div className="w-[75%] border rounded-lg text-left p-2 pl-5">{ticket.investigationUpdate===""?"-":ticket.investigationUpdate}</div>
           </div>
           <div className="flex w-[90%] my-2">
             <div className="font-bold w-[15%] text-left">Status</div>
