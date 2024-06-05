@@ -15,7 +15,8 @@ export default function ViewProfile() {
   const [imageUrl, setImageUrl] = useState("");
   const [employeeData, setEmployeeData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [canEditProfile, setCanEditProfile] = useState(false);
+  const [adminEditProfile, setAdminEditProfile] = useState(false);
+  const [userEditProfile, setUserEditProfile] = useState(false);
   const { role, employeeID } = getCurrentUser();
 
   const formatDate = (dateString) => {
@@ -41,8 +42,12 @@ export default function ViewProfile() {
         
         setEmployeeData(response.data);
 
-        setCanEditProfile(
-          role === 'Admin' || employeeID === response.data.id
+        setAdminEditProfile(
+          role === 'Admin' 
+        );
+
+        setUserEditProfile(
+          employeeID === response.data.id && role != 'Admin'
         );
 
       } catch (error) {
@@ -197,8 +202,18 @@ export default function ViewProfile() {
             <div className="border-b border-gray-900/10 pb-12"></div>
 
             <div className="mt-6 flex items-center justify-end gap-x-6">
-              {canEditProfile && (
+              {adminEditProfile && (
                 <Link to={`/info/editEmployeeProfile/${employeeData.id}`}>
+                  <button
+                    type="button"
+                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    Edit Profile
+                  </button>
+                </Link>
+              )}
+              {userEditProfile && (
+                <Link to={`/info/editMyProfile/${employeeData.id}`}>
                   <button
                     type="button"
                     className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
