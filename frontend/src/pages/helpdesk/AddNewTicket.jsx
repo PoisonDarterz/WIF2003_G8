@@ -9,7 +9,6 @@ function AddNewTicket(){
   const [files,setFiles]=useState([]);
   const [isSubmitted,setIsSubmitted]=useState(false);
   const [formData,setFormData]=useState({
-    ticketID: "007",
     dateTimeCreated: new Date(),
     category: "",
     subject: "",
@@ -57,7 +56,6 @@ function AddNewTicket(){
      const response=await axios.post("http://localhost:5000/api/tickets/submitTicket",formData,{withCredentials:true});
      console.log("New ticket submitted succesfully:",response.data)
      setFormData({
-      ticketID: "007",
       dateTimeCreated: new Date(),
       category: "",
       subject: "",
@@ -78,18 +76,7 @@ function AddNewTicket(){
             <h1 className="text-2xl font-bold">Add new ticket</h1>
             <p className="text-lg">Clear and thorough descriptions help us address your issue more effectively</p>
           </div>
-          <form className="flex flex-col mx-20 my-10" onSubmit={handleSubmit}>
-            <div className="flex my-3">
-              <label className="font-bold w-[12%] text-start">Ticket ID</label>
-              <input
-                className="border rounded-lg w-60 h-fit pl-2"
-                type="text"
-                id="ticketID"
-                value={formData.ticketID}
-                readOnly
-              >
-              </input>
-            </div>  
+          <form className="flex flex-col mx-20 my-10" onSubmit={handleSubmit}> 
             <div className="flex my-3">
               <label className="font-bold w-[12%] text-start">Category</label>
               <select id="category" className="border rounded-lg w-60 pl-2" 
