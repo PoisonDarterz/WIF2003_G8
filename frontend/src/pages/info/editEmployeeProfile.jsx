@@ -80,13 +80,13 @@ export default function EditEmployeeProfile() {
     }
   }, [roleData]);
   
-  const uploadEduDoc = async (eduId) => {
+  const uploadDocument = async (docType, docFile) => {
     try {
       const formData = new FormData();
-      formData.append("file", eduDoc);
+      formData.append("file", docFile);
   
       const uploadResponse = await axios.post(
-        `http://localhost:5000/api/employees/${id}/edu-doc/${eduId}`,
+        `http://localhost:5000/api/employees/${id}/${docType}-doc`,
         formData,
         {
           headers: {
@@ -96,95 +96,17 @@ export default function EditEmployeeProfile() {
       );
   
       if (uploadResponse.status === 200) {
-        console.log("Educational document uploaded successfully");
-  
-        const eduDocURL = uploadResponse.data.eduDocURL;
-  
-        const updatedList = [...educationList];
-        updatedList[editIndex].eduDocURL = eduDocURL;
-        setEducationList(updatedList);
-  
-        return eduDocURL;
+        console.log(`${docType} document uploaded successfully`);
+        return uploadResponse.data[`${docType}DocURL`];
       } else {
-        console.error("Educational document upload failed");
+        console.error(`${docType} document upload failed`);
         return null;
       }
     } catch (error) {
-      console.error("Error uploading educational document:", error);
+      console.error(`Error uploading ${docType} document:`, error);
       return null;
     }
   };
-  
-  const uploadSkillsDoc = async (skillsId) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", skillsDoc);
-  
-      const uploadResponse = await axios.post(
-        `http://localhost:5000/api/employees/${id}/skill-doc/${skillsId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-  
-      if (uploadResponse.status === 200) {
-        console.log("Skills document uploaded successfully");
-  
-        const skillsDocURL = uploadResponse.data.skillsDocURL;
-  
-        const updatedList = [...skillsList];
-        updatedList[editIndex].skillsDocURL = skillsDocURL;
-        setSkillsList(updatedList); 
-  
-        return skillsDocURL;
-      } else {
-        console.error("Skills document upload failed");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error uploading skills document:", error);
-      return null;
-    }
-  };
-  
-  const uploadAwardsDoc = async (awardsId) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", awardsDoc);
-  
-      const uploadResponse = await axios.post(
-        `http://localhost:5000/api/employees/${id}/award-doc/${awardsId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-  
-      if (uploadResponse.status === 200) {
-        console.log("Awards document uploaded successfully");
-  
-        const awardsDocURL = uploadResponse.data.awardsDocURL;
-  
-        const updatedList = [...awardsList];
-        updatedList[editIndex].awardsDocURL = awardsDocURL;
-        setAwardsList(updatedList);
-  
-        return awardsDocURL;
-      } else {
-        console.error("Awards document upload failed");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error uploading awards document:", error);
-      return null;
-    }
-  };
-  
 
   const uploadProfilePic = async () => {
     try {
@@ -218,31 +140,40 @@ export default function EditEmployeeProfile() {
     }
   };
   
-
   const updateProfile = async (profilePicURL) => {
     try {
-        // Update other profile information
-        let updatedEmployeeData = {
-            ...employeeData,
-            profilePicURL: profilePicURL || employeeData.profilePicURL,
-            edu: educationList.filter(edu => edu.confirmed),
-            skills: skillsList.filter(skill => skill.confirmed),
-            awards: awardsList.filter(award => award.confirmed),
-        };
-
-        const updateResponse = await axios.put(
-            `http://localhost:5000/api/employees/${id}`, updatedEmployeeData
-        );
-
-        console.log("Profile updated successfully", updateResponse.data);
-        return true;
+      let updatedEmployeeData = {
+        ...employeeData,
+        profilePicURL: profilePicURL || employeeData.profilePicURL,
+        edu: educationList
+          .filter(edu => edu.confirmed)
+          .map(edu => ({...edu, eduTitle: edu.eduTitle || "Untitled Education",
+            eduDesc: edu.eduDesc || "", eduDocURL: edu.eduDocURL || "",
+          })),
+        skills: skillsList
+          .filter(skill => skill.confirmed)
+          .map(skill => ({...skill, skillsTitle: skill.skillsTitle || "Untitled Skill",
+            skillsDesc: skill.skillsDesc || "", skillsDocURL: skill.skillsDocURL || "",
+          })),
+        awards: awardsList
+          .filter(award => award.confirmed)
+          .map(award => ({...award, awardsTitle: award.awardsTitle || "Untitled Award",
+            awardsDesc: award.awardsDesc || "", awardsDocURL: award.awardsDocURL || "",
+          })),
+      };
+  
+      const updateResponse = await axios.put(
+        `http://localhost:5000/api/employees/${id}`, updatedEmployeeData
+      );
+  
+      console.log("Profile updated successfully", updateResponse.data);
+      return true;
     } catch (error) {
-        console.error("Error updating profile:", error);
-        return false;
+      console.error("Error updating profile:", error);
+      return false;
     }
   };
 
-  
   const saveProfile = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -310,32 +241,48 @@ export default function EditEmployeeProfile() {
     setEditType(listType);
   };
   
-
   const handleConfirmItem = async (index, listType) => {
     setIsLoading(true);
-    
+  
     try {
-      if ((editType === "edu" && eduDoc) || (editType === "skills" && skillsDoc) || (editType === "awards" && awardsDoc)) {
-        const docId = listType[index]._id;
-        if (editType === "edu") {
-          await uploadEduDoc(docId);
-        } else if (editType === "skills") {
-          await uploadSkillsDoc(docId);
-        } else if (editType === "awards") {
-          await uploadAwardsDoc(docId);
-        }
+      let docURL = null;
+  
+      if (editType === "edu" && eduDoc) {
+        docURL = await uploadDocument("edu", eduDoc);
+      } else if (editType === "skills" && skillsDoc) {
+        docURL = await uploadDocument("skills", skillsDoc);
+      } else if (editType === "awards" && awardsDoc) {
+        docURL = await uploadDocument("awards", awardsDoc);
       }
   
-      const updatedList = [...listType];
-      updatedList[index].confirmed = true;
-      listType === educationList ? setEducationList(updatedList) :
-      listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
+      if (docURL) {
+        const updatedList = [...listType];
+        if (editType === "edu") {
+          updatedList[index].eduDocURL = docURL;
+        } else if (editType === "skills") {
+          updatedList[index].skillsDocURL = docURL;
+        } else if (editType === "awards") {
+          updatedList[index].awardsDocURL = docURL;
+        }
+        updatedList[index].confirmed = true;
+  
+        if (listType === educationList) {
+          setEducationList(updatedList);
+        } else if (listType === skillsList) {
+          setSkillsList(updatedList);
+        } else if (listType === awardsList) {
+          setAwardsList(updatedList);
+        }
+      } else {
+        console.error("Document upload failed");
+      }
+  
       setEditIndex(null);
       setEditType("");
     } catch (error) {
       console.error("Error confirming item:", error);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
   
@@ -349,24 +296,18 @@ export default function EditEmployeeProfile() {
     }
   };
 
-  // const handleCancelEditSection = () =>{
-  //   setEditIndex(null);
-  //   setEditType("");
-  // };  
-
-
   const handleChange = (e, index, listType) => {
     const { name, value, files } = e.target;
     const updatedList = [...listType];
   
-    // If the input is a file input and it has files
     if (files && files.length > 0) {
-      if (editType === "edu") {
-        setEduDoc(files[0]);
-      } else if (editType === "skills") {
-        setSkillsDoc(files[0]);
-      } else if (editType === "awards") {
-        setAwardsDoc(files[0]);
+      const file = files[0];
+      if (listType === educationList) {
+        setEduDoc(file);
+      } else if (listType === skillsList) {
+        setSkillsDoc(file);
+      } else if (listType === awardsList) {
+        setAwardsDoc(file);
       }
     } else {
       updatedList[index][name] = value;
