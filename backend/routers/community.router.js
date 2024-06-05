@@ -97,8 +97,12 @@ router.post("/posts", upload.single("postImage"), async (req, res) => {
             return res.status(404).json({ message: "Employee not found" });
         }
 
+        // Generate a unique postId
+        const postId = new mongoose.Types.ObjectId();
+
         // Create new community post
         const newCommunityPost = await Community.create({
+            postId, // Set the unique postId
             employee: {
                 id: employee.id, 
                 name: employee.name,
