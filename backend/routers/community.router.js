@@ -16,7 +16,7 @@ const upload = multer({
 const blobServiceClient = BlobServiceClient.fromConnectionString(
   process.env.CONNECTION_STRING
 );
-const containerClientPostImage = blobServiceClient.getContainerClient("communityPosts");
+const containerClientPostImage = blobServiceClient.getContainerClient("communitypost");
 
 
 // GET all community posts
