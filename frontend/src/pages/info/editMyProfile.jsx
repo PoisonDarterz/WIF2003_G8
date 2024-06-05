@@ -57,13 +57,13 @@ export default function EditMyProfile() {
     fetchData();
   }, [id]);
 
-  const uploadEduDoc = async (eduId) => {
+  const uploadEduDoc = async () => {
     try {
       const formData = new FormData();
       formData.append("file", eduDoc);
   
       const uploadResponse = await axios.post(
-        `http://localhost:5000/api/employees/${id}/edu-doc/${eduId}`,
+        `http://localhost:5000/api/employees/${id}/edu-doc`,
         formData,
         {
           headers: {
@@ -74,7 +74,6 @@ export default function EditMyProfile() {
   
       if (uploadResponse.status === 200) {
         console.log("Educational document uploaded successfully");
-  
         const eduDocURL = uploadResponse.data.eduDocURL;
   
         const updatedList = [...educationList];
@@ -92,13 +91,13 @@ export default function EditMyProfile() {
     }
   };
   
-  const uploadSkillsDoc = async (skillsId) => {
+  const uploadSkillsDoc = async () => {
     try {
       const formData = new FormData();
       formData.append("file", skillsDoc);
   
       const uploadResponse = await axios.post(
-        `http://localhost:5000/api/employees/${id}/skill-doc/${skillsId}`,
+        `http://localhost:5000/api/employees/${id}/skill-doc`,
         formData,
         {
           headers: {
@@ -127,13 +126,13 @@ export default function EditMyProfile() {
     }
   };
   
-  const uploadAwardsDoc = async (awardsId) => {
+  const uploadAwardsDoc = async () => {
     try {
       const formData = new FormData();
       formData.append("file", awardsDoc);
   
       const uploadResponse = await axios.post(
-        `http://localhost:5000/api/employees/${id}/award-doc/${awardsId}`,
+        `http://localhost:5000/api/employees/${id}/award-doc`,
         formData,
         {
           headers: {
@@ -181,7 +180,6 @@ export default function EditMyProfile() {
       if (uploadResponse.status === 200) {
         console.log("Profile picture uploaded successfully");
   
-        // Assuming `uploadResponse.data` contains the URL of the uploaded profile picture
         const profilePicURL = uploadResponse.data.profilePicURL;
 
         return profilePicURL; // Return the URL
@@ -198,28 +196,38 @@ export default function EditMyProfile() {
 
   const updateProfile = async (profilePicURL) => {
     try {
-        // Update other profile information
-        let updatedEmployeeData = {
-            ...employeeData,
-            profilePicURL: profilePicURL || employeeData.profilePicURL,
-            edu: educationList.filter(edu => edu.confirmed),
-            skills: skillsList.filter(skill => skill.confirmed),
-            awards: awardsList.filter(award => award.confirmed),
-        };
-
-        const updateResponse = await axios.put(
-            `http://localhost:5000/api/employees/${id}`, updatedEmployeeData
-        );
-
-        console.log("Profile updated successfully", updateResponse.data);
-        return true;
+      let updatedEmployeeData = {
+        ...employeeData,
+        profilePicURL: profilePicURL || employeeData.profilePicURL,
+        edu: educationList
+          .filter(edu => edu.confirmed)
+          .map(edu => ({...edu, eduTitle: edu.eduTitle || "Untitled Education",
+            eduDesc: edu.eduDesc || "", eduDocURL: edu.eduDocURL || "",
+          })),
+        skills: skillsList
+          .filter(skill => skill.confirmed)
+          .map(skill => ({...skill, skillsTitle: skill.skillsTitle || "Untitled Skill",
+            skillsDesc: skill.skillsDesc || "", skillsDocURL: skill.skillsDocURL || "",
+          })),
+        awards: awardsList
+          .filter(award => award.confirmed)
+          .map(award => ({...award, awardsTitle: award.awardsTitle || "Untitled Award",
+            awardsDesc: award.awardsDesc || "", awardsDocURL: award.awardsDocURL || "",
+          })),
+      };
+  
+      const updateResponse = await axios.put(
+        `http://localhost:5000/api/employees/${id}`, updatedEmployeeData
+      );
+  
+      console.log("Profile updated successfully", updateResponse.data);
+      return true;
     } catch (error) {
-        console.error("Error updating profile:", error);
-        return false;
+      console.error("Error updating profile:", error);
+      return false;
     }
   };
 
-  
   const saveProfile = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -292,21 +300,25 @@ export default function EditMyProfile() {
     setIsLoading(true);
     
     try {
-      if ((editType === "edu" && eduDoc) || (editType === "skills" && skillsDoc) || (editType === "awards" && awardsDoc)) {
-        const docId = listType[index]._id;
-        if (editType === "edu") {
-          await uploadEduDoc(docId);
-        } else if (editType === "skills") {
-          await uploadSkillsDoc(docId);
-        } else if (editType === "awards") {
-          await uploadAwardsDoc(docId);
-        }
+      let docURL = null;
+      if (editType === "edu" && eduDoc) {
+        docURL = await uploadEduDoc();
+      } else if (editType === "skills" && skillsDoc) {
+        docURL = await uploadSkillsDoc();
+      } else if (editType === "awards" && awardsDoc) {
+        docURL = await uploadAwardsDoc();
       }
   
-      const updatedList = [...listType];
-      updatedList[index].confirmed = true;
-      listType === educationList ? setEducationList(updatedList) :
-      listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
+      if (docURL) {
+        const updatedList = [...listType];
+        updatedList[index].eduDocURL = docURL;
+        updatedList[index].confirmed = true;
+        listType === educationList ? setEducationList(updatedList) :
+        listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
+      } else {
+        console.error("Document upload failed");
+      }
+  
       setEditIndex(null);
       setEditType("");
     } catch (error) {
@@ -325,12 +337,6 @@ export default function EditMyProfile() {
       listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
     }
   };
-
-  // const handleCancelEditSection = () =>{
-  //   setEditIndex(null);
-  //   setEditType("");
-  // };  
-
 
   const handleChange = (e, index, listType) => {
     const { name, value, files } = e.target;

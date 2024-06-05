@@ -58,10 +58,9 @@ router.post("/:id/profile-pic", upload.single("file"), async (req, res) => {
   }
 });
 
-router.post("/:id/edu-doc/:eduId", upload.single("file"), async (req, res) => {
+router.post("/:id/edu-doc", upload.single("file"), async (req, res) => {
   try {
     const { file } = req;
-    const { id, eduId } = req.params;
     let fileUrl;
 
     if (!file) {
@@ -77,18 +76,6 @@ router.post("/:id/edu-doc/:eduId", upload.single("file"), async (req, res) => {
     });
     fileUrl = blockBlobClient.url;
 
-    const updatedEmployee = await Employee.findOneAndUpdate(
-      { id, "edu._id": eduId },
-      { $set: { "edu.$.eduDocURL": fileUrl } },
-      { new: true }
-    );
-
-    if (!updatedEmployee) {
-      return res
-        .status(404)
-        .json({ message: "Employee or education document not found" });
-    }
-
     res.json({ eduDocURL: fileUrl });
   } catch (err) {
     console.error("Error uploading educational document:", err);
@@ -97,13 +84,9 @@ router.post("/:id/edu-doc/:eduId", upload.single("file"), async (req, res) => {
 });
 
 // Upload skill document
-router.post(
-  "/:id/skill-doc/:skillsId",
-  upload.single("file"),
-  async (req, res) => {
+router.post("/:id/skill-doc", upload.single("file"), async (req, res) => {
     try {
       const { file } = req;
-      const { id, skillsId } = req.params;
       let fileUrl;
 
       if (!file) {
@@ -111,26 +94,13 @@ router.post(
       }
 
       const blobName = Date.now() + "-" + file.originalname;
-      const blockBlobClient =
-        containerClientSkills.getBlockBlobClient(blobName);
+      const blockBlobClient = containerClientSkills.getBlockBlobClient(blobName);
       await blockBlobClient.uploadData(file.buffer, {
         blobHTTPHeaders: {
           blobContentType: file.mimetype,
         },
       });
       fileUrl = blockBlobClient.url;
-
-      const updatedEmployee = await Employee.findOneAndUpdate(
-        { id, "skills._id": skillsId },
-        { $set: { "skills.$.skillsDocURL": fileUrl } },
-        { new: true }
-      );
-
-      if (!updatedEmployee) {
-        return res
-          .status(404)
-          .json({ message: "Employee or skills document not found" });
-      }
 
       res.json({ skillsDocURL: fileUrl });
     } catch (err) {
@@ -141,13 +111,9 @@ router.post(
 );
 
 // Upload award document
-router.post(
-  "/:id/award-doc/:awardsId",
-  upload.single("file"),
-  async (req, res) => {
+router.post("/:id/award-doc", upload.single("file"), async (req, res) => {
     try {
       const { file } = req;
-      const { id, awardsId } = req.params;
       let fileUrl;
 
       if (!file) {
@@ -155,26 +121,13 @@ router.post(
       }
 
       const blobName = Date.now() + "-" + file.originalname;
-      const blockBlobClient =
-        containerClientAwards.getBlockBlobClient(blobName);
+      const blockBlobClient = containerClientAwards.getBlockBlobClient(blobName);
       await blockBlobClient.uploadData(file.buffer, {
         blobHTTPHeaders: {
           blobContentType: file.mimetype,
         },
       });
       fileUrl = blockBlobClient.url;
-
-      const updatedEmployee = await Employee.findOneAndUpdate(
-        { id, "awards._id": awardsId },
-        { $set: { "awards.$.awardsDocURL": fileUrl } },
-        { new: true }
-      );
-
-      if (!updatedEmployee) {
-        return res
-          .status(404)
-          .json({ message: "Employee or award document not found" });
-      }
 
       res.json({ awardsDocURL: fileUrl });
     } catch (err) {
@@ -245,11 +198,11 @@ router.get("/:id", async (req, res) => {
 // Update employee profile
 router.put("/:id", async (req, res) => {
   try {
-    const { edu, skills, awards, profilePicURL, ...employeeData } = req.body; // Ensure profilePicURL is retrieved
+    const { edu, skills, awards, profilePicURL, ...employeeData } = req.body; 
 
     const updatedEmployee = await Employee.findOneAndUpdate(
       { id: req.params.id },
-      { $set: { edu, skills, awards, profilePicURL }, ...employeeData }, // Update profilePicURL
+      { $set: { edu, skills, awards, profilePicURL }, ...employeeData },
       { new: true }
     ).populate([
       {
