@@ -3,10 +3,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import TopNavBlack from "../../components/TopNavBlack";
 import axios from 'axios';
 
+const getCurrentUser = () => {
+    const role = localStorage.getItem('role');
+    const employeeID = localStorage.getItem('employeeID');
+    return { role, employeeID };
+  };
+
 const Profile = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState({});
     const [error, setError] = useState(null);
+    const [adminEditProfile, setAdminEditProfile] = useState(false);
+    const { role } = getCurrentUser();
 
     const backgroundImage = process.env.PUBLIC_URL + '/Home.png';
 
@@ -26,6 +34,7 @@ const Profile = () => {
 
                 console.log('User profile data received:', formattedData);
                 setUser(formattedData);
+                setAdminEditProfile(role === 'Admin');
             } catch (error) {
                 console.error('Error fetching user profile:', error);
                 if (error.response && error.response.status === 404) {
@@ -36,7 +45,7 @@ const Profile = () => {
             }
         };
         fetchUserProfile();
-    }, []);
+    }, [role]);
 
     const handleLogout = async () => {
         try {
@@ -70,7 +79,11 @@ const Profile = () => {
                         </div>
                         <div className="border-b border-black pb-5"></div>
                         <div className="flex justify-center"> 
-                            <Link to={`/info/editMyProfile/${user.id}`} className="mt-5 text-indigo-600 font-semibold hover:underline">Edit Profile</Link>
+                            {adminEditProfile ? (
+                                <Link to={`/info/editEmployeeProfile/${user.id}`} className="mt-5 text-indigo-600 font-semibold hover:underline">Edit Profile</Link>
+                            ) : (
+                                <Link to={`/info/editMyProfile/${user.id}`} className="mt-5 text-indigo-600 font-semibold hover:underline">Edit Profile</Link>
+                            )}
                         </div>
                         <div className="border-b border-black pb-5"></div>
                         <div className="flex justify-center"> 

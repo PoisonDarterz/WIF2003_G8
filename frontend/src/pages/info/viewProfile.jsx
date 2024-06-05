@@ -15,7 +15,8 @@ export default function ViewProfile() {
   const [imageUrl, setImageUrl] = useState("");
   const [employeeData, setEmployeeData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [canEditProfile, setCanEditProfile] = useState(false);
+  const [adminEditProfile, setAdminEditProfile] = useState(false);
+  const [userEditProfile, setUserEditProfile] = useState(false);
   const { role, employeeID } = getCurrentUser();
 
   const formatDate = (dateString) => {
@@ -41,8 +42,12 @@ export default function ViewProfile() {
         
         setEmployeeData(response.data);
 
-        setCanEditProfile(
-          role === 'Admin' || employeeID === response.data.id
+        setAdminEditProfile(
+          role === 'Admin' 
+        );
+
+        setUserEditProfile(
+          employeeID === response.data.id && role != 'Admin'
         );
 
       } catch (error) {
@@ -54,7 +59,7 @@ export default function ViewProfile() {
     fetchEmployee();
   }, [id, role, employeeID]); 
   
-  if (isLoading) { // Render loading message if data is still being fetched
+  if (isLoading) { 
     return <div>Loading...</div>;
   }
 
@@ -68,9 +73,9 @@ export default function ViewProfile() {
           <h1 className="text-2xl font-bold">Profile of {employeeData.name}</h1>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-10 gap-x-4">
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-12 gap-x-4">
           {/* Left Column */}
-          <div className="bg-[#eaf3ff] p-5 sm:col-span-2 text-left rounded-lg">
+          <div className="bg-[#eaf3ff] p-5 sm:col-span-3 text-left rounded-lg">
             <div>
               <img
                 className="h-48 w-36 rounded-lg cursor-pointer"
@@ -102,7 +107,7 @@ export default function ViewProfile() {
           </div>
 
           {/* Right Column */}
-          <div className="bg-[#eaf3ff] p-5 sm:col-span-8 text-left ml-5 rounded-lg">
+          <div className="bg-[#eaf3ff] p-5 sm:col-span-9 text-left ml-5 rounded-lg">
             <h2 className="font-bold">Bio</h2>
             <p>
               {employeeData.bio}
@@ -197,8 +202,18 @@ export default function ViewProfile() {
             <div className="border-b border-gray-900/10 pb-12"></div>
 
             <div className="mt-6 flex items-center justify-end gap-x-6">
-              {canEditProfile && (
+              {adminEditProfile && (
                 <Link to={`/info/editEmployeeProfile/${employeeData.id}`}>
+                  <button
+                    type="button"
+                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    Edit Profile
+                  </button>
+                </Link>
+              )}
+              {userEditProfile && (
+                <Link to={`/info/editMyProfile/${employeeData.id}`}>
                   <button
                     type="button"
                     className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
