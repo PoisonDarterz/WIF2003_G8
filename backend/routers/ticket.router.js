@@ -38,8 +38,9 @@ router.post(
   checkRole("Employee"),
   async (req, res) => {
     try {
+      const newTicketID = await generateID();
       const newTicket = new Ticket({
-        ticketID: req.body.ticketID,
+        ticketID: newTicketID,
         employeeID: req.user.employeeID,
         dateTimeCreated: req.body.dateTimeCreated,
         category: req.body.category === "" ? "General" : req.body.category,
@@ -50,14 +51,11 @@ router.post(
         investigationUpdate: "",
         status: "pending",
       });
-      await newTicket
-        .save()
-        .then(() => console.log("Ticket submitted successfully to mongodb"))
-        .catch((error) =>
-          console.error("Error create new ticket at mongodb: ", error)
-        );
+      const hold = await newTicket.save();
+      console.log("Ticket submitted successfully to mongodb");
+      res.status(201).json(hold); // Send the created ticket as a response
     } catch (error) {
-      console.error("Error submitting ticket: ", error);
+      console.error("Error submitting ticket to mongodb: ", error);
     }
   }
 );
@@ -80,5 +78,17 @@ router.put(
     }
   }
 );
+
+const generateID = async () => {
+  const lastTicket = await Ticket.findOne().sort({ ticketID: -1 }).exec();
+  let newID = "001";
+
+  if (lastTicket) {
+    const lastTicketID = parseInt(lastTicket.ticketID, 10);
+    newID = (lastTicketID + 1).toString().padStart(3, "0");
+  }
+
+  return newID;
+};
 
 module.exports = router;
