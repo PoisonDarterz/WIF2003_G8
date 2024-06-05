@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaUpload, FaCalendarAlt } from "react-icons/fa";
@@ -31,6 +31,27 @@ const LeaveApplicationForm = () => {
     "Research Scientist",
     "None",
   ];
+
+  useEffect(() => {
+    // Fetch employee details when the component mounts
+    const fetchEmployeeDetails = async () => {
+      const storedEmployeeID = localStorage.getItem("employeeID");
+      if (storedEmployeeID) {
+        try {
+          const response = await axios.get(
+            `http://localhost:5000/api/employees/${storedEmployeeID}`
+          );
+          const employee = response.data;
+          setEmployeeName(employee.name);
+          setEmployeeID(`EMP${employee.id}`);
+        } catch (error) {
+          console.error("Error fetching employee details:", error);
+        }
+      }
+    };
+
+    fetchEmployeeDetails();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,9 +121,9 @@ const LeaveApplicationForm = () => {
               type="text"
               id="employeeName"
               value={employeeName}
-              onChange={(e) => setEmployeeName(e.target.value)}
+              readOnly // Make the field read-only
               placeholder="Enter your name"
-              className="w-64 px-3 py-2 border border-gray-300 rounded"
+              className="w-64 px-3 py-2 border border-gray-300 rounded bg-gray-100"
             />
           </div>
 
@@ -114,9 +135,9 @@ const LeaveApplicationForm = () => {
               type="text"
               id="employeeID"
               value={employeeID}
-              onChange={(e) => setEmployeeID(e.target.value)}
+              readOnly // Make the field read-only
               placeholder="Enter your ID (e.g EMP100)"
-              className="w-64 px-3 py-2 border border-gray-300 rounded"
+              className="w-64 px-3 py-2 border border-gray-300 rounded bg-gray-100"
             />
           </div>
 
@@ -205,13 +226,6 @@ const LeaveApplicationForm = () => {
                 className="w-64 px-3 py-2 border border-gray-300 rounded"
               />
             </div>
-            <button
-              type="button"
-              className="bg-[#EBB99E] hover:bg-opacity-90 text-black font-bold py-2 px-4 rounded mt-2 w-64"
-            >
-              <FaUpload className="mr-2 inline-block" />
-              Upload
-            </button>
           </div>
         </div>
       </form>

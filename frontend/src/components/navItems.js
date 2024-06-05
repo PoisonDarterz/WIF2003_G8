@@ -63,7 +63,7 @@ export const navItems = (role) => [
   },
   {
     title: "SALARY",
-    link: "/salary/view",
+    link: role === "Admin" ? "/salary/adminview" : "/salary/view",
     submenu: role === "Admin" ? adminNavItems : employeeNavItems,
   },
   {
