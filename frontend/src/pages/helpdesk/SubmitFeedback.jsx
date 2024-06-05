@@ -18,6 +18,7 @@ function SubmitFeedback(){
     category: category,
     rating: 0,
     feedbackComment: "",
+    dateTimeCreated:new Date(),
   })
   
   const handleCancelFeedback=()=>{
@@ -33,6 +34,7 @@ function SubmitFeedback(){
       category: "",
       rating: "",
       feedbackComment: "",
+      dateTimeCreated:null,
     })
     navigate('/helpdesk/feedback');
     }catch(error){

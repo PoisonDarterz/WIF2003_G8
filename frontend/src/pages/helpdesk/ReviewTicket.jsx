@@ -1,5 +1,6 @@
 import TopNavBlack from "../../components/TopNavBlack"
 import { useLocation,useNavigate } from "react-router-dom";
+import { FaFileImage, FaFilePdf, FaFileWord, FaFileExcel} from "react-icons/fa";
 
 function ReviewTicket({}){
   const navigate=useNavigate()
@@ -8,7 +9,10 @@ function ReviewTicket({}){
   console.log("ticket:",ticket)
 
   const isoString=ticket.dateTimeCreated;
-  const dateTime=new Date(isoString);
+  const utcDate = new Date(isoString); // Convert ISO string to Date object in UTC
+  const dateTime = new Date(utcDate.getTime() + 8 * 60 * 60 * 1000);
+  // const isoString=ticket.dateTimeCreated;
+  // const dateTime=new Date(isoString);
   const year = dateTime.getUTCFullYear();
   const month = dateTime.getUTCMonth() + 1;
   const day = dateTime.getUTCDate();
@@ -19,11 +23,31 @@ function ReviewTicket({}){
   const formattedHours = hours.toString().padStart(2, '0');
   const formattedMinutes = minutes.toString().padStart(2, '0');
 
-
+  const getFileIcon = (fileUrl) => {
+    const fileExtension = fileUrl.split('.').pop().toLowerCase();
+    switch (fileExtension) {
+      case "jpeg":
+      case "jpg":
+      case "png":
+        return <a href={fileUrl} target="_blank"><FaFileImage className="w-10 h-10" /></a>;
+      case "pdf":
+        return <a href={fileUrl} target="_blank"><FaFilePdf className="w-10 h-10" /></a>;
+      case "doc":
+      case "docx":
+        return <a href={fileUrl} target="_blank" ><FaFileWord className="w-10 h-10" /></a>;
+      case "xls":
+      case "xlsx":
+        return <a href={fileUrl} target="_blank"><FaFileExcel className="w-10 h-10" /></a>;
+      default:
+        return <a href={fileUrl} target="_blank"><FaFileImage className="w-10 h-10" /></a>; // Default icon for unknown file types
+    }
+  };
 
   const handleBackToMyTickets=()=>{
     navigate("/helpdesk/")
   }
+
+  const fileName=ticket.attachment.substring(ticket.attachment.lastIndexOf('/') + 1);
 
     return(
         <div className="p-8">
@@ -67,7 +91,14 @@ function ReviewTicket({}){
           </div>
           <div className="flex w-[90%] my-2">
             <div className="font-bold w-[15%] text-left">Attachment</div>
-            {ticket.attachment!==""?<div className="w-[75%] border rounded-lg text-left pl-5"></div>:<div className="w-[75%] border rounded-lg text-left pl-5">No attachement</div>}
+            {ticket.attachment!==""?
+            <div className="w-[75%] border rounded-lg text-left pl-5 py-2">
+              {getFileIcon(ticket.attachment)}
+              <div className="flex">
+                <p className="flex w-24 overflow-hidden whitespace-nowrap overflow-ellipsis" title={fileName}>{fileName}</p>
+              </div>
+            </div>
+            :<div className="w-[75%] border rounded-lg text-left pl-5">No attachment</div>}
           </div>
           <div className="flex w-[90%] my-2">
             <div className="font-bold w-[15%] text-left">Investigation Update</div>

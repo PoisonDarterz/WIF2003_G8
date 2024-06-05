@@ -19,6 +19,10 @@ const FeedbackSchema = new mongoose.Schema({
   feedbackComment: {
     type: String,
   },
+  dateTimeCreated: {
+    type: Date,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Feedback", FeedbackSchema);
