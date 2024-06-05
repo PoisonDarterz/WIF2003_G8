@@ -1,10 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const CreatePost = ({ addPost }) => {
     const [showCreatePost, setShowCreatePost] = useState(false);
     const [newPostContent, setNewPostContent] = useState('');
     const [newPostImage, setNewPostImage] = useState(null);
+    const [employeeId, setEmployeeId] = useState('');
+
+    useEffect(() => {
+        // Fetch the user profile to get the employee ID
+        const fetchUserProfile = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/auth/my-profile', {
+                    withCredentials: true // Include credentials (cookies) in the request
+                });
+                setEmployeeId(response.data.id); // Assuming the employee ID is stored in response.data.id
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
 
     const handleCreatePostClick = () => {
         setShowCreatePost(true);
@@ -16,14 +33,14 @@ const CreatePost = ({ addPost }) => {
         if (newPostImage) {
             postData.append('postImage', newPostImage);
         }
-        postData.append('employeeId', '123'); // Use the correct employeeId
+        postData.append('employeeId', employeeId); // Use the fetched employee ID
 
         try {
             const response = await axios.post('http://localhost:5000/api/community/posts', postData, {
-                
                 headers: {
                     'Content-Type': 'multipart/form-data'
-                }
+                },
+                withCredentials: true // Include credentials (cookies) in the request
             });
             const newPost = response.data;
             addPost(newPost);
@@ -87,6 +104,5 @@ const CreatePost = ({ addPost }) => {
 };
 
 export default CreatePost;
-
 
 

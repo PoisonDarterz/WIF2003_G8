@@ -16,7 +16,7 @@ const upload = multer({
 const blobServiceClient = BlobServiceClient.fromConnectionString(
   process.env.CONNECTION_STRING
 );
-const containerClientPostImage = blobServiceClient.getContainerClient("communityPosts");
+const containerClientPostImage = blobServiceClient.getContainerClient("communitypost");
 
 
 // GET all community posts
@@ -97,8 +97,12 @@ router.post("/posts", upload.single("postImage"), async (req, res) => {
             return res.status(404).json({ message: "Employee not found" });
         }
 
+        // Generate a unique postId
+        const postId = new mongoose.Types.ObjectId();
+
         // Create new community post
         const newCommunityPost = await Community.create({
+            postId, // Set the unique postId
             employee: {
                 id: employee.id, 
                 name: employee.name,

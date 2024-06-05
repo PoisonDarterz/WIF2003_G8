@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
-import { FaReply } from 'react-icons/fa'; // Importing FontAwesome icons
+import React, { useState, useEffect } from 'react';
+import { FaReply } from 'react-icons/fa';
 import moment from 'moment';
+import axios from 'axios';
 
 const CommentSection = ({ postId, comments }) => {
     const [newComments, setNewComments] = useState(Array(comments.length).fill(''));
     const [replyingTo, setReplyingTo] = useState(Array(comments.length).fill(-1));
     const [newCommentText, setNewCommentText] = useState('');
-    const [newReplies, setNewReplies] = useState(Array(comments.length).fill('')); // Adding replies state
+    const [newReplies, setNewReplies] = useState(Array(comments.length).fill(''));
+    const [employeeId, setEmployeeId] = useState('');
+
+    useEffect(() => {
+        // Fetch the user profile to get the employee ID
+        const fetchUserProfile = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/auth/my-profile', {
+                    withCredentials: true // Include credentials (cookies) in the request
+                });
+                setEmployeeId(response.data.id); // Assuming the employee ID is stored in response.data.id
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
 
     const handleCommentChange = (e, index) => {
         const updatedComments = [...newComments];
@@ -14,7 +32,7 @@ const CommentSection = ({ postId, comments }) => {
         setNewComments(updatedComments);
     };
 
-    const handleReplyChange = (e, index) => { // Adding reply change handler
+    const handleReplyChange = (e, index) => {
         const updatedReplies = [...newReplies];
         updatedReplies[index] = e.target.value;
         setNewReplies(updatedReplies);
@@ -27,7 +45,7 @@ const CommentSection = ({ postId, comments }) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ commentText: newComments[index], employeeId: '123' })
+                body: JSON.stringify({ commentText: newComments[index], employeeId })
             });
 
             if (!response.ok) {
@@ -53,7 +71,7 @@ const CommentSection = ({ postId, comments }) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ commentText: newCommentText, employeeId: '123' })
+                body: JSON.stringify({ commentText: newCommentText, employeeId })
             });
 
             if (!response.ok) {
@@ -76,7 +94,7 @@ const CommentSection = ({ postId, comments }) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ replyText: newReplies[index], employeeId: '123' })
+                body: JSON.stringify({ replyText: newReplies[index], employeeId })
             });
 
             if (!response.ok) {
@@ -124,12 +142,12 @@ const CommentSection = ({ postId, comments }) => {
                                     <textarea
                                         className="w-full p-2 rounded-md border"
                                         placeholder="Write a reply..."
-                                        value={newReplies[index]} // Fixing the value to newReplies
-                                        onChange={(e) => handleReplyChange(e, index)} // Using handleReplyChange
+                                        value={newReplies[index]}
+                                        onChange={(e) => handleReplyChange(e, index)}
                                     ></textarea>
                                     <button
                                         className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                                        onClick={() => handleSubmitReply(comment._id, index)} // Passing comment ID and index
+                                        onClick={() => handleSubmitReply(comment._id, index)}
                                     >
                                         Submit
                                     </button>
@@ -176,4 +194,5 @@ const CommentSection = ({ postId, comments }) => {
 };
 
 export default CommentSection;
+
 
