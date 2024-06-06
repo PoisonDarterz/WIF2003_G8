@@ -1,6 +1,7 @@
 import { useEffect,useState } from "react";
 import TopNavBlack from "../../components/TopNavBlack"
 import { useNavigate,useLocation } from 'react-router-dom';
+// import { ReactComponent as DropDownArrow } from "../../../public/";
 import axios from "axios";
 
 function AllEmployeeTickets(){
@@ -16,11 +17,50 @@ function AllEmployeeTickets(){
   const recordsPerPage = 10;
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = allTickets.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(allTickets.length / recordsPerPage);
+  // const [currentRecords,setCurrentRecords] = useState([]);
+  const [filteredData,setFilteredData]=useState([])
+  const currentRecords = filteredData.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+
+  const [isSearchByDropDownActive, setIsSearchByDropDownActive] =
+  useState(false);
+  const [searchBy, setSearchBy] = useState("Ticket ID");
+  const [keyword, setKeyword] = useState("");
+  const fields = ["Ticket ID", "Employee ID","Category","Status"];
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const SearchBy = () => {
+    return (
+      <div id="searching" className=" h-7">
+        <button
+          className="flex h-full w-[160px] rounded-md px-2 text-white bg-blue-700 hover:bg-blue-900 hover:scale-105 justify-center items-center"
+          onClick={() => {
+            setIsSearchByDropDownActive(!isSearchByDropDownActive);
+          }}
+        >
+          {searchBy}
+          <img src="/caret-down.png" className="w-3 h-5 ml-2 fill-white" />
+        </button>
+        {isSearchByDropDownActive && (
+          <div className="absolute w-[160px] z-10 max-h-[20%] overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg">
+            {fields.map((field) => (
+              <button
+                onClick={() => {
+                  setSearchBy(field);
+                  setIsSearchByDropDownActive(!isSearchByDropDownActive);
+                }}
+                className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                {field}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   useEffect(()=>{
@@ -29,7 +69,7 @@ function AllEmployeeTickets(){
       console.log("Ticket Response:",response.data);
       setAllTickets(response.data);
       const allInvestigatorIDs=response.data.map((ticket)=>(ticket.investigatorID))
-
+      setFilteredData(allTickets.slice(indexOfFirstRecord, indexOfLastRecord))
       try{
         const response= await axios.post(`http://localhost:5000/api/employees/employee-Id&Name`,allInvestigatorIDs);
         console.log("Investigator with name:",response.data)
@@ -42,6 +82,43 @@ function AllEmployeeTickets(){
 
     console.log("All Investigator:",investigators)
   },[]);
+
+  useEffect(() => {
+      const hold = allTickets.filter((ticket) => {
+        let modifiedKeyword=keyword.toLowerCase();
+        if(searchBy === "Ticket ID"||searchBy === "Employee ID"){
+          modifiedKeyword=modifiedKeyword.startsWith("e") || modifiedKeyword.startsWith("t")? modifiedKeyword.substring(1):modifiedKeyword
+        }
+        if (
+          searchBy === "Ticket ID" &&
+          ticket.ticketID.toString().toLowerCase().includes(modifiedKeyword)
+        ) {
+          return ticket;
+        } else if (
+          searchBy === "Employee ID" &&
+          ticket.employeeID.toString().toLowerCase().includes(modifiedKeyword)
+        ) {
+          return ticket;
+        } else if (
+          searchBy === "Category" &&
+          ticket.category.toString().toLowerCase().includes(modifiedKeyword)
+        ) {
+          return ticket;
+        } else if (
+          searchBy === "Status" &&
+          ticket.status.toString().toLowerCase().includes(modifiedKeyword)
+        ) {
+          return ticket;
+        } 
+
+        // else {
+        //  return ticket;
+        // }
+      });
+      setFilteredData(hold);
+  }, [keyword, searchBy, allTickets]);
+
+
     return(
       <div className="p-8">
         <div className="mt-[-32px] ml-[-32px] mr-[-32px]">
@@ -51,6 +128,21 @@ function AllEmployeeTickets(){
           <h1 className="text-2xl font-bold">Tickets</h1>
           <p className="text-lg">Investigate and resolve non-compliance</p>
         </div>
+        <div className="flex justify-end pt-4 pb-2">
+        <div className="flex border rounded-e-md w-fit mr-10 h-7">
+          <SearchBy />
+          <input
+            className="w-60 px-2 h-full border-l-0 focus:border-l-0 focus:ring-0 rounded-md"
+            type="text"
+            id="keyword"
+            placeholder={"search by " + searchBy}
+            value={keyword}
+            onChange={(e) => {
+              setKeyword(e.target.value);
+            }}
+          />
+        </div>
+      </div>
         {allTickets.length===0?<p className="text-2xl font-bold">No ticket</p>:
         <div className="mt-5">
 

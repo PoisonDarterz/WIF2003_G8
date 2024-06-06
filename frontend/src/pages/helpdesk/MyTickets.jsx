@@ -11,8 +11,47 @@ function MyTickets(){
   const recordsPerPage = 6;
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = tickets.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(tickets.length / recordsPerPage);
+  // const [currentRecords,setCurrentRecords] = useState([]);
+  const [filteredData,setFilteredData]=useState([])
+  const currentRecords = filteredData.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+
+  const [isSearchByDropDownActive, setIsSearchByDropDownActive] =
+  useState(false);
+  const [searchBy, setSearchBy] = useState("Ticket ID");
+  const [keyword, setKeyword] = useState("");
+  const fields = ["Ticket ID","Category","Status"];
+
+  const SearchBy = () => {
+    return (
+      <div id="searching" className=" h-7">
+        <button
+          className="flex h-full w-[160px] rounded-md px-2 text-white bg-blue-700 hover:bg-blue-900 hover:scale-105 justify-center items-center"
+          onClick={() => {
+            setIsSearchByDropDownActive(!isSearchByDropDownActive);
+          }}
+        >
+          {searchBy}
+          <img src="/caret-down.png" className="w-3 h-5 ml-2 fill-white" />
+        </button>
+        {isSearchByDropDownActive && (
+          <div className="absolute w-[160px] z-10 max-h-[20%] overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg">
+            {fields.map((field) => (
+              <button
+                onClick={() => {
+                  setSearchBy(field);
+                  setIsSearchByDropDownActive(!isSearchByDropDownActive);
+                }}
+                className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                {field}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -38,6 +77,7 @@ function MyTickets(){
       setTickets(response.data);
 
       const allInvestigatorIDs=response.data.map((ticket)=>(ticket.investigatorID))
+      setFilteredData(tickets.slice(indexOfFirstRecord, indexOfLastRecord))
 
       try{
         const response= await axios.post(`http://localhost:5000/api/employees/employee-Id&Name`,allInvestigatorIDs);
@@ -49,6 +89,36 @@ function MyTickets(){
     }
     fetchTickets();
   },[])
+
+  useEffect(() => {
+    const hold = tickets.filter((ticket) => {
+      let modifiedKeyword=keyword.toLowerCase();
+      if(searchBy === "Ticket ID"){
+        modifiedKeyword=modifiedKeyword.startsWith("t")? modifiedKeyword.substring(1):modifiedKeyword
+      }
+      if (
+        searchBy === "Ticket ID" &&
+        ticket.ticketID.toString().toLowerCase().includes(modifiedKeyword)
+      ) {
+        return ticket;
+      }  else if (
+        searchBy === "Category" &&
+        ticket.category.toString().toLowerCase().includes(modifiedKeyword)
+      ) {
+        return ticket;
+      } else if (
+        searchBy === "Status" &&
+        ticket.status.toString().toLowerCase().includes(modifiedKeyword)
+      ) {
+        return ticket;
+      } 
+
+      // else {
+      //  return ticket;
+      // }
+    });
+    setFilteredData(hold);
+}, [keyword, searchBy, tickets]);
 
     return(
         <div className="p-8">
@@ -67,7 +137,22 @@ function MyTickets(){
             <p>Report non-compliance</p>
           </button>
         </div>
-        {currentRecords.length===0?<p className="text-2xl font-bold">No ticket</p>:
+        <div className="flex justify-end pt-4 pb-2">
+        <div className="flex border rounded-e-md w-fit mr-10 h-7">
+          <SearchBy />
+          <input
+            className="w-60 px-2 h-full border-l-0 focus:border-l-0 focus:ring-0 rounded-md"
+            type="text"
+            id="keyword"
+            placeholder={"search by " + searchBy}
+            value={keyword}
+            onChange={(e) => {
+              setKeyword(e.target.value);
+            }}
+          />
+        </div>
+      </div>
+        {tickets.length===0?<p className="text-2xl font-bold">No ticket</p>:
         <div className="mt-5">
 
                 <table className="w-full table-auto">
@@ -83,7 +168,7 @@ function MyTickets(){
                   </tr>
                 </thead>
                 <tbody className="text-sm font-normal text-gray-700">
-                  {tickets.map((ticket, i) => {
+                  {currentRecords.map((ticket, i) => {
                     const isoString=ticket.dateTimeCreated;
                     const utcDate = new Date(isoString); // Convert ISO string to Date object in UTC
                     const dateTime = new Date(utcDate.getTime() + 8 * 60 * 60 * 1000);

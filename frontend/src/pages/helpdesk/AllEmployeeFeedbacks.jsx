@@ -11,8 +11,16 @@ function Feedbacks(){
   const recordsPerPage = 6;
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = feedbacks.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(feedbacks.length / recordsPerPage);
+  // const [currentRecords,setCurrentRecords] = useState([]);
+  const [filteredData,setFilteredData]=useState([])
+  const currentRecords = filteredData.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+
+  const [isSearchByDropDownActive, setIsSearchByDropDownActive] =
+  useState(false);
+  const [searchBy, setSearchBy] = useState("Feedback ID");
+  const [keyword, setKeyword] = useState("");
+  const fields = ["Feedback ID","Category","Rating"];
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -22,6 +30,37 @@ function Feedbacks(){
     navigate(`/helpdesk/reviewFeedbacks/${feedback.feedbackID}`,{state:feedback})
   }
 
+  const SearchBy = () => {
+    return (
+      <div id="searching" className=" h-7">
+        <button
+          className="flex h-full w-[160px] rounded-md px-2 text-white bg-blue-700 hover:bg-blue-900 hover:scale-105 justify-center items-center"
+          onClick={() => {
+            setIsSearchByDropDownActive(!isSearchByDropDownActive);
+          }}
+        >
+          {searchBy}
+          <img src="/caret-down.png" className="w-3 h-5 ml-2 fill-white" />
+        </button>
+        {isSearchByDropDownActive && (
+          <div className="absolute w-[160px] z-10 max-h-[20%] overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg">
+            {fields.map((field) => (
+              <button
+                onClick={() => {
+                  setSearchBy(field);
+                  setIsSearchByDropDownActive(!isSearchByDropDownActive);
+                }}
+                className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                {field}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   useEffect(()=>{
     const fetchFeedbacks=async()=>{
       const response = await axios.get("http://localhost:5000/api/feedbacks/", {
@@ -29,9 +68,41 @@ function Feedbacks(){
       });
       console.log("Feedbacks Response:",response.data);
       setFeedbacks(response.data);
+      setFilteredData(feedbacks.slice(indexOfFirstRecord, indexOfLastRecord))
+
     }
     fetchFeedbacks();
   },[])
+
+  useEffect(() => {
+    const hold = feedbacks.filter((feedback) => {
+      let modifiedKeyword=keyword.toLowerCase();
+      if(searchBy === "Feedback ID"){
+        modifiedKeyword=modifiedKeyword.startsWith("f")? modifiedKeyword.substring(1):modifiedKeyword
+      }
+      if (
+        searchBy === "Feedback ID" &&
+        feedback.feedbackID.toString().toLowerCase().includes(modifiedKeyword)
+      ) {
+        return feedback;
+      }  else if (
+        searchBy === "Category" &&
+        feedback.category.toString().toLowerCase().includes(modifiedKeyword)
+      ) {
+        return feedback;
+      } else if (
+        searchBy === "Rating" &&
+        feedback.rating.toString().toLowerCase().includes(modifiedKeyword)
+      ) {
+        return feedback;
+      } 
+
+      // else {
+      //  return ticket;
+      // }
+    });
+    setFilteredData(hold);
+}, [keyword, searchBy, feedbacks]);
 
     return(
         <div className="p-8">
@@ -42,6 +113,21 @@ function Feedbacks(){
           <h1 className="text-2xl font-bold">Feedbacks</h1>
           <p className="text-lg ">Review all employees' feedback</p>
         </div>
+        <div className="flex justify-end pt-4 pb-2">
+        <div className="flex border rounded-e-md w-fit mr-10 h-7">
+          <SearchBy />
+          <input
+            className="w-60 px-2 h-full border-l-0 focus:border-l-0 focus:ring-0 rounded-md"
+            type="text"
+            id="keyword"
+            placeholder={"search by " + searchBy}
+            value={keyword}
+            onChange={(e) => {
+              setKeyword(e.target.value);
+            }}
+          />
+        </div>
+      </div>
         {feedbacks.length===0?<p className="text-2xl font-bold">No feedback</p>:
         <div className="mt-5">
 
