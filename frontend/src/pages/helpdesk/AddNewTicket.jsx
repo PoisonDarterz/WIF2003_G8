@@ -81,6 +81,7 @@ function AddNewTicket(){
       detail: "",
       attachment: "",
     })
+    navigate('/helpdesk/')
     }catch(error){
       console.error("Error send request to submit ticket:",error);
     }

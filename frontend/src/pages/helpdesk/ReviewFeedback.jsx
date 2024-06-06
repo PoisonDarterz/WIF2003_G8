@@ -62,7 +62,7 @@ function Feedback(){
         <p className="text-2xl font-bold text-left mt-16">Share your thoughts</p>
         <div className="flex justify-start">
           <textarea
-              value={feedback.feedbackComment}
+              value={feedback.feedbackComment===""?"No comment":feedback.feedbackComment}
               className="border rounded-lg h-40 w-[70%] p-2 resize-none overflow-auto bg-[#eaf3ff] border-gray-300"
               placeholder="Your thoughts are valuable to us"
               readOnly
