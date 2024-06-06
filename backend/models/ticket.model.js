@@ -4,6 +4,7 @@ const TicketSchema = new mongoose.Schema({
   ticketID: {
     type: String,
     required: true,
+    unique: true,
   },
   employeeID: {
     type: String,

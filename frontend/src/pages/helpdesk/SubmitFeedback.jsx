@@ -16,7 +16,7 @@ function SubmitFeedback(){
 
   const [feedback,setFeedback]=useState({
     category: category,
-    rating: 0,
+    rating: -1,
     feedbackComment: "",
     dateTimeCreated:new Date(),
   })
@@ -27,18 +27,20 @@ function SubmitFeedback(){
 
   const handleSubmit=async(event)=>{
     event.preventDefault()
-    try{
-     const response=await axios.post("http://localhost:5000/api/feedbacks/submitFeedback",feedback,{withCredentials:true});
-    //  console.log("New feedback submitted succesfully:",response.data)
-     setFeedback({
-      category: "",
-      rating: "",
-      feedbackComment: "",
-      dateTimeCreated:null,
-    })
-    navigate('/helpdesk/feedback');
-    }catch(error){
-      console.error("Error send request to submit feedback:",error);
+    if(feedback.rating!==-1){
+      try{
+        const response=await axios.post("http://localhost:5000/api/feedbacks/submitFeedback",feedback,{withCredentials:true});
+       //  console.log("New feedback submitted succesfully:",response.data)
+        setFeedback({
+         category: "",
+         rating: "",
+         feedbackComment: "",
+         dateTimeCreated:null,
+       })
+       navigate('/helpdesk/feedback');
+       }catch(error){
+         console.error("Error send request to submit feedback:",error);
+       }
     }
 
   }

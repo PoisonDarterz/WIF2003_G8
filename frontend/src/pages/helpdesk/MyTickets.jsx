@@ -7,6 +7,17 @@ function MyTickets(){
   const [tickets,setTickets]=useState([])
   const [investigators,setInvestigators]=useState([])
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 6;
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = tickets.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(tickets.length / recordsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   const navigate=useNavigate();
 
   const handleViewTicket=(ticket,investigator)=>{
@@ -56,8 +67,9 @@ function MyTickets(){
             <p>Report non-compliance</p>
           </button>
         </div>
+        {currentRecords.length===0?<p className="text-2xl font-bold">No ticket</p>:
         <div className="mt-5">
-        {tickets.length===0?<p className="text-2xl font-bold">No ticket</p>:
+
                 <table className="w-full table-auto">
                 <thead>
                   <tr className="text-sm font-medium text-center text-gray-700 rounded-lg bg-gray-200">
@@ -100,16 +112,17 @@ function MyTickets(){
                   )})}
                 </tbody>
               </table>
-        
-        }
+              <div className="flex justify-center items-center mt-6">
+          <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 text-sm text-white bg-gray-500 rounded">Previous</button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button key={i} onClick={() => handlePageChange(i + 1)} className={`px-4 py-2 ml-2 text-sm rounded ${currentPage === i + 1 ? 'bg-[#2C74D8] text-white' : 'text-black bg-gray-300'}`}>{i + 1}</button>
+          ))}
+          <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 ml-2 text-sm text-white bg-gray-500 rounded">Next</button>
         </div>
-        {/* <div className="flex justify-center items-center mt-6">
-          <button className="px-4 py-2 text-sm text-white bg-gray-500 rounded">Previous</button>
-          <button className="px-4 py-2 ml-2 text-sm text-white bg-[#2C74D8] rounded">1</button>
-          <button className="px-4 py-2 ml-2 text-sm text-black bg-gray-300 rounded">2</button>
-          <button className="px-4 py-2 ml-2 text-sm text-black bg-gray-300 rounded">3</button>
-          <button className="px-4 py-2 ml-2 text-sm text-white bg-gray-500 rounded">Next</button>
-        </div> */}
+        
+        
+        </div>
+}
         </div>
     )
 }
