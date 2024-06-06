@@ -152,7 +152,7 @@ function MyTickets(){
           />
         </div>
       </div>
-        {tickets.length===0?<p className="text-2xl font-bold">No ticket</p>:
+        {/* {tickets.length===0?<p className="text-2xl font-bold">No ticket</p>: */}
         <div className="mt-5">
 
                 <table className="w-full table-auto">
@@ -195,8 +195,10 @@ function MyTickets(){
                       <td className="w-[7%] px-4 py-4">{ticket.status}</td>
                     </tr>
                   )})}
+
                 </tbody>
               </table>
+              {currentRecords.length===0&&<p className="flex text-2xl text-center w-full items-center justify-center font-bold py-5">No record</p>}
               <div className="flex justify-center items-center mt-6">
           <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 text-sm text-white bg-gray-500 rounded">Previous</button>
           {Array.from({ length: totalPages }, (_, i) => (
@@ -207,7 +209,7 @@ function MyTickets(){
         
         
         </div>
-}
+{/* } */}
         </div>
     )
 }
