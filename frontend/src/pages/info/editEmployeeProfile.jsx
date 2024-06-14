@@ -34,6 +34,7 @@ export default function EditEmployeeProfile() {
   const [isLoading, setIsLoading] = useState(true);
   const [editIndex, setEditIndex] = useState(null);
   const [editType, setEditType] = useState("");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [profilePicPreview, setProfilePicPreview] = useState(null);
 
   useEffect(() => {
@@ -174,6 +175,11 @@ export default function EditEmployeeProfile() {
   const saveProfile = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    if (hasUnsavedChanges) {
+      alert('Please confirm your changes before proceeding.');
+      setIsLoading(false);
+      return;
+    }
     try {
       let profilePicURL = null;
         if (profilePic) {
@@ -215,25 +221,40 @@ export default function EditEmployeeProfile() {
   
 
   const handleAddEducation = () => {
+    if (hasUnsavedChanges) {
+      alert('Please confirm your changes before proceeding.');
+      return;
+    }
     setEducationList([...educationList, { eduTitle: '', eduDesc: '', eduDocURL: '', confirmed: false }]);
     setEditIndex(educationList.length);
     setEditType("edu");
   };
 
   const handleAddSkill = () => {
+    if (hasUnsavedChanges) {
+      alert('Please confirm your changes before proceeding.');
+      return;
+    }
     setSkillsList([...skillsList, { skillsTitle: "", skillsDesc: "", skillsDocURL: "", confirmed: false }]);
     setEditIndex(skillsList.length);
     setEditType("skills");
   };
 
   const handleAddAward = () => {
+    if (hasUnsavedChanges) {
+      alert('Please confirm your changes before proceeding.');
+      return;
+    }
     setAwardsList([...awardsList, { awardsTitle: "", awardsDesc: "", awardsDocURL: "", confirmed: false }]);
     setEditIndex(awardsList.length);
     setEditType("awards");
   };
 
   const handleEditItem = (index, listType) => {
-    const itemToEdit = listType[index];
+    if (hasUnsavedChanges) {
+      alert('Please confirm your changes before proceeding.');
+      return;
+    }
     setEditIndex(index);
     setEditType(listType);
   };
@@ -251,9 +272,9 @@ export default function EditEmployeeProfile() {
       } else if (editType === "awards" && awardsDoc) {
         docURL = await uploadDocument("awards", awardsDoc);
       }
-  
-      if (docURL) {
-        const updatedList = [...listType];
+      const updatedList = [...listType];
+
+      if (docURL) {        
         if (editType === "edu") {
           updatedList[index].eduDocURL = docURL;
         } else if (editType === "skills") {
@@ -261,21 +282,28 @@ export default function EditEmployeeProfile() {
         } else if (editType === "awards") {
           updatedList[index].awardsDocURL = docURL;
         }
-        updatedList[index].confirmed = true;
-  
-        if (listType === educationList) {
+      }  
+            
+      updatedList[index].confirmed = true;
+
+      if (listType === educationList) {
           setEducationList(updatedList);
         } else if (listType === skillsList) {
           setSkillsList(updatedList);
         } else if (listType === awardsList) {
           setAwardsList(updatedList);
         }
-      } else {
-        console.error("Document upload failed");
-      }
-  
+      
+      if (editType === "edu") {
+          setEduDoc(null);
+        } else if (editType === "skills") {
+          setSkillsDoc(null);
+        } else if (editType === "awards") {
+          setAwardsDoc(null);
+        }
       setEditIndex(null);
       setEditType("");
+      setHasUnsavedChanges(false);
     } catch (error) {
       console.error("Error confirming item:", error);
     } finally {
@@ -284,6 +312,10 @@ export default function EditEmployeeProfile() {
   };
   
   const handleDeleteItem = (index, listType) => {
+    if (hasUnsavedChanges) {
+      alert('Please confirm your changes before proceeding.');
+      return;
+    }
     const isConfirmed = window.confirm("Are you sure you want to delete this item?");
     if (isConfirmed) {
       const updatedList = [...listType];
@@ -312,6 +344,8 @@ export default function EditEmployeeProfile() {
   
     listType === educationList ? setEducationList(updatedList)
       : listType === skillsList ? setSkillsList(updatedList) : setAwardsList(updatedList);
+    
+    setHasUnsavedChanges(true);
   };
   
   const handleJobTitleChange = (e) => {
